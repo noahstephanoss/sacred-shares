@@ -3,7 +3,7 @@ import { useState, useEffect, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { slugify } from "@/lib/slugify";
 
-export const Route = createFileRoute("/blog/new")({
+export const Route = createFileRoute("/blog_/new")({
   head: () => ({
     meta: [
       { title: "New Blog Post — Testimonies" },
