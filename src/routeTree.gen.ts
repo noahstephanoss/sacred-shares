@@ -10,12 +10,14 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ThinkersRouteImport } from './routes/thinkers'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as DiscernmentRouteImport } from './routes/discernment'
 import { Route as CheckEmailRouteImport } from './routes/check-email'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProfileUserIdRouteImport } from './routes/profile.$userId'
 import { Route as BlogNewRouteImport } from './routes/blog_.new'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
@@ -23,6 +25,11 @@ import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 const ThinkersRoute = ThinkersRouteImport.update({
   id: '/thinkers',
   path: '/thinkers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -55,6 +62,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileUserIdRoute = ProfileUserIdRouteImport.update({
+  id: '/profile/$userId',
+  path: '/profile/$userId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogNewRoute = BlogNewRouteImport.update({
   id: '/blog_/new',
   path: '/blog/new',
@@ -78,10 +90,12 @@ export interface FileRoutesByFullPath {
   '/discernment': typeof DiscernmentRoute
   '/feed': typeof FeedRoute
   '/login': typeof LoginRoute
+  '/settings': typeof SettingsRoute
   '/thinkers': typeof ThinkersRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/new': typeof BlogNewRoute
+  '/profile/$userId': typeof ProfileUserIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -90,10 +104,12 @@ export interface FileRoutesByTo {
   '/discernment': typeof DiscernmentRoute
   '/feed': typeof FeedRoute
   '/login': typeof LoginRoute
+  '/settings': typeof SettingsRoute
   '/thinkers': typeof ThinkersRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/new': typeof BlogNewRoute
+  '/profile/$userId': typeof ProfileUserIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -103,10 +119,12 @@ export interface FileRoutesById {
   '/discernment': typeof DiscernmentRoute
   '/feed': typeof FeedRoute
   '/login': typeof LoginRoute
+  '/settings': typeof SettingsRoute
   '/thinkers': typeof ThinkersRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog_/new': typeof BlogNewRoute
+  '/profile/$userId': typeof ProfileUserIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -117,10 +135,12 @@ export interface FileRouteTypes {
     | '/discernment'
     | '/feed'
     | '/login'
+    | '/settings'
     | '/thinkers'
     | '/auth/callback'
     | '/blog/$slug'
     | '/blog/new'
+    | '/profile/$userId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -129,10 +149,12 @@ export interface FileRouteTypes {
     | '/discernment'
     | '/feed'
     | '/login'
+    | '/settings'
     | '/thinkers'
     | '/auth/callback'
     | '/blog/$slug'
     | '/blog/new'
+    | '/profile/$userId'
   id:
     | '__root__'
     | '/'
@@ -141,10 +163,12 @@ export interface FileRouteTypes {
     | '/discernment'
     | '/feed'
     | '/login'
+    | '/settings'
     | '/thinkers'
     | '/auth/callback'
     | '/blog/$slug'
     | '/blog_/new'
+    | '/profile/$userId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -154,9 +178,11 @@ export interface RootRouteChildren {
   DiscernmentRoute: typeof DiscernmentRoute
   FeedRoute: typeof FeedRoute
   LoginRoute: typeof LoginRoute
+  SettingsRoute: typeof SettingsRoute
   ThinkersRoute: typeof ThinkersRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   BlogNewRoute: typeof BlogNewRoute
+  ProfileUserIdRoute: typeof ProfileUserIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -166,6 +192,13 @@ declare module '@tanstack/react-router' {
       path: '/thinkers'
       fullPath: '/thinkers'
       preLoaderRoute: typeof ThinkersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -210,6 +243,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile/$userId': {
+      id: '/profile/$userId'
+      path: '/profile/$userId'
+      fullPath: '/profile/$userId'
+      preLoaderRoute: typeof ProfileUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog_/new': {
       id: '/blog_/new'
       path: '/blog/new'
@@ -251,10 +291,21 @@ const rootRouteChildren: RootRouteChildren = {
   DiscernmentRoute: DiscernmentRoute,
   FeedRoute: FeedRoute,
   LoginRoute: LoginRoute,
+  SettingsRoute: SettingsRoute,
   ThinkersRoute: ThinkersRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   BlogNewRoute: BlogNewRoute,
+  ProfileUserIdRoute: ProfileUserIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
