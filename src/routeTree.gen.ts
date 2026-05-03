@@ -18,6 +18,7 @@ import { Route as BlogRouteImport } from './routes/blog'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BlogNewRouteImport } from './routes/blog_.new'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 
 const ThinkersRoute = ThinkersRouteImport.update({
   id: '/thinkers',
@@ -64,6 +65,11 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => BlogRoute,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/feed': typeof FeedRoute
   '/login': typeof LoginRoute
   '/thinkers': typeof ThinkersRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/new': typeof BlogNewRoute
 }
@@ -84,6 +91,7 @@ export interface FileRoutesByTo {
   '/feed': typeof FeedRoute
   '/login': typeof LoginRoute
   '/thinkers': typeof ThinkersRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/new': typeof BlogNewRoute
 }
@@ -96,6 +104,7 @@ export interface FileRoutesById {
   '/feed': typeof FeedRoute
   '/login': typeof LoginRoute
   '/thinkers': typeof ThinkersRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog_/new': typeof BlogNewRoute
 }
@@ -109,6 +118,7 @@ export interface FileRouteTypes {
     | '/feed'
     | '/login'
     | '/thinkers'
+    | '/auth/callback'
     | '/blog/$slug'
     | '/blog/new'
   fileRoutesByTo: FileRoutesByTo
@@ -120,6 +130,7 @@ export interface FileRouteTypes {
     | '/feed'
     | '/login'
     | '/thinkers'
+    | '/auth/callback'
     | '/blog/$slug'
     | '/blog/new'
   id:
@@ -131,6 +142,7 @@ export interface FileRouteTypes {
     | '/feed'
     | '/login'
     | '/thinkers'
+    | '/auth/callback'
     | '/blog/$slug'
     | '/blog_/new'
   fileRoutesById: FileRoutesById
@@ -143,6 +155,7 @@ export interface RootRouteChildren {
   FeedRoute: typeof FeedRoute
   LoginRoute: typeof LoginRoute
   ThinkersRoute: typeof ThinkersRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
   BlogNewRoute: typeof BlogNewRoute
 }
 
@@ -211,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof BlogRoute
     }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -232,8 +252,18 @@ const rootRouteChildren: RootRouteChildren = {
   FeedRoute: FeedRoute,
   LoginRoute: LoginRoute,
   ThinkersRoute: ThinkersRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
   BlogNewRoute: BlogNewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
