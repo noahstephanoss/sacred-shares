@@ -44,6 +44,22 @@ function Index() {
         >
           A place to share your spiritual journey, seek righteous counsel, and grow in faith with a community rooted in truth.
         </p>
+
+        {/* Scripture */}
+        <div className="mx-auto mt-10 max-w-xl">
+          <div className="mx-auto mb-4 h-px w-24" style={{ backgroundColor: "#92400E" }} />
+          <blockquote
+            className="text-sm italic leading-relaxed sm:text-base"
+            style={{ fontFamily: "'Georgia', serif", color: "#A8998A" }}
+          >
+            "For just as each of us has one body with many members, and these members do not all have the same function, so in Christ we, though many, form one body, and each member belongs to all the others."
+            <footer className="mt-2 text-xs not-italic tracking-widest uppercase" style={{ color: "#92400E" }}>
+              — Romans 12:4-5
+            </footer>
+          </blockquote>
+          <div className="mx-auto mt-4 h-px w-24" style={{ backgroundColor: "#92400E" }} />
+        </div>
+
         <div className="mt-12 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
           <Link
             to="/login"
