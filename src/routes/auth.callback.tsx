@@ -13,8 +13,6 @@ function AuthCallbackPage() {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // Supabase puts tokens in the URL hash after email confirmation.
-        // getSession() will pick them up automatically from the hash fragment.
         const { data, error } = await supabase.auth.getSession();
 
         if (error) {
