@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { analyzeThinkerPost } from "@/lib/ai";
+import { useDailyLimit } from "@/hooks/useDailyLimit";
 
 export const Route = createFileRoute("/thinkers")({
   head: () => ({
@@ -29,6 +30,7 @@ function ThinkersPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [results, setResults] = useState<AnalysisResult[]>([]);
+  const { remaining, isAtLimit, increment } = useDailyLimit("thinkers");
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -38,6 +40,13 @@ function ThinkersPage() {
     setError("");
 
     try {
+      const allowed = await increment();
+      if (!allowed) {
+        setError("You've reached your daily limit of 5 analyses. Come back tomorrow.");
+        setLoading(false);
+        return;
+      }
+
       const result = await analyzeThinkerPost(content.trim());
       setResults((prev) => [
         { content: content.trim(), ...result },
@@ -60,6 +69,7 @@ function ThinkersPage() {
               Thinkers
             </h1>
             <p className="text-sm text-muted-foreground">Share your struggle. Know your battlefield.</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{remaining} analyses remaining today</p>
           </div>
           <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
             ← Home

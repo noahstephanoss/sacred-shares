@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      daily_usage: {
+        Row: {
+          discernment_count: number
+          id: string
+          thinkers_count: number
+          usage_date: string
+          user_id: string
+        }
+        Insert: {
+          discernment_count?: number
+          id?: string
+          thinkers_count?: number
+          usage_date?: string
+          user_id: string
+        }
+        Update: {
+          discernment_count?: number
+          id?: string
+          thinkers_count?: number
+          usage_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -103,12 +127,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_daily_usage: {
+        Args: { _user_id: string }
+        Returns: {
+          discernment_count: number
+          thinkers_count: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_usage: {
+        Args: { _field: string; _user_id: string }
+        Returns: number
       }
     }
     Enums: {
