@@ -40,7 +40,7 @@ function LoginPage() {
           // Email confirmation required
           navigate({ to: "/check-email", search: { email } });
         } else if (data.session) {
-          navigate({ to: "/" });
+          navigate({ to: "/feed" });
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -50,7 +50,7 @@ function LoginPage() {
         if (error) {
           setError(error.message);
         } else {
-          navigate({ to: "/" });
+          navigate({ to: "/feed" });
         }
       }
     } catch {

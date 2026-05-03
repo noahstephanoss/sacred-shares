@@ -1,6 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { AppNav } from "@/components/AppNav";
 
 export const Route = createFileRoute("/feed")({
   head: () => ({
@@ -133,29 +134,25 @@ function FeedPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card px-4 py-4">
-        <div className="mx-auto flex max-w-3xl items-center justify-between">
+      <AppNav />
+      <div className="mx-auto max-w-3xl px-4 py-6">
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
+            <h2 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
               Testimony Feed
-            </h1>
+            </h2>
             <p className="text-sm text-muted-foreground">Stories of faith from the community</p>
           </div>
-          <div className="flex items-center gap-3">
-            {userId && (
-              <button
-                onClick={() => setShowForm(!showForm)}
-                className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-              >
-                {showForm ? "Cancel" : "Share Testimony"}
-              </button>
-            )}
-            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
-              ← Home
-            </Link>
-          </div>
+          {userId && (
+            <button
+              onClick={() => setShowForm(!showForm)}
+              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            >
+              {showForm ? "Cancel" : "Share Testimony"}
+            </button>
+          )}
         </div>
-      </header>
+      </div>
 
       <main className="mx-auto max-w-3xl px-4 py-8">
         {/* Post form */}

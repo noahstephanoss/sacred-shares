@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { AppNav } from "@/components/AppNav";
 
 export const Route = createFileRoute("/blog")({
   head: () => ({
@@ -51,29 +52,21 @@ function BlogListPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card px-4 py-4">
-        <div className="mx-auto flex max-w-3xl items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
-              Blog
-            </h1>
-            <p className="text-sm text-muted-foreground">Reflections and teachings</p>
-          </div>
-          <div className="flex items-center gap-3">
-            {isAdmin && (
-              <Link
-                to="/blog/new"
-                className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-              >
-                New Post
-              </Link>
-            )}
-            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
-              ← Home
-            </Link>
-          </div>
+      <AppNav />
+      <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-4">
+        <div>
+          <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>Blog</h2>
+          <p className="text-sm text-muted-foreground">Reflections and teachings</p>
         </div>
-      </header>
+        {isAdmin && (
+          <Link
+            to="/blog/new"
+            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+          >
+            New Post
+          </Link>
+        )}
+      </div>
 
       <main className="mx-auto max-w-3xl px-4 py-8">
         {loading ? (
