@@ -23,7 +23,7 @@ function Index() {
       />
       {/* Faint cross */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.03]"
+        className="pointer-events-none absolute inset-0 opacity-[0.015]"
         style={{
           backgroundImage:
             "linear-gradient(to bottom, transparent 46%, #F5F0E8 46%, #F5F0E8 54%, transparent 54%), linear-gradient(to right, transparent 48.5%, #F5F0E8 48.5%, #F5F0E8 51.5%, transparent 51.5%)",
