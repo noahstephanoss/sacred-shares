@@ -1,7 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { analyzeThinkerPost } from "@/lib/ai";
 import { useDailyLimit } from "@/hooks/useDailyLimit";
+import { AppNav } from "@/components/AppNav";
 
 export const Route = createFileRoute("/thinkers")({
   head: () => ({
@@ -62,20 +63,11 @@ function ThinkersPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card px-4 py-4">
-        <div className="mx-auto flex max-w-3xl items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
-              Thinkers
-            </h1>
-            <p className="text-sm text-muted-foreground">Share your struggle. Know your battlefield.</p>
-            <p className="text-xs text-muted-foreground mt-0.5">{remaining} analyses remaining today</p>
-          </div>
-          <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
-            ← Home
-          </Link>
-        </div>
-      </header>
+      <AppNav />
+      <div className="mx-auto max-w-3xl px-4 py-4">
+        <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>Thinkers</h2>
+        <p className="text-sm text-muted-foreground">Share your struggle. Know your battlefield. · {remaining} remaining today</p>
+      </div>
 
       <main className="mx-auto max-w-3xl px-4 py-8">
         {/* Post form */}

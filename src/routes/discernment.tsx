@@ -1,7 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState, useRef, useEffect, type FormEvent } from "react";
 import { streamDiscernment, type ChatMessage } from "@/lib/ai";
 import { useDailyLimit } from "@/hooks/useDailyLimit";
+import { AppNav } from "@/components/AppNav";
 
 export const Route = createFileRoute("/discernment")({
   head: () => ({
@@ -70,21 +71,13 @@ function DiscernmentPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card px-4 py-4">
-        <div className="mx-auto flex max-w-3xl items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
-              Discernment Bot
-            </h1>
-            <p className="text-sm text-muted-foreground">Stern counsel. Rooted in scripture.</p>
-            <p className="text-xs text-muted-foreground mt-0.5">{remaining} messages remaining today</p>
-          </div>
-          <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
-            ← Home
-          </Link>
-        </div>
-      </header>
+      <AppNav />
+      <div className="mx-auto w-full max-w-3xl px-4 py-3">
+        <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
+          Discernment Bot
+        </h2>
+        <p className="text-sm text-muted-foreground">Stern counsel. Rooted in scripture. · {remaining} remaining today</p>
+      </div>
 
       {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-6">
