@@ -51,6 +51,10 @@ function Index() {
           <Link to="/thinkers" className="text-primary hover:underline">
             Thinkers
           </Link>
+          <span className="text-border">·</span>
+          <Link to="/blog" className="text-primary hover:underline">
+            Blog
+          </Link>
         </div>
       </div>
     </div>
