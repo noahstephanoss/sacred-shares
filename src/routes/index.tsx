@@ -40,6 +40,10 @@ function Index() {
 
         {/* Quick nav */}
         <div className="mt-12 flex flex-wrap justify-center gap-4 text-sm">
+          <Link to="/feed" className="text-primary hover:underline">
+            Feed
+          </Link>
+          <span className="text-border">·</span>
           <Link to="/discernment" className="text-primary hover:underline">
             Discernment Bot
           </Link>

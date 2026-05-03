@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ThinkersRouteImport } from './routes/thinkers'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as FeedRouteImport } from './routes/feed'
 import { Route as DiscernmentRouteImport } from './routes/discernment'
 import { Route as CheckEmailRouteImport } from './routes/check-email'
 import { Route as IndexRouteImport } from './routes/index'
@@ -23,6 +24,11 @@ const ThinkersRoute = ThinkersRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeedRoute = FeedRouteImport.update({
+  id: '/feed',
+  path: '/feed',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiscernmentRoute = DiscernmentRouteImport.update({
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/check-email': typeof CheckEmailRoute
   '/discernment': typeof DiscernmentRoute
+  '/feed': typeof FeedRoute
   '/login': typeof LoginRoute
   '/thinkers': typeof ThinkersRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/check-email': typeof CheckEmailRoute
   '/discernment': typeof DiscernmentRoute
+  '/feed': typeof FeedRoute
   '/login': typeof LoginRoute
   '/thinkers': typeof ThinkersRoute
 }
@@ -60,19 +68,27 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/check-email': typeof CheckEmailRoute
   '/discernment': typeof DiscernmentRoute
+  '/feed': typeof FeedRoute
   '/login': typeof LoginRoute
   '/thinkers': typeof ThinkersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/check-email' | '/discernment' | '/login' | '/thinkers'
+  fullPaths:
+    | '/'
+    | '/check-email'
+    | '/discernment'
+    | '/feed'
+    | '/login'
+    | '/thinkers'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/check-email' | '/discernment' | '/login' | '/thinkers'
+  to: '/' | '/check-email' | '/discernment' | '/feed' | '/login' | '/thinkers'
   id:
     | '__root__'
     | '/'
     | '/check-email'
     | '/discernment'
+    | '/feed'
     | '/login'
     | '/thinkers'
   fileRoutesById: FileRoutesById
@@ -81,6 +97,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CheckEmailRoute: typeof CheckEmailRoute
   DiscernmentRoute: typeof DiscernmentRoute
+  FeedRoute: typeof FeedRoute
   LoginRoute: typeof LoginRoute
   ThinkersRoute: typeof ThinkersRoute
 }
@@ -99,6 +116,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feed': {
+      id: '/feed'
+      path: '/feed'
+      fullPath: '/feed'
+      preLoaderRoute: typeof FeedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/discernment': {
@@ -129,6 +153,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CheckEmailRoute: CheckEmailRoute,
   DiscernmentRoute: DiscernmentRoute,
+  FeedRoute: FeedRoute,
   LoginRoute: LoginRoute,
   ThinkersRoute: ThinkersRoute,
 }
