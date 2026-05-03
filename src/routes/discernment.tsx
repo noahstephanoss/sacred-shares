@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useRef, useEffect, type FormEvent } from "react";
 import { streamDiscernment, type ChatMessage } from "@/lib/ai";
+import { useDailyLimit } from "@/hooks/useDailyLimit";
 
 export const Route = createFileRoute("/discernment")({
   head: () => ({
@@ -18,6 +19,7 @@ function DiscernmentPage() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { remaining, isAtLimit, increment } = useDailyLimit("discernment");
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -33,6 +35,14 @@ function DiscernmentPage() {
     setInput("");
     setIsStreaming(true);
     setError("");
+
+    // Check & increment daily limit
+    const allowed = await increment();
+    if (!allowed) {
+      setError("You've reached your daily limit of 20 messages. Come back tomorrow.");
+      setIsStreaming(false);
+      return;
+    }
 
     let assistantSoFar = "";
 
@@ -68,6 +78,7 @@ function DiscernmentPage() {
               Discernment Bot
             </h1>
             <p className="text-sm text-muted-foreground">Stern counsel. Rooted in scripture.</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{remaining} messages remaining today</p>
           </div>
           <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
             ← Home
