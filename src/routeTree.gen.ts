@@ -9,13 +9,25 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ThinkersRouteImport } from './routes/thinkers'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as DiscernmentRouteImport } from './routes/discernment'
 import { Route as CheckEmailRouteImport } from './routes/check-email'
 import { Route as IndexRouteImport } from './routes/index'
 
+const ThinkersRoute = ThinkersRouteImport.update({
+  id: '/thinkers',
+  path: '/thinkers',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiscernmentRoute = DiscernmentRouteImport.update({
+  id: '/discernment',
+  path: '/discernment',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckEmailRoute = CheckEmailRouteImport.update({
@@ -32,40 +44,68 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/check-email': typeof CheckEmailRoute
+  '/discernment': typeof DiscernmentRoute
   '/login': typeof LoginRoute
+  '/thinkers': typeof ThinkersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/check-email': typeof CheckEmailRoute
+  '/discernment': typeof DiscernmentRoute
   '/login': typeof LoginRoute
+  '/thinkers': typeof ThinkersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/check-email': typeof CheckEmailRoute
+  '/discernment': typeof DiscernmentRoute
   '/login': typeof LoginRoute
+  '/thinkers': typeof ThinkersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/check-email' | '/login'
+  fullPaths: '/' | '/check-email' | '/discernment' | '/login' | '/thinkers'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/check-email' | '/login'
-  id: '__root__' | '/' | '/check-email' | '/login'
+  to: '/' | '/check-email' | '/discernment' | '/login' | '/thinkers'
+  id:
+    | '__root__'
+    | '/'
+    | '/check-email'
+    | '/discernment'
+    | '/login'
+    | '/thinkers'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CheckEmailRoute: typeof CheckEmailRoute
+  DiscernmentRoute: typeof DiscernmentRoute
   LoginRoute: typeof LoginRoute
+  ThinkersRoute: typeof ThinkersRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/thinkers': {
+      id: '/thinkers'
+      path: '/thinkers'
+      fullPath: '/thinkers'
+      preLoaderRoute: typeof ThinkersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/discernment': {
+      id: '/discernment'
+      path: '/discernment'
+      fullPath: '/discernment'
+      preLoaderRoute: typeof DiscernmentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/check-email': {
@@ -88,7 +128,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CheckEmailRoute: CheckEmailRoute,
+  DiscernmentRoute: DiscernmentRoute,
   LoginRoute: LoginRoute,
+  ThinkersRoute: ThinkersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

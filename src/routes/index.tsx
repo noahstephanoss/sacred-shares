@@ -37,6 +37,17 @@ function Index() {
             Sign In
           </Link>
         </div>
+
+        {/* Quick nav */}
+        <div className="mt-12 flex flex-wrap justify-center gap-4 text-sm">
+          <Link to="/discernment" className="text-primary hover:underline">
+            Discernment Bot
+          </Link>
+          <span className="text-border">·</span>
+          <Link to="/thinkers" className="text-primary hover:underline">
+            Thinkers
+          </Link>
+        </div>
       </div>
     </div>
   );
