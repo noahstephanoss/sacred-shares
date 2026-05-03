@@ -12,47 +12,86 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
-      <div className="max-w-2xl text-center">
+    <div className="relative flex min-h-screen flex-col items-center justify-center bg-background px-4 overflow-hidden">
+      {/* Subtle radial light rays */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 60% 50% at 50% 30%, rgba(146,64,14,0.08) 0%, transparent 70%)",
+        }}
+      />
+      {/* Faint cross */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage:
+            "linear-gradient(to bottom, transparent 46%, #F5F0E8 46%, #F5F0E8 54%, transparent 54%), linear-gradient(to right, transparent 48.5%, #F5F0E8 48.5%, #F5F0E8 51.5%, transparent 51.5%)",
+          backgroundSize: "100% 100%",
+        }}
+      />
+
+      <div className="relative z-10 max-w-3xl text-center py-24">
         <h1
-          className="text-5xl font-bold tracking-tight text-foreground sm:text-6xl"
-          style={{ fontFamily: "'Georgia', serif" }}
+          className="text-6xl font-bold tracking-tight sm:text-8xl"
+          style={{ fontFamily: "'Georgia', serif", color: "#F5F0E8" }}
         >
           Testimonies
         </h1>
-        <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
+        <p
+          className="mt-6 text-lg leading-relaxed sm:text-xl"
+          style={{ color: "#A8998A" }}
+        >
           A place to share your spiritual journey, seek righteous counsel, and grow in faith with a community rooted in truth.
         </p>
-        <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+        <div className="mt-12 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
           <Link
             to="/login"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-8 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center rounded-md px-10 py-3.5 text-sm font-semibold tracking-wide transition-colors hover:opacity-90"
+            style={{ backgroundColor: "#92400E", color: "#F5F0E8" }}
           >
             Get Started
           </Link>
           <Link
             to="/login"
-            className="inline-flex items-center justify-center rounded-md border border-border bg-card px-8 py-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
+            className="inline-flex items-center justify-center rounded-md border px-10 py-3.5 text-sm font-semibold tracking-wide transition-colors hover:bg-white/5"
+            style={{ borderColor: "#F5F0E8", color: "#F5F0E8", backgroundColor: "transparent" }}
           >
             Sign In
           </Link>
         </div>
 
         {/* Quick nav */}
-        <div className="mt-12 flex flex-wrap justify-center gap-4 text-sm">
-          <Link to="/feed" className="text-primary hover:underline">
+        <div className="mt-16 flex flex-wrap justify-center gap-6 text-sm">
+          <Link
+            to="/feed"
+            className="transition-colors hover:underline hover:decoration-primary hover:underline-offset-4"
+            style={{ color: "#F5F0E8" }}
+          >
             Feed
           </Link>
-          <span className="text-border">·</span>
-          <Link to="/discernment" className="text-primary hover:underline">
+          <span style={{ color: "#A8998A" }}>·</span>
+          <Link
+            to="/discernment"
+            className="transition-colors hover:underline hover:decoration-primary hover:underline-offset-4"
+            style={{ color: "#F5F0E8" }}
+          >
             Discernment Bot
           </Link>
-          <span className="text-border">·</span>
-          <Link to="/thinkers" className="text-primary hover:underline">
+          <span style={{ color: "#A8998A" }}>·</span>
+          <Link
+            to="/thinkers"
+            className="transition-colors hover:underline hover:decoration-primary hover:underline-offset-4"
+            style={{ color: "#F5F0E8" }}
+          >
             Thinkers
           </Link>
-          <span className="text-border">·</span>
-          <Link to="/blog" className="text-primary hover:underline">
+          <span style={{ color: "#A8998A" }}>·</span>
+          <Link
+            to="/blog"
+            className="transition-colors hover:underline hover:decoration-primary hover:underline-offset-4"
+            style={{ color: "#F5F0E8" }}
+          >
             Blog
           </Link>
         </div>
