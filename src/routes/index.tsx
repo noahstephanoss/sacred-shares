@@ -1,26 +1,43 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Testimonies — A Faith-Based Community" },
+      { name: "description", content: "Share your spiritual journey, seek counsel, and grow in faith together." },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. For sites with multiple pages (About, Services, Contact, etc.),
-// create separate route files (about.tsx, services.tsx, contact.tsx) — don't put all pages in this file.
-function PlaceholderIndex() {
+function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
+      <div className="max-w-2xl text-center">
+        <h1
+          className="text-5xl font-bold tracking-tight text-foreground sm:text-6xl"
+          style={{ fontFamily: "'Georgia', serif" }}
+        >
+          Testimonies
+        </h1>
+        <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
+          A place to share your spiritual journey, seek righteous counsel, and grow in faith with a community rooted in truth.
+        </p>
+        <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          <Link
+            to="/login"
+            className="inline-flex items-center justify-center rounded-md bg-primary px-8 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            Get Started
+          </Link>
+          <Link
+            to="/login"
+            className="inline-flex items-center justify-center rounded-md border border-border bg-card px-8 py-3 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
+          >
+            Sign In
+          </Link>
+        </div>
+      </div>
     </div>
   );
-}
-
-function Index() {
-  return <PlaceholderIndex />;
 }
