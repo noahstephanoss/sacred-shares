@@ -30,7 +30,7 @@ export function useAuth() {
       email,
       password,
       options: {
-        emailRedirectTo: typeof window !== "undefined" ? window.location.origin : undefined,
+        emailRedirectTo: typeof window !== "undefined" ? `${window.location.origin}/auth/callback` : undefined,
       },
     });
     return { data, error };
