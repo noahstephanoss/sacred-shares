@@ -82,22 +82,22 @@ function FeedPage() {
     // Load public feed
     const { data: publicData } = await supabase
       .from("testimonies")
-      .select("*, profiles!testimonies_user_id_fkey(display_name)")
+      .select("*")
       .eq("is_public", true)
       .order("created_at", { ascending: false });
 
     // Double-filter: only show is_public = true regardless of DB response
-    const filtered = (publicData ?? []).filter((t: Testimony) => t.is_public === true);
+    const filtered = ((publicData ?? []) as unknown as Testimony[]).filter((t) => t.is_public === true);
     setTestimonies(filtered);
 
     // Load user's own posts (including private)
     if (userId) {
       const { data: myData } = await supabase
         .from("testimonies")
-        .select("*, profiles!testimonies_user_id_fkey(display_name)")
+        .select("*")
         .eq("user_id", userId)
         .order("created_at", { ascending: false });
-      setMyPosts(myData ?? []);
+      setMyPosts((myData ?? []) as unknown as Testimony[]);
     }
 
     setLoading(false);
