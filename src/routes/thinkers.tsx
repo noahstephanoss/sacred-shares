@@ -58,6 +58,13 @@ type FeedPost = {
   created_at: string;
 };
 
+type VoteRecord = {
+  id: string;
+  post_id: string;
+  user_id: string;
+  vote_type: "up" | "down";
+};
+
 type ThinkerResponse = {
   id: string;
   post_id: string;
@@ -101,6 +108,11 @@ function ThinkersPage() {
   const [responseScripture, setResponseScripture] = useState("");
   const [responseSubmitting, setResponseSubmitting] = useState(false);
 
+  // Votes state
+  const [votes, setVotes] = useState<Record<string, VoteRecord[]>>({});
+  const [myVotes, setMyVotes] = useState<Record<string, "up" | "down">>({});
+  const [feedSort, setFeedSort] = useState<"top" | "new">("top");
+
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
   }, []);
@@ -139,10 +151,27 @@ function ThinkersPage() {
           }
           setResponses(grouped);
         }
+
+        // Load votes (upvotes visible to all, own votes visible)
+        const { data: voteData } = await supabase
+          .from("thinker_votes")
+          .select("*")
+          .in("post_id", postIds);
+        if (voteData) {
+          const grouped: Record<string, VoteRecord[]> = {};
+          const mine: Record<string, "up" | "down"> = {};
+          for (const v of voteData as VoteRecord[]) {
+            if (!grouped[v.post_id]) grouped[v.post_id] = [];
+            grouped[v.post_id].push(v);
+            if (v.user_id === userId) mine[v.post_id] = v.vote_type;
+          }
+          setVotes(grouped);
+          setMyVotes(mine);
+        }
       }
     }
     loadFeed();
-  }, [feedFilter]);
+  }, [feedFilter, userId]);
 
   const toggleTag = (tag: string) => {
     setTagError("");
@@ -272,6 +301,64 @@ function ThinkersPage() {
     }
     setResponseSubmitting(false);
   }, [userId, respondingTo, responseBody, responseScripture]);
+
+  const handleVote = useCallback(async (postId: string, voteType: "up" | "down") => {
+    if (!userId) { openAuthPrompt(); return; }
+
+    const currentVote = myVotes[postId];
+
+    if (currentVote === voteType) {
+      // Remove vote
+      await supabase.from("thinker_votes").delete().eq("post_id", postId).eq("user_id", userId);
+      setMyVotes((prev) => { const next = { ...prev }; delete next[postId]; return next; });
+      setVotes((prev) => ({
+        ...prev,
+        [postId]: (prev[postId] ?? []).filter((v) => v.user_id !== userId),
+      }));
+    } else if (currentVote) {
+      // Switch vote
+      await supabase.from("thinker_votes").update({ vote_type: voteType }).eq("post_id", postId).eq("user_id", userId);
+      setMyVotes((prev) => ({ ...prev, [postId]: voteType }));
+      setVotes((prev) => ({
+        ...prev,
+        [postId]: (prev[postId] ?? []).map((v) => v.user_id === userId ? { ...v, vote_type: voteType } : v),
+      }));
+    } else {
+      // New vote
+      const { data } = await supabase.from("thinker_votes").insert({
+        post_id: postId,
+        user_id: userId,
+        vote_type: voteType,
+      }).select().single();
+      if (data) {
+        setMyVotes((prev) => ({ ...prev, [postId]: voteType }));
+        setVotes((prev) => ({
+          ...prev,
+          [postId]: [...(prev[postId] ?? []), data as VoteRecord],
+        }));
+      }
+    }
+  }, [userId, myVotes, openAuthPrompt]);
+
+  // Score calculation
+  const calcTimeDecayScore = useCallback((post: FeedPost) => {
+    const postVotes = votes[post.id] ?? [];
+    const upvotes = postVotes.filter((v) => v.vote_type === "up").length;
+    const downvotes = postVotes.filter((v) => v.vote_type === "down").length;
+    const postResps = responses[post.id] ?? [];
+    const affirmCount = postResps.filter((r) => r.type === "affirm").length;
+    const challengeCount = postResps.filter((r) => r.type === "challenge").length;
+
+    const rawScore = Math.max(0, (upvotes * 2) + (affirmCount * 1.5) + (challengeCount * 3) - (downvotes * 1));
+    const hoursSincePosted = (Date.now() - new Date(post.created_at).getTime()) / (1000 * 60 * 60);
+    return rawScore / Math.pow(hoursSincePosted + 2, 1.5);
+  }, [votes, responses]);
+
+  // Sorted feed
+  const sortedFeed = [...feedPosts].sort((a, b) => {
+    if (feedSort === "new") return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    return calcTimeDecayScore(b) - calcTimeDecayScore(a);
+  });
 
   // Active scripture suggestions for selected tags
   const activeSuggestions = selectedTags
@@ -435,8 +522,36 @@ function ThinkersPage() {
 
         {/* Community Feed */}
         <div>
-          <h3 className="text-sm font-semibold text-foreground mb-3" style={{ fontFamily: "'Georgia', serif" }}>Community Feed</h3>
-          {/* Feed filter pills */}
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>Community Feed</h3>
+            <div className="flex gap-1">
+              <button
+                type="button"
+                onClick={() => setFeedSort("top")}
+                className="rounded-full px-2.5 py-1 text-[10px] font-medium transition-colors"
+                style={{
+                  backgroundColor: feedSort === "top" ? "#92400E" : "transparent",
+                  color: feedSort === "top" ? "#FFF" : "#92400E",
+                  border: "1px solid #92400E",
+                }}
+              >
+                🔥 Top
+              </button>
+              <button
+                type="button"
+                onClick={() => setFeedSort("new")}
+                className="rounded-full px-2.5 py-1 text-[10px] font-medium transition-colors"
+                style={{
+                  backgroundColor: feedSort === "new" ? "#92400E" : "transparent",
+                  color: feedSort === "new" ? "#FFF" : "#92400E",
+                  border: "1px solid #92400E",
+                }}
+              >
+                🕊️ New
+              </button>
+            </div>
+          </div>
+          {/* Tag filter pills */}
           <div className="flex flex-wrap gap-1.5 mb-4">
             {["All", ...PRESET_TAGS].map((tag) => {
               const isActive = feedFilter === tag;
@@ -464,8 +579,10 @@ function ThinkersPage() {
             <p className="text-sm text-muted-foreground">No posts yet. Be the first to share.</p>
           ) : (
             <div className="space-y-3">
-              {feedPosts.map((post) => {
+              {sortedFeed.map((post) => {
                 const color = getRatingColor(post.attack_rating);
+                const postUpvotes = (votes[post.id] ?? []).filter((v) => v.vote_type === "up").length;
+                const myVote = myVotes[post.id];
                 return (
                   <div
                     key={post.id}
@@ -490,6 +607,34 @@ function ThinkersPage() {
                     </div>
                     <p className="mt-2 text-xs text-muted-foreground leading-relaxed">{post.ai_analysis}</p>
                     <p className="mt-2 text-[10px] text-muted-foreground">{new Date(post.created_at).toLocaleDateString()}</p>
+
+                    {/* Voting */}
+                    <div className="mt-3 flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => handleVote(post.id, "up")}
+                        className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium transition-colors"
+                        style={{
+                          backgroundColor: myVote === "up" ? "#92400E" : "transparent",
+                          color: myVote === "up" ? "#FFF" : "#92400E",
+                          border: "1px solid #92400E",
+                        }}
+                      >
+                        ▲ {postUpvotes > 0 ? postUpvotes : ""}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleVote(post.id, "down")}
+                        className="inline-flex items-center rounded px-2 py-1 text-xs font-medium transition-colors"
+                        style={{
+                          backgroundColor: myVote === "down" ? "#78716C" : "transparent",
+                          color: myVote === "down" ? "#FFF" : "#78716C",
+                          border: "1px solid #A8A29E",
+                        }}
+                      >
+                        ▼
+                      </button>
+                    </div>
 
                     {/* Affirm / Challenge */}
                     {(() => {
