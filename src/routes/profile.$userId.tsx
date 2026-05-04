@@ -80,7 +80,7 @@ function ProfilePage() {
         <div className="flex flex-col items-center justify-center px-4 py-24 text-center">
           <h2 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>Sign in to view profiles</h2>
           <p className="mt-2 text-sm text-muted-foreground">Create an account or sign in to see user profiles.</p>
-          <button onClick={openAuthPrompt} className="mt-6 rounded-full px-8 py-3 text-sm font-semibold transition-colors hover:opacity-90" style={{ backgroundColor: "#92400E", color: "#FDF6EC" }}>Get Started</button>
+          <button onClick={openAuthPrompt} className="mt-6 rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:opacity-90">Get Started</button>
         </div>
         <AuthPromptModal open={showModal} onClose={closeAuthPrompt} />
       </div>
@@ -116,14 +116,14 @@ function ProfilePage() {
                 <button
                   onClick={() => setActiveTab("profile")}
                   className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === "profile" ? "border-b-2 text-foreground" : "text-muted-foreground hover:text-foreground"}`}
-                  style={activeTab === "profile" ? { borderColor: "#92400E" } : {}}
+                  style={activeTab === "profile" ? { borderColor: "var(--primary)" } : {}}
                 >
                   Profile
                 </button>
                 <button
                   onClick={() => setActiveTab("battlefield")}
                   className={`px-4 py-2 text-sm font-medium transition-colors ${activeTab === "battlefield" ? "border-b-2 text-foreground" : "text-muted-foreground hover:text-foreground"}`}
-                  style={activeTab === "battlefield" ? { borderColor: "#92400E" } : {}}
+                  style={activeTab === "battlefield" ? { borderColor: "var(--primary)" } : {}}
                 >
                   My Battlefield
                 </button>
@@ -148,7 +148,7 @@ function ProfilePage() {
                             <span className={`text-lg font-bold ${color.text}`}>{item.attack_rating}/10</span>
                             <span className="text-xs text-muted-foreground">{color.label}</span>
                           </div>
-                          <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full" style={{ backgroundColor: "#E7D5B3" }}>
+                          <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full" style={{ backgroundColor: "var(--border)" }}>
                             <div className="h-full rounded-full" style={{ backgroundColor: color.bar, width: `${item.attack_rating * 10}%` }} />
                           </div>
                           <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{item.ai_analysis}</p>
