@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useState, useEffect, useRef, type FormEvent, useCallback } from "react";
+import { useState, useEffect, useRef, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsMobile } from "@/hooks/use-mobile";
 
