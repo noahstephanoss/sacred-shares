@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useState, useEffect, useRef, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -13,6 +13,17 @@ export function AppNav() {
   const [discernInput, setDiscernInput] = useState("");
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const isMobile = useIsMobile();
+  const routerState = useRouterState();
+
+  const getPageContext = (): string => {
+    const path = routerState.location.pathname;
+    if (path === "/feed") return "Browsing the Testimonies feed";
+    if (path === "/thinkers") return "Browsing the Thinkers section";
+    if (path === "/bible") return "Reading the Bible";
+    if (path.startsWith("/blog")) return "Reading the blog";
+    if (path === "/discernment") return "";
+    return "Browsing Testimonies";
+  };
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -56,7 +67,14 @@ export function AppNav() {
   const handleDiscernSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!discernInput.trim()) return;
-    navigate({ to: "/discernment", search: { prefill: discernInput.trim() } });
+    const ctx = getPageContext();
+    if (routerState.location.pathname === "/discernment") {
+      // Already on discernment — don't redirect, just clear
+      setDiscernInput("");
+      setMobileSearchOpen(false);
+      return;
+    }
+    navigate({ to: "/discernment", search: { prefill: discernInput.trim(), context: ctx || undefined } });
     setDiscernInput("");
     setMobileSearchOpen(false);
   };
