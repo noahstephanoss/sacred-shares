@@ -16,6 +16,7 @@ import { Route as FeedRouteImport } from './routes/feed'
 import { Route as DiscernmentRouteImport } from './routes/discernment'
 import { Route as CheckEmailRouteImport } from './routes/check-email'
 import { Route as BlogRouteImport } from './routes/blog'
+import { Route as BibleRouteImport } from './routes/bible'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProfileUserIdRouteImport } from './routes/profile.$userId'
 import { Route as BlogNewRouteImport } from './routes/blog_.new'
@@ -57,6 +58,11 @@ const BlogRoute = BlogRouteImport.update({
   path: '/blog',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BibleRoute = BibleRouteImport.update({
+  id: '/bible',
+  path: '/bible',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -85,6 +91,7 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/bible': typeof BibleRoute
   '/blog': typeof BlogRouteWithChildren
   '/check-email': typeof CheckEmailRoute
   '/discernment': typeof DiscernmentRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/bible': typeof BibleRoute
   '/blog': typeof BlogRouteWithChildren
   '/check-email': typeof CheckEmailRoute
   '/discernment': typeof DiscernmentRoute
@@ -114,6 +122,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/bible': typeof BibleRoute
   '/blog': typeof BlogRouteWithChildren
   '/check-email': typeof CheckEmailRoute
   '/discernment': typeof DiscernmentRoute
@@ -130,6 +139,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/bible'
     | '/blog'
     | '/check-email'
     | '/discernment'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/bible'
     | '/blog'
     | '/check-email'
     | '/discernment'
@@ -158,6 +169,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/bible'
     | '/blog'
     | '/check-email'
     | '/discernment'
@@ -173,6 +185,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BibleRoute: typeof BibleRoute
   BlogRoute: typeof BlogRouteWithChildren
   CheckEmailRoute: typeof CheckEmailRoute
   DiscernmentRoute: typeof DiscernmentRoute
@@ -236,6 +249,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/bible': {
+      id: '/bible'
+      path: '/bible'
+      fullPath: '/bible'
+      preLoaderRoute: typeof BibleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -286,6 +306,7 @@ const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BibleRoute: BibleRoute,
   BlogRoute: BlogRouteWithChildren,
   CheckEmailRoute: CheckEmailRoute,
   DiscernmentRoute: DiscernmentRoute,

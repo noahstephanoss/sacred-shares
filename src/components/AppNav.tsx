@@ -73,6 +73,9 @@ export function AppNav() {
           <Link to="/blog" className="text-sm text-muted-foreground hover:text-foreground" activeProps={{ className: "text-sm text-foreground font-medium" }}>
             Blog
           </Link>
+          <Link to="/bible" className="text-sm text-muted-foreground hover:text-foreground" activeProps={{ className: "text-sm text-foreground font-medium" }}>
+            Bible
+          </Link>
 
           {user && (
             <div className="relative" ref={menuRef}>
