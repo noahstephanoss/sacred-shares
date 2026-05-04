@@ -72,7 +72,7 @@ function LoginPage() {
           </p>
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-8 shadow-sm">
+        <div className="rounded-xl bg-card p-8" style={{ boxShadow: "0 2px 12px rgba(146,64,14,0.08)" }}>
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
               <div className="rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
