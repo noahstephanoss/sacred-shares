@@ -6,8 +6,8 @@ import { AppNav } from "@/components/AppNav";
 export const Route = createFileRoute("/blog")({
   head: () => ({
     meta: [
-      { title: "Blog — Testimonies" },
-      { name: "description", content: "Articles and reflections from the Testimonies community." },
+      { title: "Reflections — Testimonies" },
+      { name: "description", content: "Deep writings on faith and truth from the Testimonies community." },
     ],
   }),
   component: BlogListPage,
@@ -17,10 +17,17 @@ type BlogPost = {
   id: string;
   title: string;
   slug: string;
+  body: string;
   excerpt: string | null;
   published: boolean;
   created_at: string;
+  profiles?: { display_name: string | null } | null;
 };
+
+function readTime(body: string): number {
+  const words = body.trim().split(/\s+/).length;
+  return Math.max(1, Math.ceil(words / 200));
+}
 
 function BlogListPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -31,13 +38,12 @@ function BlogListPage() {
     async function load() {
       const { data } = await supabase
         .from("blog_posts")
-        .select("id, title, slug, excerpt, published, created_at")
+        .select("id, title, slug, body, excerpt, published, created_at, profiles:author_id(display_name)")
         .eq("published", true)
         .order("created_at", { ascending: false });
-      setPosts((data ?? []) as BlogPost[]);
+      setPosts((data ?? []) as unknown as BlogPost[]);
       setLoading(false);
 
-      // Check admin
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data: roleData } = await supabase.rpc("has_role", {
@@ -53,46 +59,69 @@ function BlogListPage() {
   return (
     <div className="min-h-screen bg-background">
       <AppNav />
-      <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-4">
+      <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-6">
         <div>
-          <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>Blog</h2>
-          <p className="text-sm text-muted-foreground">Reflections and teachings</p>
+          <h2 className="text-3xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
+            Reflections
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">Deep writings on faith and truth</p>
         </div>
         {isAdmin && (
           <Link
             to="/blog/new"
-            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            className="rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
           >
             New Post
           </Link>
         )}
       </div>
 
-      <main className="mx-auto max-w-3xl px-4 py-8">
+      <main className="mx-auto max-w-3xl px-4 pb-12">
         {loading ? (
           <p className="py-12 text-center text-sm text-muted-foreground">Loading...</p>
         ) : posts.length === 0 ? (
           <p className="py-12 text-center text-sm text-muted-foreground">No articles yet.</p>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-8">
             {posts.map((post) => {
               const date = new Date(post.created_at).toLocaleDateString("en-US", {
                 month: "long", day: "numeric", year: "numeric",
               });
+              const minutes = readTime(post.body);
+              const authorName = (post.profiles as unknown as { display_name: string | null })?.display_name || "Testimonies Team";
               return (
                 <Link
                   key={post.id}
                   to="/blog/$slug"
                   params={{ slug: post.slug }}
-                  className="block rounded-xl border border-border bg-card p-6 transition-colors hover:border-primary/30"
+                  className="block rounded-2xl bg-card p-8 transition-shadow hover:shadow-md"
+                  style={{ boxShadow: "0 2px 12px rgba(146,64,14,0.08)" }}
                 >
-                  <h2 className="text-xl font-semibold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
+                  <div className="flex items-center gap-3 mb-4">
+                    <span
+                      className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                      style={{ backgroundColor: "rgba(146,64,14,0.1)", color: "#92400E" }}
+                    >
+                      Long Read
+                    </span>
+                    <span className="text-xs text-muted-foreground">{minutes} min read</span>
+                  </div>
+                  <h2
+                    className="text-2xl font-bold text-foreground leading-tight"
+                    style={{ fontFamily: "'Georgia', serif" }}
+                  >
                     {post.title}
                   </h2>
                   {post.excerpt && (
-                    <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{post.excerpt}</p>
+                    <p className="mt-3 text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                      {post.excerpt}
+                    </p>
                   )}
-                  <p className="mt-3 text-xs text-muted-foreground">{date}</p>
+                  <div className="mt-5 flex items-center gap-2 text-xs text-muted-foreground">
+                    <span className="font-medium text-foreground">{authorName}</span>
+                    <span>·</span>
+                    <span>{date}</span>
+                  </div>
                 </Link>
               );
             })}
