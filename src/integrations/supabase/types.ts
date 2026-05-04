@@ -167,6 +167,36 @@ export type Database = {
         }
         Relationships: []
       }
+      thinker_posts: {
+        Row: {
+          ai_analysis: string
+          attack_rating: number
+          body: string
+          created_at: string
+          id: string
+          tags: string[]
+          user_id: string
+        }
+        Insert: {
+          ai_analysis?: string
+          attack_rating?: number
+          body: string
+          created_at?: string
+          id?: string
+          tags?: string[]
+          user_id: string
+        }
+        Update: {
+          ai_analysis?: string
+          attack_rating?: number
+          body?: string
+          created_at?: string
+          id?: string
+          tags?: string[]
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
