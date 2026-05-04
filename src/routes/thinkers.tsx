@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect, type FormEvent } from "react";
+import { useState, useEffect, useCallback, type FormEvent } from "react";
 import { analyzeThinkerPost } from "@/lib/ai";
 import { useDailyLimit } from "@/hooks/useDailyLimit";
 import { AppNav } from "@/components/AppNav";
@@ -20,6 +20,7 @@ type AnalysisResult = {
   content: string;
   attack_rating: number;
   analysis: string;
+  saved?: boolean;
 };
 
 function getRatingColor(rating: number) {
@@ -35,7 +36,7 @@ function ThinkersPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [results, setResults] = useState<AnalysisResult[]>([]);
-  const { remaining, isAtLimit, increment } = useDailyLimit("thinkers");
+  const { count, limit, remaining, isAtLimit, increment } = useDailyLimit("thinkers");
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
@@ -70,17 +71,41 @@ function ThinkersPage() {
     }
   };
 
+  const handleSaveToArchive = useCallback(async (result: AnalysisResult, index: number) => {
+    if (!userId) return;
+    const { error } = await supabase.from("insight_archive").insert({
+      user_id: userId,
+      title: result.content.slice(0, 80),
+      original_thought: result.content,
+      ai_analysis: result.analysis,
+      attack_rating: result.attack_rating,
+    });
+    if (!error) {
+      setResults((prev) => prev.map((r, i) => i === index ? { ...r, saved: true } : r));
+    }
+  }, [userId]);
+
   return (
     <div className="min-h-screen bg-background">
       <AppNav />
       <div className="mx-auto max-w-3xl px-4 py-4">
         <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>Thinkers</h2>
-        <p className="text-sm text-muted-foreground">Share your struggle. Know your battlefield. · {remaining} remaining today</p>
+        <p className="text-sm text-muted-foreground">Share your struggle. Know your battlefield.</p>
       </div>
 
       <main className="mx-auto max-w-3xl px-4 py-8">
         {/* Post form */}
         <div className="rounded-xl border border-border bg-card p-6">
+          {/* Daily usage progress bar */}
+          <div className="mb-4">
+            <div className="h-[3px] w-full overflow-hidden rounded-full" style={{ backgroundColor: "#E7D5B3" }}>
+              <div
+                className="h-full rounded-full transition-all duration-700 ease-in-out"
+                style={{ backgroundColor: "#92400E", width: `${Math.max(0, ((limit - count) / limit) * 100)}%` }}
+              />
+            </div>
+            <p className="mt-1.5 text-[10px] text-muted-foreground tracking-wide">Daily reflection limit</p>
+          </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <textarea
               value={content}
@@ -133,6 +158,17 @@ function ThinkersPage() {
                   <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
                     {r.analysis}
                   </p>
+
+                  {/* Save to Archive */}
+                  <button
+                    type="button"
+                    disabled={r.saved}
+                    onClick={() => handleSaveToArchive(r, i)}
+                    className="mt-3 inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50"
+                    style={{ backgroundColor: r.saved ? "#E7D5B3" : "transparent", color: "#92400E", border: "1px solid #92400E" }}
+                  >
+                    {r.saved ? "✓ Saved" : "Save to Archive"}
+                  </button>
                 </div>
               </div>
             );
