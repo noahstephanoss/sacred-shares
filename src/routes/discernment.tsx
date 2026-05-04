@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useRef, useEffect, type FormEvent } from "react";
+import { useState, useRef, useEffect, type FormEvent, useCallback } from "react";
 import { streamDiscernment, type ChatMessage } from "@/lib/ai";
 import { useDailyLimit } from "@/hooks/useDailyLimit";
 import { AppNav } from "@/components/AppNav";
+import { AuthPromptModal, useAuthPrompt } from "@/components/AuthPromptModal";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/discernment")({
   head: () => ({
@@ -15,12 +17,22 @@ export const Route = createFileRoute("/discernment")({
 });
 
 function DiscernmentPage() {
+  const { showModal, openAuthPrompt, closeAuthPrompt } = useAuthPrompt();
+  const [userId, setUserId] = useState<string | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const { remaining, isAtLimit, increment } = useDailyLimit("discernment");
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUserId(data.user?.id ?? null);
+      setAuthChecked(true);
+    });
+  }, []);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -68,6 +80,35 @@ function DiscernmentPage() {
       },
     });
   };
+
+  // Guest view — show auth prompt overlay
+  if (authChecked && !userId) {
+    return (
+      <div className="flex min-h-screen flex-col bg-background">
+        <AppNav />
+        <div className="flex flex-1 flex-col items-center justify-center px-4 text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" className="mb-6 h-14 w-14" fill="none">
+            <rect x="16" y="4" width="8" height="32" rx="1.5" fill="#1C1917" />
+            <rect x="4" y="14" width="32" height="8" rx="1.5" fill="#1C1917" />
+          </svg>
+          <h2 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
+            Discernment Bot
+          </h2>
+          <p className="mt-2 max-w-md text-sm text-muted-foreground">
+            Seek biblically grounded counsel. Sign in or create an account to access the Discernment Bot.
+          </p>
+          <button
+            onClick={openAuthPrompt}
+            className="mt-6 rounded-full px-8 py-3 text-sm font-semibold transition-colors hover:opacity-90"
+            style={{ backgroundColor: "#92400E", color: "#FDF6EC" }}
+          >
+            Get Started
+          </button>
+        </div>
+        <AuthPromptModal open={showModal} onClose={closeAuthPrompt} />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -145,6 +186,7 @@ function DiscernmentPage() {
           </button>
         </form>
       </div>
+      <AuthPromptModal open={showModal} onClose={closeAuthPrompt} />
     </div>
   );
 }
