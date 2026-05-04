@@ -95,12 +95,12 @@ function BlogListPage() {
                   to="/blog/$slug"
                   params={{ slug: post.slug }}
                   className="block rounded-2xl bg-card p-8 transition-shadow hover:shadow-md"
-                  style={{ boxShadow: "0 2px 12px rgba(146,64,14,0.08)" }}
+                  style={{ boxShadow: "0 2px 12px rgba(107,63,42,0.08)" }}
                 >
                   <div className="flex items-center gap-3 mb-4">
                     <span
                       className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
-                      style={{ backgroundColor: "rgba(146,64,14,0.1)", color: "#92400E" }}
+                      style={{ backgroundColor: "rgba(107,63,42,0.1)", color: "var(--primary)" }}
                     >
                       Long Read
                     </span>
