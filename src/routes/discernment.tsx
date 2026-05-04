@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { useState, useRef, useEffect, type FormEvent, useCallback } from "react";
+import { z } from "zod";
 import { streamDiscernment, type ChatMessage } from "@/lib/ai";
 import { useDailyLimit } from "@/hooks/useDailyLimit";
 import { AppNav } from "@/components/AppNav";
@@ -7,6 +8,9 @@ import { AuthPromptModal, useAuthPrompt } from "@/components/AuthPromptModal";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/discernment")({
+  validateSearch: z.object({
+    prefill: z.string().optional(),
+  }),
   head: () => ({
     meta: [
       { title: "Discernment Bot — Testimonies" },
@@ -17,6 +21,7 @@ export const Route = createFileRoute("/discernment")({
 });
 
 function DiscernmentPage() {
+  const { prefill } = useSearch({ from: "/discernment" });
   const { showModal, openAuthPrompt, closeAuthPrompt } = useAuthPrompt();
   const [userId, setUserId] = useState<string | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
@@ -33,6 +38,13 @@ function DiscernmentPage() {
       setAuthChecked(true);
     });
   }, []);
+
+  // Pre-fill from nav bar redirect
+  useEffect(() => {
+    if (prefill && !input && messages.length === 0) {
+      setInput(prefill);
+    }
+  }, [prefill]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
