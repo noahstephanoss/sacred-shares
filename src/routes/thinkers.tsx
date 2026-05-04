@@ -467,9 +467,15 @@ function ThinkersPage() {
               {feedPosts.map((post) => {
                 const color = getRatingColor(post.attack_rating);
                 return (
-                  <div key={post.id} className="rounded-xl border border-border bg-card p-5">
-                    {/* fade-in animation for new post */}
-                    <style>{newPostId === post.id ? `@keyframes thinker-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } } [data-new-post="${post.id}"] { animation: thinker-enter 500ms ease-in forwards; }` : ""}</style>
+                  <div
+                    key={post.id}
+                    className="rounded-xl border border-border bg-card p-5"
+                    data-new-post={newPostId === post.id ? post.id : undefined}
+                    style={newPostId === post.id ? { animation: "thinker-enter 500ms ease-in forwards" } : undefined}
+                  >
+                    {newPostId === post.id && (
+                      <style>{`@keyframes thinker-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+                    )}
                     <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{post.body}</p>
                     {post.tags.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-1.5">
