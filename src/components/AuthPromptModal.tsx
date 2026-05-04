@@ -17,7 +17,7 @@ export function AuthPromptModal({ open, onClose }: AuthPromptModalProps) {
       {/* Modal */}
       <div
         className="relative z-10 mx-4 w-full max-w-sm rounded-2xl px-8 py-10 text-center"
-        style={{ backgroundColor: "#FDF6EC", boxShadow: "0 8px 40px rgba(0,0,0,0.15)" }}
+        style={{ backgroundColor: "var(--card)", boxShadow: "0 8px 40px rgba(0,0,0,0.15)" }}
       >
         {/* Close button */}
         <button
@@ -34,26 +34,26 @@ export function AuthPromptModal({ open, onClose }: AuthPromptModalProps) {
         {/* Cross brand mark */}
         <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" className="h-10 w-10" fill="none">
-            <rect x="16" y="4" width="8" height="32" rx="1.5" fill="#1C1917" />
-            <rect x="4" y="14" width="32" height="8" rx="1.5" fill="#1C1917" />
+            <rect x="16" y="4" width="8" height="32" rx="1.5" fill="#B8860B" />
+            <rect x="4" y="14" width="32" height="8" rx="1.5" fill="#B8860B" />
           </svg>
         </div>
 
         <h2
           className="text-2xl font-bold"
-          style={{ fontFamily: "'Georgia', serif", color: "#1C1917" }}
+          style={{ fontFamily: "'Georgia', serif", color: "var(--foreground)" }}
         >
           Join Testimonies
         </h2>
 
-        <p className="mt-3 text-sm leading-relaxed" style={{ color: "#44403C" }}>
+        <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
           Create an account to share your testimony, react, and seek righteous counsel.
         </p>
 
         <Link
           to="/login"
           className="mt-6 inline-flex w-full items-center justify-center rounded-full px-6 py-3 text-sm font-semibold transition-colors hover:opacity-90"
-          style={{ backgroundColor: "#92400E", color: "#FDF6EC" }}
+          style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}
         >
           Get Started
         </Link>
@@ -61,8 +61,7 @@ export function AuthPromptModal({ open, onClose }: AuthPromptModalProps) {
         <div className="mt-4">
           <Link
             to="/login"
-            className="text-sm font-medium hover:underline"
-            style={{ color: "#92400E" }}
+            className="text-sm font-medium text-primary hover:underline"
           >
             Already have an account? Sign In
           </Link>
