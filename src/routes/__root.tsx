@@ -56,9 +56,8 @@ function RootShell({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body className="transition-colors duration-300">
+      <body>
         {children}
-        <script dangerouslySetInnerHTML={{ __html: `try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}` }} />
         <Scripts />
       </body>
     </html>
