@@ -59,6 +59,51 @@ function RootShell({ children }: { children: React.ReactNode }) {
       <body>
         {children}
         <Scripts />
+        <noscript>
+          <div style={{
+            display: "flex", alignItems: "center", justifyContent: "center",
+            minHeight: "100vh", fontFamily: "Georgia, serif",
+            background: "#FAF3E0", color: "#2C1810", padding: "2rem", textAlign: "center" as const,
+          }}>
+            <div>
+              <div style={{ fontSize: "2rem", marginBottom: "0.5rem", color: "#B8860B" }}>✝</div>
+              <h1 style={{ fontSize: "1.5rem", fontWeight: "bold" }}>JavaScript Required</h1>
+              <p style={{ marginTop: "0.5rem", color: "#6B4C3B" }}>Please enable JavaScript to use Testimonies.</p>
+            </div>
+          </div>
+        </noscript>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(){
+                var t=setTimeout(function(){
+                  if(document.getElementById('__testimonies_fallback'))return;
+                  var d=document.createElement('div');
+                  d.id='__testimonies_fallback';
+                  d.style.cssText='position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;background:#FAF3E0;color:#2C1810;padding:2rem;text-align:center';
+                  d.innerHTML='<div>'
+                    +'<div style="font-size:2.5rem;margin-bottom:0.75rem;color:#B8860B">✝</div>'
+                    +'<h1 style="font-size:1.5rem;font-weight:bold;margin:0">Having trouble connecting</h1>'
+                    +'<p style="margin-top:0.5rem;color:#6B4C3B;font-size:0.95rem;max-width:360px">The page took longer than expected to load. This is usually a temporary connection issue — not something you did wrong.</p>'
+                    +'<button onclick="location.reload()" style="margin-top:1.5rem;padding:0.625rem 1.75rem;background:#6B3F2A;color:#FAF3E0;border:none;border-radius:6px;font-size:0.9rem;font-family:Georgia,serif;cursor:pointer">Refresh &amp; Retry</button>'
+                    +'<p style="margin-top:1rem;color:#6B4C3B;font-size:0.8rem">If this keeps happening, try again in a moment.</p>'
+                  +'</div>';
+                  document.body.appendChild(d);
+                },6000);
+                window.addEventListener('DOMContentLoaded',function(){
+                  var root=document.getElementById('root')||document.querySelector('[data-reactroot]');
+                  if(root&&root.children.length>0)clearTimeout(t);
+                });
+                var obs=new MutationObserver(function(){
+                  var fb=document.getElementById('__testimonies_fallback');
+                  var hasApp=document.querySelector('.min-h-screen');
+                  if(hasApp&&fb){fb.remove();obs.disconnect();}
+                });
+                obs.observe(document.body,{childList:true,subtree:true});
+              })();
+            `,
+          }}
+        />
       </body>
     </html>
   );
