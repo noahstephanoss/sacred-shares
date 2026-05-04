@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect, useCallback, type FormEvent } from "react";
+import { useState, useEffect, useCallback, type FormEvent, useRef } from "react";
 import { analyzeThinkerPost } from "@/lib/ai";
 import { useDailyLimit } from "@/hooks/useDailyLimit";
 import { AppNav } from "@/components/AppNav";
@@ -58,6 +58,16 @@ type FeedPost = {
   created_at: string;
 };
 
+type ThinkerResponse = {
+  id: string;
+  post_id: string;
+  user_id: string;
+  type: "affirm" | "challenge";
+  body: string;
+  scripture_reference: string | null;
+  created_at: string;
+};
+
 function getRatingColor(rating: number) {
   if (rating <= 3) return { bg: "bg-green-100", bar: "bg-green-500", text: "text-green-700", label: "Light resistance" };
   if (rating <= 6) return { bg: "bg-amber-100", bar: "bg-amber-500", text: "text-amber-700", label: "Moderate warfare" };
@@ -76,11 +86,20 @@ function ThinkersPage() {
   const [error, setError] = useState("");
   const [results, setResults] = useState<AnalysisResult[]>([]);
   const { count, limit, increment } = useDailyLimit("thinkers");
+  const [formFading, setFormFading] = useState(false);
+  const [newPostId, setNewPostId] = useState<string | null>(null);
 
   // Feed state
   const [feedPosts, setFeedPosts] = useState<FeedPost[]>([]);
   const [feedFilter, setFeedFilter] = useState("All");
   const [feedLoading, setFeedLoading] = useState(true);
+
+  // Responses state
+  const [responses, setResponses] = useState<Record<string, ThinkerResponse[]>>({});
+  const [respondingTo, setRespondingTo] = useState<{ postId: string; type: "affirm" | "challenge" } | null>(null);
+  const [responseBody, setResponseBody] = useState("");
+  const [responseScripture, setResponseScripture] = useState("");
+  const [responseSubmitting, setResponseSubmitting] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
@@ -103,6 +122,24 @@ function ThinkersPage() {
       const { data } = await query;
       setFeedPosts((data as FeedPost[]) ?? []);
       setFeedLoading(false);
+
+      // Load responses for feed posts
+      if (data && data.length > 0) {
+        const postIds = (data as FeedPost[]).map((p) => p.id);
+        const { data: resData } = await supabase
+          .from("thinker_responses")
+          .select("*")
+          .in("post_id", postIds)
+          .order("created_at", { ascending: true });
+        if (resData) {
+          const grouped: Record<string, ThinkerResponse[]> = {};
+          for (const r of resData as ThinkerResponse[]) {
+            if (!grouped[r.post_id]) grouped[r.post_id] = [];
+            grouped[r.post_id].push(r);
+          }
+          setResponses(grouped);
+        }
+      }
     }
     loadFeed();
   }, [feedFilter]);
@@ -157,18 +194,23 @@ function ThinkersPage() {
       const result = await analyzeThinkerPost(content.trim());
       const newResult: AnalysisResult = { content: content.trim(), tags: [...selectedTags], ...result };
 
+      // Fade out form
+      setFormFading(true);
+      await new Promise((resolve) => setTimeout(resolve, 400));
+
       // Save to thinker_posts feed
-      await supabase.from("thinker_posts").insert({
+      const { data: insertedPost } = await supabase.from("thinker_posts").insert({
         user_id: userId,
         body: content.trim(),
         tags: selectedTags,
         attack_rating: result.attack_rating,
         ai_analysis: result.analysis,
-      });
+      }).select("id").single();
 
       setResults((prev) => [newResult, ...prev]);
       setContent("");
       setSelectedTags([]);
+      setFormFading(false);
 
       // Refresh feed
       const { data } = await supabase
@@ -176,9 +218,16 @@ function ThinkersPage() {
         .select("*")
         .order("created_at", { ascending: false })
         .limit(50);
-      if (data) setFeedPosts(data as FeedPost[]);
+      if (data) {
+        setFeedPosts(data as FeedPost[]);
+        if (insertedPost) {
+          setNewPostId(insertedPost.id);
+          setTimeout(() => setNewPostId(null), 600);
+        }
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Analysis failed");
+      setFormFading(false);
     } finally {
       setLoading(false);
     }
@@ -198,6 +247,32 @@ function ThinkersPage() {
     }
   }, [userId]);
 
+  const handleSubmitResponse = useCallback(async () => {
+    if (!userId || !respondingTo || !responseBody.trim()) return;
+    if (respondingTo.type === "challenge" && !responseScripture.trim()) return;
+
+    setResponseSubmitting(true);
+    const { data, error } = await supabase.from("thinker_responses").insert({
+      post_id: respondingTo.postId,
+      user_id: userId,
+      type: respondingTo.type,
+      body: responseBody.trim(),
+      scripture_reference: responseScripture.trim() || null,
+    }).select().single();
+
+    if (!error && data) {
+      const newResp = data as ThinkerResponse;
+      setResponses((prev) => ({
+        ...prev,
+        [respondingTo.postId]: [...(prev[respondingTo.postId] ?? []), newResp],
+      }));
+      setRespondingTo(null);
+      setResponseBody("");
+      setResponseScripture("");
+    }
+    setResponseSubmitting(false);
+  }, [userId, respondingTo, responseBody, responseScripture]);
+
   // Active scripture suggestions for selected tags
   const activeSuggestions = selectedTags
     .filter((tag) => TAG_SCRIPTURE_MAP[tag])
@@ -213,7 +288,14 @@ function ThinkersPage() {
 
       <main className="mx-auto max-w-3xl px-4 py-8 space-y-8">
         {/* Post form */}
-        <div className="rounded-xl border border-border bg-card p-6">
+        <div
+          className="rounded-xl border border-border bg-card p-6"
+          style={{
+            transition: "opacity 400ms ease-out, transform 400ms ease-out",
+            opacity: formFading ? 0 : 1,
+            transform: formFading ? "scale(0.97)" : "scale(1)",
+          }}
+        >
           {/* Daily usage progress bar */}
           <div className="mb-4">
             <div className="h-[3px] w-full overflow-hidden rounded-full" style={{ backgroundColor: "#E7D5B3" }}>
@@ -385,7 +467,15 @@ function ThinkersPage() {
               {feedPosts.map((post) => {
                 const color = getRatingColor(post.attack_rating);
                 return (
-                  <div key={post.id} className="rounded-xl border border-border bg-card p-5">
+                  <div
+                    key={post.id}
+                    className="rounded-xl border border-border bg-card p-5"
+                    data-new-post={newPostId === post.id ? post.id : undefined}
+                    style={newPostId === post.id ? { animation: "thinker-enter 500ms ease-in forwards" } : undefined}
+                  >
+                    {newPostId === post.id && (
+                      <style>{`@keyframes thinker-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+                    )}
                     <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{post.body}</p>
                     {post.tags.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-1.5">
@@ -400,6 +490,108 @@ function ThinkersPage() {
                     </div>
                     <p className="mt-2 text-xs text-muted-foreground leading-relaxed">{post.ai_analysis}</p>
                     <p className="mt-2 text-[10px] text-muted-foreground">{new Date(post.created_at).toLocaleDateString()}</p>
+
+                    {/* Affirm / Challenge */}
+                    {(() => {
+                      const postResps = responses[post.id] ?? [];
+                      const affirmCount = postResps.filter((r) => r.type === "affirm").length;
+                      const challengeCount = postResps.filter((r) => r.type === "challenge").length;
+                      return (
+                        <>
+                          <div className="mt-3 flex items-center gap-3">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (!userId) { openAuthPrompt(); return; }
+                                setRespondingTo({ postId: post.id, type: "affirm" });
+                                setResponseBody(""); setResponseScripture("");
+                              }}
+                              className="inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors"
+                              style={{ border: "1px solid #92400E", color: "#92400E" }}
+                            >
+                              💬 Affirm
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (!userId) { openAuthPrompt(); return; }
+                                setRespondingTo({ postId: post.id, type: "challenge" });
+                                setResponseBody(""); setResponseScripture("");
+                              }}
+                              className="inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors"
+                              style={{ border: "1px solid #7C2D12", color: "#7C2D12" }}
+                            >
+                              ⚔️ Challenge
+                            </button>
+                            {(affirmCount > 0 || challengeCount > 0) && (
+                              <span className="text-[10px] text-muted-foreground">
+                                {affirmCount} Affirm{affirmCount !== 1 ? "s" : ""} · {challengeCount} Challenge{challengeCount !== 1 ? "s" : ""}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Inline response form */}
+                          {respondingTo?.postId === post.id && (
+                            <div className="mt-3 rounded-lg border p-3 space-y-2" style={{ borderColor: respondingTo.type === "affirm" ? "#E7D5B3" : "#7C2D12", backgroundColor: "#FEFBF4" }}>
+                              <p className="text-xs font-medium" style={{ color: respondingTo.type === "affirm" ? "#92400E" : "#7C2D12" }}>
+                                {respondingTo.type === "affirm" ? "💬 Affirm this thought" : "⚔️ Challenge with truth"}
+                              </p>
+                              <textarea
+                                value={responseBody}
+                                onChange={(e) => setResponseBody(e.target.value)}
+                                placeholder={respondingTo.type === "affirm" ? "Share encouragement…" : "Speak truth in love…"}
+                                rows={2}
+                                className="w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                              />
+                              {respondingTo.type === "challenge" && (
+                                <input
+                                  value={responseScripture}
+                                  onChange={(e) => setResponseScripture(e.target.value)}
+                                  placeholder="Scripture reference (required)"
+                                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                                />
+                              )}
+                              <div className="flex gap-2">
+                                <button
+                                  type="button"
+                                  onClick={handleSubmitResponse}
+                                  disabled={responseSubmitting || !responseBody.trim() || (respondingTo.type === "challenge" && !responseScripture.trim())}
+                                  className="rounded px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50"
+                                  style={{ backgroundColor: respondingTo.type === "affirm" ? "#92400E" : "#7C2D12" }}
+                                >
+                                  {responseSubmitting ? "Sending…" : "Submit"}
+                                </button>
+                                <button type="button" onClick={() => setRespondingTo(null)} className="rounded px-3 py-1.5 text-xs text-muted-foreground">Cancel</button>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Existing responses */}
+                          {postResps.length > 0 && (
+                            <div className="mt-3 space-y-2">
+                              {postResps.map((resp) => (
+                                <div
+                                  key={resp.id}
+                                  className="rounded-md p-3 text-xs"
+                                  style={{
+                                    borderLeft: `3px solid ${resp.type === "affirm" ? "#D97706" : "#7C2D12"}`,
+                                    backgroundColor: "#FEFBF4",
+                                  }}
+                                >
+                                  <span className="font-medium" style={{ color: resp.type === "affirm" ? "#92400E" : "#7C2D12" }}>
+                                    {resp.type === "affirm" ? "Affirm" : "⚔️ Challenge"}
+                                  </span>
+                                  <p className="mt-1 text-foreground leading-relaxed">{resp.body}</p>
+                                  {resp.scripture_reference && (
+                                    <p className="mt-1 italic text-muted-foreground">— {resp.scripture_reference}</p>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
                 );
               })}

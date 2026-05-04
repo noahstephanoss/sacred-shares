@@ -197,6 +197,44 @@ export type Database = {
         }
         Relationships: []
       }
+      thinker_responses: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          post_id: string
+          scripture_reference: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          post_id: string
+          scripture_reference?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          post_id?: string
+          scripture_reference?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "thinker_responses_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "thinker_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
