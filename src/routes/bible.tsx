@@ -68,7 +68,7 @@ function BiblePage() {
     if (result) {
       setVerse(result);
     } else {
-      setError("Verse not found. Try a reference like "John 3:16" or "Psalm 23:1-6".");
+      setError('Verse not found. Try a reference like "John 3:16" or "Psalm 23:1-6".');
     }
     setLoading(false);
   }
