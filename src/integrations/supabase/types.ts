@@ -174,6 +174,7 @@ export type Database = {
           body: string
           created_at: string
           id: string
+          score: number | null
           tags: string[]
           user_id: string
         }
@@ -183,6 +184,7 @@ export type Database = {
           body: string
           created_at?: string
           id?: string
+          score?: number | null
           tags?: string[]
           user_id: string
         }
@@ -192,6 +194,7 @@ export type Database = {
           body?: string
           created_at?: string
           id?: string
+          score?: number | null
           tags?: string[]
           user_id?: string
         }
@@ -228,6 +231,38 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "thinker_responses_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "thinker_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      thinker_votes: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+          vote_type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+          vote_type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+          vote_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "thinker_votes_post_id_fkey"
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "thinker_posts"
