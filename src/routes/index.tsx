@@ -18,7 +18,7 @@ function Index() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 60% 50% at 50% 30%, rgba(146,64,14,0.05) 0%, transparent 70%)",
+            "radial-gradient(ellipse 60% 50% at 50% 30%, rgba(184,134,11,0.06) 0%, transparent 70%)",
         }}
       />
       {/* Faint cross */}
@@ -26,7 +26,7 @@ function Index() {
         className="pointer-events-none absolute inset-0 opacity-[0.04]"
         style={{
           backgroundImage:
-            "linear-gradient(to bottom, transparent 46%, #92400E 46%, #92400E 54%, transparent 54%), linear-gradient(to right, transparent 48.5%, #92400E 48.5%, #92400E 51.5%, transparent 51.5%)",
+            "linear-gradient(to bottom, transparent 46%, #B8860B 46%, #B8860B 54%, transparent 54%), linear-gradient(to right, transparent 48.5%, #B8860B 48.5%, #B8860B 51.5%, transparent 51.5%)",
           backgroundSize: "100% 100%",
         }}
       />
