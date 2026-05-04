@@ -74,6 +74,36 @@ export type Database = {
         }
         Relationships: []
       }
+      insight_archive: {
+        Row: {
+          ai_analysis: string
+          attack_rating: number
+          id: string
+          original_thought: string
+          saved_at: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          ai_analysis: string
+          attack_rating: number
+          id?: string
+          original_thought: string
+          saved_at?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          ai_analysis?: string
+          attack_rating?: number
+          id?: string
+          original_thought?: string
+          saved_at?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
