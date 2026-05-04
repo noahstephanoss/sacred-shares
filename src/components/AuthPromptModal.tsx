@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { useState } from "react";
 
 interface AuthPromptModalProps {
   open: boolean;
@@ -79,5 +80,3 @@ export function useAuthPrompt() {
     closeAuthPrompt: () => setShowModal(false),
   };
 }
-
-import { useState } from "react";
