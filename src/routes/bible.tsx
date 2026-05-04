@@ -197,7 +197,7 @@ function BiblePage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder='Search a verse — e.g. John 3:16'
-              className="flex-1 rounded-lg border border-border bg-white px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="flex-1 rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               style={{ fontFamily: SERIF }}
             />
             <button type="submit" disabled={searchLoading} className="rounded-lg bg-primary px-6 py-3 font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
@@ -298,7 +298,7 @@ function BiblePage() {
                   value={commentBody}
                   onChange={e => setCommentBody(e.target.value)}
                   placeholder={userId ? "Share a reflection on this chapter…" : "Sign in to leave a note…"}
-                  className="flex-1 rounded-lg border border-border bg-white px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                  className="flex-1 rounded-lg border border-border bg-card px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                   onFocus={() => { if (!userId) openAuthPrompt(); }}
                 />
                 <button type="submit" disabled={commentSubmitting || !commentBody.trim()} className="rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50">

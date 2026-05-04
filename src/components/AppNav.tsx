@@ -112,7 +112,7 @@ export function AppNav() {
                 value={discernInput}
                 onChange={(e) => setDiscernInput(e.target.value)}
                 placeholder="Ask for discernment..."
-                className="w-52 rounded-full border border-input bg-white px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                className="w-52 rounded-full border border-input bg-card px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
               />
               {discernInput.trim() && (
                 <button
@@ -246,7 +246,7 @@ export function AppNav() {
               onChange={(e) => setDiscernInput(e.target.value)}
               placeholder="Ask for discernment..."
               autoFocus
-              className="w-full rounded-full border border-input bg-white px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full rounded-full border border-input bg-card px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
             <button
               type="button"
