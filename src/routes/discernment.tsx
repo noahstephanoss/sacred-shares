@@ -110,6 +110,17 @@ function DiscernmentPage() {
     );
   }
 
+  if (!authChecked) {
+    return (
+      <div className="flex min-h-screen flex-col bg-background">
+        <AppNav />
+        <div className="flex flex-1 items-center justify-center">
+          <p className="text-sm text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <AppNav />
