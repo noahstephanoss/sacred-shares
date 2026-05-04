@@ -14,6 +14,22 @@ export function AppNav() {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const isMobile = useIsMobile();
   const routerState = useRouterState();
+  const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("theme") === "dark";
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [darkMode]);
 
   const getPageContext = (): string => {
     const path = routerState.location.pathname;
@@ -82,11 +98,8 @@ export function AppNav() {
   return (
     <header className="border-b border-border bg-background px-4 py-3">
       <div className="mx-auto flex max-w-5xl items-center justify-between">
-        <Link
-          to="/"
-          className="text-xl font-bold text-foreground"
-          style={{ fontFamily: "'Georgia', serif" }}
-        >
+        <Link to="/" className="flex items-center gap-2 text-xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
+          <span style={{ color: "#B8860B", fontSize: "16px", textShadow: "1px 1px 0px rgba(0,0,0,0.2)" }}>✝</span>
           Testimonies
         </Link>
 
@@ -99,7 +112,7 @@ export function AppNav() {
                 value={discernInput}
                 onChange={(e) => setDiscernInput(e.target.value)}
                 placeholder="Ask for discernment..."
-                className="w-52 rounded-full border border-input bg-white px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                className="w-52 rounded-full border border-input bg-card px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
               />
               {discernInput.trim() && (
                 <button
@@ -143,6 +156,23 @@ export function AppNav() {
           <Link to="/bible" className="text-sm text-muted-foreground hover:text-foreground" activeProps={{ className: "text-sm text-foreground font-medium" }}>
             Bible
           </Link>
+
+          {/* Dark mode toggle */}
+          <button
+            onClick={() => setDarkMode((prev) => !prev)}
+            className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Toggle dark mode"
+          >
+            {darkMode ? (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+                <path d="M10 2a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 10 2ZM10 15a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 10 15ZM10 7a3 3 0 1 0 0 6 3 3 0 0 0 0-6ZM15.657 5.404a.75.75 0 1 0-1.06-1.06l-1.061 1.06a.75.75 0 0 0 1.06 1.061l1.06-1.06ZM6.464 14.596a.75.75 0 1 0-1.06-1.06l-1.061 1.06a.75.75 0 0 0 1.06 1.061l1.06-1.06ZM18 10a.75.75 0 0 1-.75.75h-1.5a.75.75 0 0 1 0-1.5h1.5A.75.75 0 0 1 18 10ZM5 10a.75.75 0 0 1-.75.75h-1.5a.75.75 0 0 1 0-1.5h1.5A.75.75 0 0 1 5 10ZM14.596 15.657a.75.75 0 0 0 1.06-1.06l-1.06-1.061a.75.75 0 1 0-1.061 1.06l1.06 1.06ZM5.404 6.464a.75.75 0 0 0 1.06-1.06l-1.06-1.061a.75.75 0 1 0-1.061 1.06l1.06 1.06Z" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+                <path fillRule="evenodd" d="M7.455 2.004a.75.75 0 0 1 .26.77 7 7 0 0 0 9.958 7.967.75.75 0 0 1 1.067.853A8.5 8.5 0 1 1 6.647 1.921a.75.75 0 0 1 .808.083Z" clipRule="evenodd" />
+              </svg>
+            )}
+          </button>
 
           {user && (
             <div className="relative" ref={menuRef}>
@@ -216,7 +246,7 @@ export function AppNav() {
               onChange={(e) => setDiscernInput(e.target.value)}
               placeholder="Ask for discernment..."
               autoFocus
-              className="w-full rounded-full border border-input bg-white px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full rounded-full border border-input bg-card px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
             <button
               type="button"

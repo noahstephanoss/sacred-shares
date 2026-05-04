@@ -65,7 +65,7 @@ function SettingsPage() {
         <div className="flex flex-col items-center justify-center px-4 py-24 text-center">
           <h2 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>Sign in to access settings</h2>
           <p className="mt-2 text-sm text-muted-foreground">Create an account or sign in to manage your profile.</p>
-          <button onClick={openAuthPrompt} className="mt-6 rounded-full px-8 py-3 text-sm font-semibold transition-colors hover:opacity-90" style={{ backgroundColor: "#92400E", color: "#FDF6EC" }}>Get Started</button>
+          <button onClick={openAuthPrompt} className="mt-6 rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:opacity-90">Get Started</button>
         </div>
         <AuthPromptModal open={showModal} onClose={closeAuthPrompt} />
       </div>

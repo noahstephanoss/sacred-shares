@@ -159,7 +159,7 @@ function NewBlogPostPage() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
-              className="w-full rounded-md border border-input bg-white px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20"
+              className="w-full rounded-md border border-input bg-card px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20"
               placeholder="Your article title"
             />
           </div>
@@ -173,7 +173,7 @@ function NewBlogPostPage() {
               </span>
             </label>
             <div className="flex gap-2">
-              <div className="flex flex-1 items-center rounded-md border border-input bg-white">
+              <div className="flex flex-1 items-center rounded-md border border-input bg-card">
                 <span className="pl-3 text-sm text-muted-foreground">/blog/</span>
                 <input
                   id="slug"
@@ -186,7 +186,7 @@ function NewBlogPostPage() {
                 />
               </div>
               {slugManual && (
-                <button type="button" onClick={resetSlugToAuto} className="shrink-0 rounded-md border border-input bg-white px-3 py-2.5 text-xs text-muted-foreground hover:text-foreground">
+                <button type="button" onClick={resetSlugToAuto} className="shrink-0 rounded-md border border-input bg-card px-3 py-2.5 text-xs text-muted-foreground hover:text-foreground">
                   Reset to auto
                 </button>
               )}
@@ -203,7 +203,7 @@ function NewBlogPostPage() {
               value={excerpt}
               onChange={(e) => setExcerpt(e.target.value)}
               rows={2}
-              className="w-full resize-none rounded-md border border-input bg-white px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20"
+              className="w-full resize-none rounded-md border border-input bg-card px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20"
               placeholder="A brief summary..."
             />
           </div>
@@ -234,7 +234,7 @@ function NewBlogPostPage() {
                 onChange={(e) => setBody(e.target.value)}
                 required
                 rows={16}
-                className="w-full resize-y border-0 bg-white px-3 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                className="w-full resize-y border-0 bg-card px-3 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
                 placeholder="Write your article... Use the toolbar above for headings, bold, italic, and block quotes."
               />
             </div>

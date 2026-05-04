@@ -34,44 +34,42 @@ function Index() {
       <div className="relative z-10 max-w-3xl text-center py-24">
         <h1
           className="text-6xl font-bold tracking-tight sm:text-8xl"
-          style={{ fontFamily: "'Georgia', serif", color: "#1C1917" }}
+          style={{ fontFamily: "'Georgia', serif" }}
         >
           Testimonies
         </h1>
         <p
           className="mt-6 text-lg leading-relaxed sm:text-sm"
-          style={{ color: "#44403C" }}
+          style={{ color: "var(--muted-foreground)" }}
         >
           A place to share your spiritual journey, seek righteous counsel, and grow in faith with a community rooted in truth.
         </p>
 
         {/* Scripture */}
         <div className="mx-auto mt-10 max-w-xl">
-          <div className="mx-auto mb-4 h-px w-24" style={{ backgroundColor: "#E7D5B3" }} />
+          <div className="mx-auto mb-4 h-px w-24" style={{ backgroundColor: "var(--border)" }} />
           <blockquote
             className="text-sm italic leading-relaxed sm:text-base"
-            style={{ fontFamily: "'Georgia', serif", color: "#44403C" }}
+            style={{ fontFamily: "'Georgia', serif", color: "var(--muted-foreground)" }}
           >
             "For just as each of us has one body with many members, and these members do not all have the same function, so in Christ we, though many, form one body, and each member belongs to all the others."
-            <footer className="mt-2 text-xs not-italic tracking-widest uppercase" style={{ color: "#92400E" }}>
+            <footer className="mt-2 text-xs not-italic tracking-widest uppercase" style={{ color: "#B8860B" }}>
               — Romans 12:4-5
             </footer>
           </blockquote>
-          <div className="mx-auto mt-4 h-px w-24" style={{ backgroundColor: "#E7D5B3" }} />
+          <div className="mx-auto mt-4 h-px w-24" style={{ backgroundColor: "var(--border)" }} />
         </div>
 
         <div className="mt-12 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
           <Link
             to="/login"
-            className="inline-flex items-center justify-center rounded-md px-10 py-3.5 text-sm font-semibold tracking-wide transition-colors hover:opacity-90"
-            style={{ backgroundColor: "#92400E", color: "#FDF6EC" }}
+            className="inline-flex items-center justify-center rounded-md bg-primary px-10 py-3.5 text-sm font-semibold tracking-wide text-primary-foreground transition-colors hover:opacity-90"
           >
             Get Started
           </Link>
           <Link
             to="/login"
-            className="inline-flex items-center justify-center rounded-md border px-10 py-3.5 text-sm font-semibold tracking-wide transition-colors hover:bg-black/5"
-            style={{ borderColor: "#92400E", color: "#92400E", backgroundColor: "transparent" }}
+            className="inline-flex items-center justify-center rounded-md border border-primary px-10 py-3.5 text-sm font-semibold tracking-wide text-primary transition-colors hover:bg-primary/10"
           >
             Sign In
           </Link>
@@ -79,35 +77,19 @@ function Index() {
 
         {/* Quick nav */}
         <div className="mt-16 flex flex-wrap justify-center gap-6 text-sm">
-          <Link
-            to="/feed"
-            className="transition-colors hover:underline hover:decoration-primary hover:underline-offset-4"
-            style={{ color: "#1C1917" }}
-          >
+          <Link to="/feed" className="text-foreground transition-colors hover:underline hover:decoration-primary hover:underline-offset-4">
             Feed
           </Link>
-          <span style={{ color: "#92400E" }}>·</span>
-          <Link
-            to="/discernment"
-            className="transition-colors hover:underline hover:decoration-primary hover:underline-offset-4"
-            style={{ color: "#1C1917" }}
-          >
+          <span style={{ color: "#B8860B" }}>·</span>
+          <Link to="/discernment" className="text-foreground transition-colors hover:underline hover:decoration-primary hover:underline-offset-4">
             Discernment Bot
           </Link>
-          <span style={{ color: "#92400E" }}>·</span>
-          <Link
-            to="/thinkers"
-            className="transition-colors hover:underline hover:decoration-primary hover:underline-offset-4"
-            style={{ color: "#1C1917" }}
-          >
+          <span style={{ color: "#B8860B" }}>·</span>
+          <Link to="/thinkers" className="text-foreground transition-colors hover:underline hover:decoration-primary hover:underline-offset-4">
             Thinkers
           </Link>
-          <span style={{ color: "#92400E" }}>·</span>
-          <Link
-            to="/blog"
-            className="transition-colors hover:underline hover:decoration-primary hover:underline-offset-4"
-            style={{ color: "#1C1917" }}
-          >
+          <span style={{ color: "#B8860B" }}>·</span>
+          <Link to="/blog" className="text-foreground transition-colors hover:underline hover:decoration-primary hover:underline-offset-4">
             Blog
           </Link>
         </div>

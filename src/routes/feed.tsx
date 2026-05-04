@@ -85,7 +85,7 @@ function ReactionButtons({ onAuthRequired }: { onAuthRequired?: () => void }) {
 
 function TestimonyCard({ testimony, onAuthRequired }: { testimony: Testimony; onAuthRequired?: () => void }) {
   return (
-    <div className="rounded-xl bg-card px-5 py-4" style={{ boxShadow: "0 1px 6px rgba(146,64,14,0.08)" }}>
+    <div className="rounded-xl bg-card px-5 py-4" style={{ boxShadow: "0 1px 6px rgba(107,63,42,0.08)" }}>
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <span className="font-medium text-foreground">
           {testimony.profiles?.display_name || "Anonymous"}
@@ -204,7 +204,7 @@ function FeedPage() {
       <main className="mx-auto max-w-2xl px-4 pb-12">
         {/* Post form */}
         {showForm && userId && (
-          <div className="mb-6 rounded-xl bg-card px-5 py-4" style={{ boxShadow: "0 1px 6px rgba(146,64,14,0.08)" }}>
+          <div className="mb-6 rounded-xl bg-card px-5 py-4" style={{ boxShadow: "0 1px 6px rgba(107,63,42,0.08)" }}>
             <form onSubmit={handleSubmit} className="space-y-3">
               <textarea
                 value={body}
@@ -213,7 +213,7 @@ function FeedPage() {
                 }}
                 placeholder="What is God doing in your life today?"
                 rows={3}
-                className="w-full resize-none rounded-md border border-input bg-white px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20"
+                className="w-full resize-none rounded-md border border-input bg-card px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20"
               />
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">

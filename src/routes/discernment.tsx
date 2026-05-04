@@ -105,8 +105,8 @@ function DiscernmentPage() {
         <AppNav />
         <div className="flex flex-1 flex-col items-center justify-center px-4 text-center">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" className="mb-6 h-14 w-14" fill="none">
-            <rect x="16" y="4" width="8" height="32" rx="1.5" fill="#1C1917" />
-            <rect x="4" y="14" width="32" height="8" rx="1.5" fill="#1C1917" />
+            <rect x="16" y="4" width="8" height="32" rx="1.5" fill="#B8860B" />
+            <rect x="4" y="14" width="32" height="8" rx="1.5" fill="#B8860B" />
           </svg>
           <h2 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
             Discernment Bot
@@ -117,7 +117,7 @@ function DiscernmentPage() {
           <button
             onClick={openAuthPrompt}
             className="mt-6 rounded-full px-8 py-3 text-sm font-semibold transition-colors hover:opacity-90"
-            style={{ backgroundColor: "#92400E", color: "#FDF6EC" }}
+            style={{ backgroundColor: "var(--primary)", color: "var(--primary-foreground)" }}
           >
             Get Started
           </button>
