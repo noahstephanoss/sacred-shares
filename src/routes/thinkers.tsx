@@ -385,10 +385,10 @@ function ThinkersPage() {
         >
           {/* Daily usage progress bar */}
           <div className="mb-4">
-            <div className="h-[3px] w-full overflow-hidden rounded-full" style={{ backgroundColor: "#E7D5B3" }}>
+            <div className="h-[3px] w-full overflow-hidden rounded-full" style={{ backgroundColor: "var(--border)" }}>
               <div
                 className="h-full rounded-full transition-all duration-700 ease-in-out"
-                style={{ backgroundColor: "#92400E", width: `${Math.max(0, ((limit - count) / limit) * 100)}%` }}
+                style={{ backgroundColor: "var(--primary)", width: `${Math.max(0, ((limit - count) / limit) * 100)}%` }}
               />
             </div>
             <p className="mt-1.5 text-[10px] text-muted-foreground tracking-wide">Daily reflection limit</p>
@@ -415,9 +415,9 @@ function ThinkersPage() {
                       onClick={() => toggleTag(tag)}
                       className="rounded-full px-3 py-1 text-xs font-medium transition-colors"
                       style={{
-                        backgroundColor: isSelected ? "#92400E" : "transparent",
-                        color: isSelected ? "#FFF" : "#92400E",
-                        border: "1px solid #92400E",
+                        backgroundColor: isSelected ? "var(--primary)" : "transparent",
+                        color: isSelected ? "#FFF" : "var(--primary)",
+                        border: "1px solid var(--primary)",
                       }}
                     >
                       {tag}
@@ -426,7 +426,7 @@ function ThinkersPage() {
                 })}
               </div>
               {tagError && (
-                <p className="mt-1.5 text-xs" style={{ color: "#92400E" }}>{tagError}</p>
+                <p className="mt-1.5 text-xs" style={{ color: "var(--primary)" }}>{tagError}</p>
               )}
             </div>
 
@@ -437,9 +437,9 @@ function ThinkersPage() {
                   <div
                     key={s.tag}
                     className="rounded-lg border p-3"
-                    style={{ backgroundColor: "#FEFBF4", borderColor: "#E7D5B3" }}
+                    style={{ backgroundColor: "var(--card)", borderColor: "var(--border)" }}
                   >
-                    <p className="text-xs font-medium" style={{ color: "#92400E" }}>
+                    <p className="text-xs font-medium" style={{ color: "var(--primary)" }}>
                       📖 Suggested for "{s.tag}" — {s.ref}
                     </p>
                     {loadingVerse === s.tag ? (
@@ -451,7 +451,7 @@ function ThinkersPage() {
                           type="button"
                           onClick={() => appendVerseToContent(s.tag)}
                           className="mt-2 rounded px-2.5 py-1 text-[10px] font-medium transition-colors"
-                          style={{ backgroundColor: "#E7D5B3", color: "#92400E" }}
+                          style={{ backgroundColor: "var(--border)", color: "var(--primary)" }}
                         >
                           Add to post
                         </button>
@@ -491,7 +491,7 @@ function ThinkersPage() {
                   {r.tags.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       {r.tags.map((t) => (
-                        <span key={t} className="rounded-full px-2 py-0.5 text-[10px] font-medium" style={{ backgroundColor: "#E7D5B3", color: "#92400E" }}>{t}</span>
+                        <span key={t} className="rounded-full px-2 py-0.5 text-[10px] font-medium" style={{ backgroundColor: "var(--border)", color: "var(--primary)" }}>{t}</span>
                       ))}
                     </div>
                   )}
@@ -509,7 +509,7 @@ function ThinkersPage() {
                       disabled={r.saved}
                       onClick={() => handleSaveToArchive(r, i)}
                       className="mt-3 inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50"
-                      style={{ backgroundColor: r.saved ? "#E7D5B3" : "transparent", color: "#92400E", border: "1px solid #92400E" }}
+                      style={{ backgroundColor: r.saved ? "var(--border)" : "transparent", color: "var(--primary)", border: "1px solid var(--primary)" }}
                     >
                       {r.saved ? "✓ Saved" : "Save to Archive"}
                     </button>
@@ -530,9 +530,9 @@ function ThinkersPage() {
                 onClick={() => setFeedSort("top")}
                 className="rounded-full px-2.5 py-1 text-[10px] font-medium transition-colors"
                 style={{
-                  backgroundColor: feedSort === "top" ? "#92400E" : "transparent",
-                  color: feedSort === "top" ? "#FFF" : "#92400E",
-                  border: "1px solid #92400E",
+                  backgroundColor: feedSort === "top" ? "var(--primary)" : "transparent",
+                  color: feedSort === "top" ? "#FFF" : "var(--primary)",
+                  border: "1px solid var(--primary)",
                 }}
               >
                 🔥 Top
@@ -542,9 +542,9 @@ function ThinkersPage() {
                 onClick={() => setFeedSort("new")}
                 className="rounded-full px-2.5 py-1 text-[10px] font-medium transition-colors"
                 style={{
-                  backgroundColor: feedSort === "new" ? "#92400E" : "transparent",
-                  color: feedSort === "new" ? "#FFF" : "#92400E",
-                  border: "1px solid #92400E",
+                  backgroundColor: feedSort === "new" ? "var(--primary)" : "transparent",
+                  color: feedSort === "new" ? "#FFF" : "var(--primary)",
+                  border: "1px solid var(--primary)",
                 }}
               >
                 🕊️ New
@@ -562,9 +562,9 @@ function ThinkersPage() {
                   onClick={() => setFeedFilter(tag)}
                   className="rounded-full px-2.5 py-1 text-[10px] font-medium transition-colors"
                   style={{
-                    backgroundColor: isActive ? "#92400E" : "transparent",
-                    color: isActive ? "#FFF" : "#92400E",
-                    border: "1px solid #92400E",
+                    backgroundColor: isActive ? "var(--primary)" : "transparent",
+                    color: isActive ? "#FFF" : "var(--primary)",
+                    border: "1px solid var(--primary)",
                   }}
                 >
                   {tag}
@@ -597,7 +597,7 @@ function ThinkersPage() {
                     {post.tags.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-1.5">
                         {post.tags.map((t) => (
-                          <span key={t} className="rounded-full px-2 py-0.5 text-[10px] font-medium" style={{ backgroundColor: "#E7D5B3", color: "#92400E" }}>{t}</span>
+                          <span key={t} className="rounded-full px-2 py-0.5 text-[10px] font-medium" style={{ backgroundColor: "var(--border)", color: "var(--primary)" }}>{t}</span>
                         ))}
                       </div>
                     )}
@@ -615,9 +615,9 @@ function ThinkersPage() {
                         onClick={() => handleVote(post.id, "up")}
                         className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium transition-colors"
                         style={{
-                          backgroundColor: myVote === "up" ? "#92400E" : "transparent",
-                          color: myVote === "up" ? "#FFF" : "#92400E",
-                          border: "1px solid #92400E",
+                          backgroundColor: myVote === "up" ? "var(--primary)" : "transparent",
+                          color: myVote === "up" ? "#FFF" : "var(--primary)",
+                          border: "1px solid var(--primary)",
                         }}
                       >
                         ▲ {postUpvotes > 0 ? postUpvotes : ""}
@@ -652,7 +652,7 @@ function ThinkersPage() {
                                 setResponseBody(""); setResponseScripture("");
                               }}
                               className="inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors"
-                              style={{ border: "1px solid #92400E", color: "#92400E" }}
+                              style={{ border: "1px solid var(--primary)", color: "var(--primary)" }}
                             >
                               💬 Affirm
                             </button>
@@ -677,8 +677,8 @@ function ThinkersPage() {
 
                           {/* Inline response form */}
                           {respondingTo?.postId === post.id && (
-                            <div className="mt-3 rounded-lg border p-3 space-y-2" style={{ borderColor: respondingTo.type === "affirm" ? "#E7D5B3" : "#7C2D12", backgroundColor: "#FEFBF4" }}>
-                              <p className="text-xs font-medium" style={{ color: respondingTo.type === "affirm" ? "#92400E" : "#7C2D12" }}>
+                            <div className="mt-3 rounded-lg border p-3 space-y-2" style={{ borderColor: respondingTo.type === "affirm" ? "var(--border)" : "#7C2D12", backgroundColor: "var(--card)" }}>
+                              <p className="text-xs font-medium" style={{ color: respondingTo.type === "affirm" ? "var(--primary)" : "#7C2D12" }}>
                                 {respondingTo.type === "affirm" ? "💬 Affirm this thought" : "⚔️ Challenge with truth"}
                               </p>
                               <textarea
@@ -702,7 +702,7 @@ function ThinkersPage() {
                                   onClick={handleSubmitResponse}
                                   disabled={responseSubmitting || !responseBody.trim() || (respondingTo.type === "challenge" && !responseScripture.trim())}
                                   className="rounded px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50"
-                                  style={{ backgroundColor: respondingTo.type === "affirm" ? "#92400E" : "#7C2D12" }}
+                                  style={{ backgroundColor: respondingTo.type === "affirm" ? "var(--primary)" : "#7C2D12" }}
                                 >
                                   {responseSubmitting ? "Sending…" : "Submit"}
                                 </button>
@@ -720,10 +720,10 @@ function ThinkersPage() {
                                   className="rounded-md p-3 text-xs"
                                   style={{
                                     borderLeft: `3px solid ${resp.type === "affirm" ? "#D97706" : "#7C2D12"}`,
-                                    backgroundColor: "#FEFBF4",
+                                    backgroundColor: "var(--card)",
                                   }}
                                 >
-                                  <span className="font-medium" style={{ color: resp.type === "affirm" ? "#92400E" : "#7C2D12" }}>
+                                  <span className="font-medium" style={{ color: resp.type === "affirm" ? "var(--primary)" : "#7C2D12" }}>
                                     {resp.type === "affirm" ? "Affirm" : "⚔️ Challenge"}
                                   </span>
                                   <p className="mt-1 text-foreground leading-relaxed">{resp.body}</p>
