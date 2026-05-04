@@ -52,7 +52,7 @@ function ThinkersPage() {
     try {
       const allowed = await increment();
       if (!allowed) {
-        setError("You've reached your daily limit of 5 analyses. Come back tomorrow.");
+        setError("You've reached your daily limit of 50 analyses. Come back tomorrow.");
         setLoading(false);
         return;
       }

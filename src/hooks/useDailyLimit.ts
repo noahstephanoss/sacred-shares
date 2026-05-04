@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-const LIMITS = { discernment: 20, thinkers: 5 } as const;
+const LIMITS = { discernment: 20, thinkers: 50 } as const;
 type Feature = keyof typeof LIMITS;
 
 export function useDailyLimit(feature: Feature) {
