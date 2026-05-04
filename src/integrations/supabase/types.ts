@@ -158,6 +158,39 @@ export type Database = {
         }
         Relationships: []
       }
+      verse_comments: {
+        Row: {
+          book: string
+          chapter: number
+          comment_body: string
+          created_at: string
+          id: string
+          is_public: boolean
+          user_id: string
+          verse: number | null
+        }
+        Insert: {
+          book: string
+          chapter: number
+          comment_body: string
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          user_id: string
+          verse?: number | null
+        }
+        Update: {
+          book?: string
+          chapter?: number
+          comment_body?: string
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          user_id?: string
+          verse?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
