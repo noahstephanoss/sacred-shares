@@ -39,7 +39,7 @@ function Index() {
           Testimonies
         </h1>
         <p
-          className="mt-6 text-lg leading-relaxed sm:text-xl"
+          className="mt-6 text-lg leading-relaxed sm:text-sm"
           style={{ color: "#44403C" }}
         >
           A place to share your spiritual journey, seek righteous counsel, and grow in faith with a community rooted in truth.
