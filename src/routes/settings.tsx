@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppNav } from "@/components/AppNav";
+import { AuthPromptModal, useAuthPrompt } from "@/components/AuthPromptModal";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -11,6 +12,9 @@ export const Route = createFileRoute("/settings")({
 });
 
 function SettingsPage() {
+  const { showModal, openAuthPrompt, closeAuthPrompt } = useAuthPrompt();
+  const [authedUserId, setAuthedUserId] = useState<string | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
   const [displayName, setDisplayName] = useState("");
   const [bio, setBio] = useState("");
   const [loading, setLoading] = useState(true);
@@ -19,6 +23,8 @@ function SettingsPage() {
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
+      setAuthedUserId(data.user?.id ?? null);
+      setAuthChecked(true);
       if (data.user) {
         supabase
           .from("profiles")
@@ -51,6 +57,20 @@ function SettingsPage() {
     setMessage(error ? "Failed to save." : "Saved!");
     setSaving(false);
   };
+
+  if (authChecked && !authedUserId) {
+    return (
+      <div className="min-h-screen bg-background">
+        <AppNav />
+        <div className="flex flex-col items-center justify-center px-4 py-24 text-center">
+          <h2 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>Sign in to access settings</h2>
+          <p className="mt-2 text-sm text-muted-foreground">Create an account or sign in to manage your profile.</p>
+          <button onClick={openAuthPrompt} className="mt-6 rounded-full px-8 py-3 text-sm font-semibold transition-colors hover:opacity-90" style={{ backgroundColor: "#92400E", color: "#FDF6EC" }}>Get Started</button>
+        </div>
+        <AuthPromptModal open={showModal} onClose={closeAuthPrompt} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">

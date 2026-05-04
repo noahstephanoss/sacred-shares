@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { analyzeThinkerPost } from "@/lib/ai";
 import { useDailyLimit } from "@/hooks/useDailyLimit";
 import { AppNav } from "@/components/AppNav";
+import { AuthPromptModal, useAuthPrompt } from "@/components/AuthPromptModal";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/thinkers")({
   head: () => ({
@@ -27,14 +29,21 @@ function getRatingColor(rating: number) {
 }
 
 function ThinkersPage() {
+  const { showModal, openAuthPrompt, closeAuthPrompt } = useAuthPrompt();
+  const [userId, setUserId] = useState<string | null>(null);
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [results, setResults] = useState<AnalysisResult[]>([]);
   const { remaining, isAtLimit, increment } = useDailyLimit("thinkers");
 
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
+  }, []);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!userId) { openAuthPrompt(); return; }
     if (!content.trim() || loading) return;
 
     setLoading(true);
@@ -130,6 +139,7 @@ function ThinkersPage() {
           })}
         </div>
       </main>
+      <AuthPromptModal open={showModal} onClose={closeAuthPrompt} />
     </div>
   );
 }
