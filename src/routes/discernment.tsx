@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/discernment")({
   validateSearch: z.object({
     prefill: z.string().optional(),
+    context: z.string().optional(),
   }),
   head: () => ({
     meta: [
@@ -21,7 +22,7 @@ export const Route = createFileRoute("/discernment")({
 });
 
 function DiscernmentPage() {
-  const { prefill } = useSearch({ from: "/discernment" });
+  const { prefill, context } = useSearch({ from: "/discernment" });
   const { showModal, openAuthPrompt, closeAuthPrompt } = useAuthPrompt();
   const [userId, setUserId] = useState<string | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
@@ -54,9 +55,11 @@ function DiscernmentPage() {
     e.preventDefault();
     if (!input.trim() || isStreaming) return;
 
-    const userMsg: ChatMessage = { role: "user", content: input.trim() };
-    const updatedMessages = [...messages, userMsg];
-    setMessages(updatedMessages);
+    const displayContent = input.trim();
+    const isFirstMessage = messages.length === 0;
+    const userMsg: ChatMessage = { role: "user", content: displayContent };
+    const displayMessages = [...messages, userMsg];
+    setMessages(displayMessages);
     setInput("");
     setIsStreaming(true);
     setError("");
@@ -72,7 +75,9 @@ function DiscernmentPage() {
     let assistantSoFar = "";
 
     await streamDiscernment({
-      messages: updatedMessages,
+      messages: isFirstMessage && context
+        ? [{ role: "user" as const, content: `Context: ${context}. User asks: ${displayContent}` }, ...displayMessages.slice(1)]
+        : displayMessages,
       onDelta: (chunk) => {
         assistantSoFar += chunk;
         setMessages((prev) => {
