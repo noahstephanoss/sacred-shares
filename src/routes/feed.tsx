@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppNav } from "@/components/AppNav";
+import { AuthPromptModal, useAuthPrompt } from "@/components/AuthPromptModal";
 
 export const Route = createFileRoute("/feed")({
   head: () => ({
@@ -50,7 +51,7 @@ function PrivateBadge() {
   );
 }
 
-function ReactionButtons() {
+function ReactionButtons({ onAuthRequired }: { onAuthRequired?: () => void }) {
   const [praying, setPraying] = useState(0);
   const [amen, setAmen] = useState(0);
   const [prayedClicked, setPrayedClicked] = useState(false);
@@ -59,7 +60,7 @@ function ReactionButtons() {
   return (
     <div className="mt-3 flex items-center gap-3 border-t border-border pt-3">
       <button
-        onClick={() => { if (!prayedClicked) { setPraying((p) => p + 1); setPrayedClicked(true); } }}
+        onClick={() => { if (onAuthRequired) { onAuthRequired(); return; } if (!prayedClicked) { setPraying((p) => p + 1); setPrayedClicked(true); } }}
         className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
           prayedClicked
             ? "bg-primary/10 text-primary"
@@ -69,7 +70,7 @@ function ReactionButtons() {
         🙏 Praying{praying > 0 && <span>{praying}</span>}
       </button>
       <button
-        onClick={() => { if (!amenClicked) { setAmen((a) => a + 1); setAmenClicked(true); } }}
+        onClick={() => { if (onAuthRequired) { onAuthRequired(); return; } if (!amenClicked) { setAmen((a) => a + 1); setAmenClicked(true); } }}
         className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
           amenClicked
             ? "bg-primary/10 text-primary"
@@ -82,7 +83,7 @@ function ReactionButtons() {
   );
 }
 
-function TestimonyCard({ testimony }: { testimony: Testimony }) {
+function TestimonyCard({ testimony, onAuthRequired }: { testimony: Testimony; onAuthRequired?: () => void }) {
   return (
     <div className="rounded-xl bg-card px-5 py-4" style={{ boxShadow: "0 1px 6px rgba(146,64,14,0.08)" }}>
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -96,12 +97,13 @@ function TestimonyCard({ testimony }: { testimony: Testimony }) {
       <p className="mt-2 text-sm text-foreground leading-relaxed whitespace-pre-wrap">
         {testimony.body}
       </p>
-      <ReactionButtons />
+      <ReactionButtons onAuthRequired={onAuthRequired} />
     </div>
   );
 }
 
 function FeedPage() {
+  const { showModal, openAuthPrompt, closeAuthPrompt } = useAuthPrompt();
   const [testimonies, setTestimonies] = useState<Testimony[]>([]);
   const [myPosts, setMyPosts] = useState<Testimony[]>([]);
   const [loading, setLoading] = useState(true);
@@ -188,6 +190,14 @@ function FeedPage() {
               {showForm ? "Cancel" : "+ Share"}
             </button>
           )}
+          {!userId && (
+            <button
+              onClick={openAuthPrompt}
+              className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            >
+              + Share
+            </button>
+          )}
         </div>
       </div>
 
@@ -272,11 +282,12 @@ function FeedPage() {
         ) : (
           <div className="space-y-3">
             {displayPosts.map((t) => (
-              <TestimonyCard key={t.id} testimony={t} />
+              <TestimonyCard key={t.id} testimony={t} onAuthRequired={userId ? undefined : openAuthPrompt} />
             ))}
           </div>
         )}
       </main>
+      <AuthPromptModal open={showModal} onClose={closeAuthPrompt} />
     </div>
   );
 }
