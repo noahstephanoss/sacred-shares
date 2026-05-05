@@ -173,6 +173,30 @@ export type Database = {
         }
         Relationships: []
       }
+      testimony_reactions: {
+        Row: {
+          created_at: string
+          id: string
+          testimony_id: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          testimony_id: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          testimony_id?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       thinker_posts: {
         Row: {
           ai_analysis: string
