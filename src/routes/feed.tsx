@@ -3,6 +3,7 @@ import { useState, useEffect, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppNav } from "@/components/AppNav";
 import { AuthPromptModal, useAuthPrompt } from "@/components/AuthPromptModal";
+import { EmptyState } from "@/components/EmptyState";
 
 export const Route = createFileRoute("/feed")({
   head: () => ({
@@ -276,9 +277,19 @@ function FeedPage() {
         {loading ? (
           <p className="py-12 text-center text-sm text-muted-foreground">Loading testimonies...</p>
         ) : displayPosts.length === 0 ? (
-          <p className="py-12 text-center text-sm text-muted-foreground">
-            {tab === "mine" ? "You haven't shared any testimonies yet." : "No testimonies yet. Be the first to share."}
-          </p>
+          tab === "mine" ? (
+            <EmptyState
+              verse="Your story is worth telling"
+              reference="Romans 10:11"
+              description="Share your first testimony with the community."
+            />
+          ) : (
+            <EmptyState
+              verse="Be still and know that I am God"
+              reference="Psalm 46:10"
+              description="Be the first to share what God is doing in your life."
+            />
+          )
         ) : (
           <div className="space-y-3">
             {displayPosts.map((t) => (
