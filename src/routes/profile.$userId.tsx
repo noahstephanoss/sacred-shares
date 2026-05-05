@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppNav } from "@/components/AppNav";
 import { AuthPromptModal, useAuthPrompt } from "@/components/AuthPromptModal";
+import { EmptyState } from "@/components/EmptyState";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/profile/$userId")({
@@ -328,7 +329,11 @@ function ProfilePage() {
                   {testimoniesLoading ? (
                     <p className="text-center text-sm text-muted-foreground py-8">Loading testimonies...</p>
                   ) : testimonies.length === 0 ? (
-                    <p className="text-center text-sm text-muted-foreground py-8">No public testimonies yet.</p>
+                    <EmptyState
+                      verse="Your story is worth telling"
+                      reference="Romans 10:11"
+                      description="Share your first testimony with the community."
+                    />
                   ) : (
                     testimonies.map((t) => (
                       <div key={t.id} className="rounded-xl border border-border bg-card p-5">
@@ -349,7 +354,11 @@ function ProfilePage() {
                   {publicPostsLoading ? (
                     <p className="text-center text-sm text-muted-foreground py-8">Loading thoughts...</p>
                   ) : publicPosts.length === 0 ? (
-                    <p className="text-center text-sm text-muted-foreground py-8">No public thoughts yet.</p>
+                    <EmptyState
+                      verse="Iron sharpens iron"
+                      reference="Proverbs 27:17"
+                      description="Share a thought and let the community sharpen you."
+                    />
                   ) : (
                     publicPosts.map((post) => {
                       const color = getRatingColor(post.attack_rating);
@@ -390,7 +399,11 @@ function ProfilePage() {
                   {archiveLoading ? (
                     <p className="text-center text-sm text-muted-foreground py-8">Loading archive...</p>
                   ) : archive.length === 0 ? (
-                    <p className="text-center text-sm text-muted-foreground py-8">No saved analyses yet. Visit Thinkers to begin.</p>
+                    <EmptyState
+                      verse="Know your enemy, know your ground"
+                      reference="Ephesians 6:12"
+                      description="Save an analysis from Thinkers to begin your war journal."
+                    />
                   ) : (
                     archive.map((item) => {
                       const color = getRatingColor(item.attack_rating);
@@ -424,7 +437,11 @@ function ProfilePage() {
                   {draftsLoading ? (
                     <p className="text-center text-sm text-muted-foreground py-8">Loading drafts...</p>
                   ) : drafts.length === 0 ? (
-                    <p className="text-center text-sm text-muted-foreground py-8">No drafts yet. Use Draft mode in Thinkers to save private thoughts.</p>
+                    <EmptyState
+                      verse="A thought refined is a testimony prepared"
+                      reference=""
+                      description="Write, refine, then share with the community."
+                    />
                   ) : (
                     drafts.map((item) => {
                       const color = getRatingColor(item.attack_rating);
@@ -504,7 +521,11 @@ function ProfilePage() {
                   {journalsLoading ? (
                     <p className="text-center text-sm text-muted-foreground py-8">Loading journal...</p>
                   ) : journals.length === 0 ? (
-                    <p className="text-center text-sm text-muted-foreground py-8">No journal entries yet. Use Journal mode in Thinkers to begin.</p>
+                    <EmptyState
+                      verse="Pour out your heart before Him"
+                      reference="Psalm 62:8"
+                      description="This space is yours alone. Write freely."
+                    />
                   ) : (
                     <div className="space-y-0">
                       {journals.map((item, idx) => (
