@@ -253,13 +253,11 @@ function DiscernmentPage() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="What's on your heart..."
-            disabled={isStreaming}
             disabled={isStreaming || !!closingPrayer || loadingPrayer}
             className="flex-1 rounded-md border border-input bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20 disabled:opacity-50"
           />
           <button
             type="submit"
-            disabled={isStreaming || !input.trim()}
             disabled={isStreaming || !input.trim() || !!closingPrayer || loadingPrayer}
             className="rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
           >
