@@ -1,7 +1,7 @@
 import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { useState, useRef, useEffect, type FormEvent, useCallback } from "react";
 import { z } from "zod";
-import { streamDiscernment, type ChatMessage, analyzeThinkerPost } from "@/lib/ai";
+import { streamDiscernment, type ChatMessage } from "@/lib/ai";
 import { useDailyLimit } from "@/hooks/useDailyLimit";
 import { AppNav } from "@/components/AppNav";
 import { AuthPromptModal, useAuthPrompt } from "@/components/AuthPromptModal";
