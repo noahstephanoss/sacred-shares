@@ -89,6 +89,15 @@ function ThinkersPage() {
   const [content, setContent] = useState("");
   const [postTitle, setPostTitle] = useState("");
   const [writeMode, setWriteMode] = useState<"journal" | "draft" | "post">("post");
+
+  // Romans 2:1 daily warning
+  const [showWarning, setShowWarning] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const stored = localStorage.getItem("thinkers_warning_date");
+    const today = new Date().toISOString().slice(0, 10);
+    return stored !== today;
+  });
+
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [tagError, setTagError] = useState("");
   const [verseText, setVerseText] = useState<Record<string, string>>({});
@@ -402,6 +411,42 @@ function ThinkersPage() {
   return (
     <div className="min-h-screen bg-background">
       <AppNav />
+
+      {/* Romans 2:1 Daily Warning Modal */}
+      {showWarning && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" style={{ backdropFilter: "blur(4px)" }}>
+          <div
+            className="mx-4 max-w-md rounded-xl border p-8 text-center"
+            style={{ backgroundColor: "var(--card)", borderColor: "var(--border)" }}
+          >
+            {/* Gold Cross */}
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" className="mx-auto mb-6 h-12 w-12" fill="none">
+              <rect x="16" y="4" width="8" height="32" rx="1.5" fill="#B8860B" />
+              <rect x="4" y="14" width="32" height="8" rx="1.5" fill="#B8860B" />
+            </svg>
+            <p
+              className="text-base text-foreground leading-relaxed italic"
+              style={{ fontFamily: "'Georgia', serif" }}
+            >
+              "You, therefore, have no excuse, you who pass judgment on someone else, for at whatever point you judge another, you are condemning yourself."
+            </p>
+            <p className="mt-2 text-xs text-muted-foreground" style={{ fontFamily: "'Georgia', serif" }}>
+              — Romans 2:1
+            </p>
+            <button
+              onClick={() => {
+                localStorage.setItem("thinkers_warning_date", new Date().toISOString().slice(0, 10));
+                setShowWarning(false);
+              }}
+              className="mt-8 rounded-full px-8 py-3 text-sm font-semibold transition-colors hover:opacity-90"
+              style={{ backgroundColor: "#B8860B", color: "#FDF8F0" }}
+            >
+              Enter with humility
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="mx-auto max-w-3xl px-4 py-4">
         <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>Thinkers</h2>
         <p className="text-sm text-muted-foreground">Share your struggle. Know your battlefield.</p>
