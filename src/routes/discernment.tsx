@@ -1,7 +1,7 @@
 import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { useState, useRef, useEffect, type FormEvent, useCallback } from "react";
 import { z } from "zod";
-import { streamDiscernment, type ChatMessage } from "@/lib/ai";
+import { streamDiscernment, type ChatMessage, analyzeThinkerPost } from "@/lib/ai";
 import { useDailyLimit } from "@/hooks/useDailyLimit";
 import { AppNav } from "@/components/AppNav";
 import { AuthPromptModal, useAuthPrompt } from "@/components/AuthPromptModal";
@@ -30,6 +30,8 @@ function DiscernmentPage() {
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState("");
+  const [closingPrayer, setClosingPrayer] = useState("");
+  const [loadingPrayer, setLoadingPrayer] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { remaining, isAtLimit, increment } = useDailyLimit("discernment");
 
@@ -67,8 +69,28 @@ function DiscernmentPage() {
     // Check & increment daily limit
     const allowed = await increment();
     if (!allowed) {
-      setError("You've reached your daily limit of 20 messages. Come back tomorrow.");
+      // Generate closing prayer
+      setLoadingPrayer(true);
       setIsStreaming(false);
+      try {
+        const prayerPrompt = "Write a short 3-sentence closing prayer summarizing the spiritual themes of this conversation. Address it to God. Keep it humble and sincere.";
+        let prayerText = "";
+        await streamDiscernment({
+          messages: [...messages, { role: "user" as const, content: prayerPrompt }],
+          onDelta: (chunk) => {
+            prayerText += chunk;
+            setClosingPrayer(prayerText);
+          },
+          onDone: () => setLoadingPrayer(false),
+          onError: () => {
+            setClosingPrayer("Lord, thank You for this time of seeking. Guide the reflections shared here and draw this heart closer to Your truth. Amen.");
+            setLoadingPrayer(false);
+          },
+        });
+      } catch {
+        setClosingPrayer("Lord, thank You for this time of seeking. Guide the reflections shared here and draw this heart closer to Your truth. Amen.");
+        setLoadingPrayer(false);
+      }
       return;
     }
 
@@ -177,6 +199,35 @@ function DiscernmentPage() {
             </div>
           ))}
 
+          {/* Closing prayer when limit reached */}
+          {(closingPrayer || loadingPrayer) && (
+            <div className="mx-auto max-w-lg py-8 text-center">
+              <div className="rounded-xl border p-8" style={{ backgroundColor: "var(--card)", borderColor: "var(--border)" }}>
+                {/* Gold Cross */}
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" className="mx-auto mb-4 h-10 w-10" fill="none">
+                  <rect x="16" y="4" width="8" height="32" rx="1.5" fill="#B8860B" />
+                  <rect x="4" y="14" width="32" height="8" rx="1.5" fill="#B8860B" />
+                </svg>
+                <h3 className="text-lg font-bold text-foreground mb-2" style={{ fontFamily: "'Georgia', serif" }}>
+                  You've sought counsel today
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-6">
+                  The best conversations continue in prayer. Take what you've received here directly to God.
+                </p>
+                {loadingPrayer ? (
+                  <p className="text-sm text-muted-foreground italic">Preparing a closing prayer…</p>
+                ) : (
+                  <p className="text-sm text-foreground leading-relaxed italic" style={{ fontFamily: "'Georgia', serif" }}>
+                    {closingPrayer}
+                  </p>
+                )}
+                <p className="mt-6 text-xs text-muted-foreground" style={{ fontFamily: "'Georgia', serif" }}>
+                  Come back tomorrow — <em>Isaiah 40:31</em>
+                </p>
+              </div>
+            </div>
+          )}
+
           {isStreaming && messages[messages.length - 1]?.role !== "assistant" && (
             <div className="flex justify-start">
               <div className="max-w-[80%] rounded-xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
@@ -196,18 +247,20 @@ function DiscernmentPage() {
 
       {/* Input */}
       <div className="border-t border-border bg-card px-4 py-4">
-        <form onSubmit={send} className="mx-auto flex max-w-3xl gap-3">
+        <form onSubmit={send} className={`mx-auto flex max-w-3xl gap-3 ${closingPrayer || loadingPrayer ? "opacity-50 pointer-events-none" : ""}`}>
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="What's on your heart..."
             disabled={isStreaming}
+            disabled={isStreaming || !!closingPrayer || loadingPrayer}
             className="flex-1 rounded-md border border-input bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20 disabled:opacity-50"
           />
           <button
             type="submit"
             disabled={isStreaming || !input.trim()}
+            disabled={isStreaming || !input.trim() || !!closingPrayer || loadingPrayer}
             className="rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
           >
             Send
