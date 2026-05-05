@@ -14,9 +14,11 @@ export function EmptyState({ verse, reference, description, children }: EmptySta
       <p className="text-base italic text-foreground max-w-sm" style={{ fontFamily: SERIF }}>
         "{verse}"
       </p>
-      <p className="mt-1 text-sm text-muted-foreground" style={{ fontFamily: SERIF }}>
-        — {reference}
-      </p>
+      {reference && (
+        <p className="mt-1 text-sm text-muted-foreground" style={{ fontFamily: SERIF }}>
+          — {reference}
+        </p>
+      )}
       <p className="mt-3 text-sm text-muted-foreground max-w-xs">{description}</p>
       {children && <div className="mt-5">{children}</div>}
     </div>
