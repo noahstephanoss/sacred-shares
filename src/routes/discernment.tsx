@@ -14,8 +14,8 @@ export const Route = createFileRoute("/discernment")({
   }),
   head: () => ({
     meta: [
-      { title: "Discernment Bot — Testimonies" },
-      { name: "description", content: "Seek biblically grounded counsel from the Discernment Bot." },
+      { title: "Nathan — Testimonies" },
+      { name: "description", content: "Seek discerning counsel from Nathan — listens first, speaks with weight." },
     ],
   }),
   component: DiscernmentPage,
@@ -131,10 +131,11 @@ function DiscernmentPage() {
             <rect x="4" y="14" width="32" height="8" rx="1.5" fill="#B8860B" />
           </svg>
           <h2 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
-            Discernment Bot
+            Nathan
           </h2>
+          <p className="text-xs text-muted-foreground italic" style={{ fontFamily: "'Georgia', serif" }}>A discerning counselor — listens first, speaks with weight.</p>
           <p className="mt-2 max-w-md text-sm text-muted-foreground">
-            Seek biblically grounded counsel. Sign in or create an account to access the Discernment Bot.
+            Seek discerning counsel. Sign in or create an account to begin.
           </p>
           <button
             onClick={openAuthPrompt}
@@ -165,9 +166,10 @@ function DiscernmentPage() {
       <AppNav />
       <div className="mx-auto w-full max-w-3xl px-4 py-3">
         <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
-          Discernment Bot
+          Nathan
         </h2>
-        <p className="text-sm text-muted-foreground">Stern counsel. Rooted in scripture. · {remaining} remaining today</p>
+        <p className="text-xs text-muted-foreground italic mb-1" style={{ fontFamily: "'Georgia', serif" }}>A discerning counselor — listens first, speaks with weight.</p>
+        <p className="text-sm text-muted-foreground">{remaining} remaining today</p>
       </div>
 
       {/* Messages */}
@@ -176,8 +178,7 @@ function DiscernmentPage() {
           {messages.length === 0 && (
             <div className="py-20 text-center">
               <p className="text-lg text-muted-foreground">
-                Share what&apos;s on your heart. The Discernment Bot will give you
-                righteous counsel grounded in scripture.
+                Share what&apos;s on your heart. Nathan will listen first, then speak with weight.
               </p>
             </div>
           )}
@@ -231,7 +232,7 @@ function DiscernmentPage() {
           {isStreaming && messages[messages.length - 1]?.role !== "assistant" && (
             <div className="flex justify-start">
               <div className="max-w-[80%] rounded-xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
-                Seeking counsel...
+                Nathan is listening...
               </div>
             </div>
           )}
