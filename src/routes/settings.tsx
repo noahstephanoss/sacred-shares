@@ -162,7 +162,7 @@ function SettingsPage() {
     if (authedUserId) {
       await supabase
         .from("profiles")
-        .update({ theme_preference: newDark ? "dark" : "light" } as Record<string, unknown>)
+        .update({ theme_preference: newDark ? "dark" : "light" } as any)
         .eq("user_id", authedUserId);
     }
   };
