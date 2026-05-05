@@ -154,7 +154,7 @@ function ReactionButtons({
   );
 }
 
-function TestimonyCard({ testimony, onAuthRequired }: { testimony: Testimony; onAuthRequired?: () => void }) {
+function TestimonyCard({ testimony, userId, onAuthRequired }: { testimony: Testimony; userId: string | null; onAuthRequired?: () => void }) {
   return (
     <div className="rounded-xl bg-card px-5 py-4" style={{ boxShadow: "0 1px 6px rgba(107,63,42,0.08)" }}>
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
