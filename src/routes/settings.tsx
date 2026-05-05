@@ -56,7 +56,7 @@ function SettingsPage() {
       if (u) {
         supabase
           .from("profiles")
-          .select("display_name, bio, avatar_url, is_public, theme_preference")
+          .select("display_name, bio, avatar_url, is_public, theme_preference" as any)
           .eq("user_id", u.id)
           .single()
           .then(({ data: p }) => {
@@ -65,7 +65,7 @@ function SettingsPage() {
               setBio(p.bio || "");
               setAvatarUrl(p.avatar_url);
               setIsPublic(p.is_public ?? true);
-              const theme = (p as Record<string, unknown>).theme_preference as string;
+              const theme = (p as any).theme_preference as string;
               if (theme === "dark") {
                 setDarkMode(true);
                 document.documentElement.classList.add("dark");
