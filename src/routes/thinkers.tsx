@@ -52,6 +52,8 @@ type FeedPost = {
   id: string;
   user_id: string;
   body: string;
+  title: string | null;
+  post_type: string;
   tags: string[];
   attack_rating: number;
   ai_analysis: string;
@@ -85,6 +87,8 @@ function ThinkersPage() {
   const { showModal, openAuthPrompt, closeAuthPrompt } = useAuthPrompt();
   const [userId, setUserId] = useState<string | null>(null);
   const [content, setContent] = useState("");
+  const [postTitle, setPostTitle] = useState("");
+  const [writeMode, setWriteMode] = useState<"journal" | "draft" | "post">("post");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [tagError, setTagError] = useState("");
   const [verseText, setVerseText] = useState<Record<string, string>>({});
@@ -124,6 +128,8 @@ function ThinkersPage() {
       let query = supabase
         .from("thinker_posts")
         .select("*")
+        .eq("post_type", "post")
+        .eq("is_public", true)
         .order("created_at", { ascending: false })
         .limit(50);
 
@@ -208,11 +214,33 @@ function ThinkersPage() {
     e.preventDefault();
     if (!userId) { openAuthPrompt(); return; }
     if (!content.trim() || loading) return;
+    if (writeMode === "journal" && !postTitle.trim()) return;
 
     setLoading(true);
     setError("");
 
     try {
+      // Journal mode: skip AI analysis and daily limit
+      if (writeMode === "journal") {
+        setFormFading(true);
+        await new Promise((resolve) => setTimeout(resolve, 400));
+        await supabase.from("thinker_posts").insert({
+          user_id: userId,
+          body: content.trim(),
+          title: postTitle.trim(),
+          tags: [],
+          attack_rating: 0,
+          ai_analysis: "",
+          post_type: "journal",
+          is_public: false,
+        });
+        setContent("");
+        setPostTitle("");
+        setFormFading(false);
+        setLoading(false);
+        return;
+      }
+
       const allowed = await increment();
       if (!allowed) {
         setError("You've reached your daily limit of 50 analyses. Come back tomorrow.");
@@ -234,6 +262,8 @@ function ThinkersPage() {
         tags: selectedTags,
         attack_rating: result.attack_rating,
         ai_analysis: result.analysis,
+        post_type: writeMode,
+        is_public: writeMode === "post",
       }).select("id").single();
 
       setResults((prev) => [newResult, ...prev]);
@@ -241,17 +271,21 @@ function ThinkersPage() {
       setSelectedTags([]);
       setFormFading(false);
 
-      // Refresh feed
-      const { data } = await supabase
-        .from("thinker_posts")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(50);
-      if (data) {
-        setFeedPosts(data as FeedPost[]);
-        if (insertedPost) {
-          setNewPostId(insertedPost.id);
-          setTimeout(() => setNewPostId(null), 600);
+      // Only refresh feed if posting publicly
+      if (writeMode === "post") {
+        const { data } = await supabase
+          .from("thinker_posts")
+          .select("*")
+          .eq("post_type", "post")
+          .eq("is_public", true)
+          .order("created_at", { ascending: false })
+          .limit(50);
+        if (data) {
+          setFeedPosts(data as FeedPost[]);
+          if (insertedPost) {
+            setNewPostId(insertedPost.id);
+            setTimeout(() => setNewPostId(null), 600);
+          }
         }
       }
     } catch (err) {
@@ -394,16 +428,49 @@ function ThinkersPage() {
             <p className="mt-1.5 text-[10px] text-muted-foreground tracking-wide">Daily reflection limit</p>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Writing mode selector */}
+            <div className="flex gap-2">
+              {([
+                { mode: "journal" as const, icon: "📓", label: "Journal" },
+                { mode: "draft" as const, icon: "📝", label: "Draft" },
+                { mode: "post" as const, icon: "📢", label: "Post" },
+              ]).map(({ mode, icon, label }) => (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => { setWriteMode(mode); setSelectedTags([]); setPostTitle(""); }}
+                  className="rounded-full px-4 py-1.5 text-xs font-medium transition-colors"
+                  style={{
+                    backgroundColor: writeMode === mode ? "var(--primary)" : "transparent",
+                    color: writeMode === mode ? "#FFF" : "var(--primary)",
+                    border: "1px solid var(--primary)",
+                  }}
+                >
+                  {icon} {label}
+                </button>
+              ))}
+            </div>
+
+            {/* Title field for journal mode */}
+            {writeMode === "journal" && (
+              <input
+                value={postTitle}
+                onChange={(e) => setPostTitle(e.target.value)}
+                placeholder="Journal entry title"
+                className="w-full rounded-md border border-input bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20"
+              />
+            )}
+
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="What thought or struggle is weighing on you?"
+              placeholder={writeMode === "journal" ? "Write your private reflections…" : "What thought or struggle is weighing on you?"}
               rows={4}
               className="w-full resize-none rounded-md border border-input bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20"
             />
 
-            {/* Tag selector */}
-            <div>
+            {/* Tag selector — hidden in journal mode */}
+            {writeMode !== "journal" && (<div>
               <p className="text-xs text-muted-foreground mb-2">Select up to 3 topics</p>
               <div className="flex flex-wrap gap-2">
                 {PRESET_TAGS.map((tag) => {
@@ -428,10 +495,10 @@ function ThinkersPage() {
               {tagError && (
                 <p className="mt-1.5 text-xs" style={{ color: "var(--primary)" }}>{tagError}</p>
               )}
-            </div>
+            </div>)}
 
             {/* Scripture suggestions */}
-            {activeSuggestions.length > 0 && (
+            {writeMode !== "journal" && activeSuggestions.length > 0 && (
               <div className="space-y-2">
                 {activeSuggestions.map((s) => (
                   <div
@@ -471,10 +538,10 @@ function ThinkersPage() {
             )}
             <button
               type="submit"
-              disabled={loading || !content.trim()}
+              disabled={loading || !content.trim() || (writeMode === "journal" && !postTitle.trim())}
               className="rounded-md bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
             >
-              {loading ? "Analyzing..." : "Analyze Spiritual Attack"}
+              {loading ? (writeMode === "journal" ? "Saving…" : "Analyzing...") : writeMode === "journal" ? "Save Journal Entry" : writeMode === "draft" ? "Save Draft & Analyze" : "Analyze Spiritual Attack"}
             </button>
           </form>
         </div>

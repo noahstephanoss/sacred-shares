@@ -174,8 +174,11 @@ export type Database = {
           body: string
           created_at: string
           id: string
+          is_public: boolean
+          post_type: string
           score: number | null
           tags: string[]
+          title: string | null
           user_id: string
         }
         Insert: {
@@ -184,8 +187,11 @@ export type Database = {
           body: string
           created_at?: string
           id?: string
+          is_public?: boolean
+          post_type?: string
           score?: number | null
           tags?: string[]
+          title?: string | null
           user_id: string
         }
         Update: {
@@ -194,8 +200,11 @@ export type Database = {
           body?: string
           created_at?: string
           id?: string
+          is_public?: boolean
+          post_type?: string
           score?: number | null
           tags?: string[]
+          title?: string | null
           user_id?: string
         }
         Relationships: []
