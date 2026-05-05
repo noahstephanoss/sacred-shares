@@ -56,16 +56,17 @@ function SettingsPage() {
       if (u) {
         supabase
           .from("profiles")
-          .select("display_name, bio, avatar_url, is_public, theme_preference" as any)
+          .select("display_name, bio, avatar_url, is_public, theme_preference")
           .eq("user_id", u.id)
           .single()
           .then(({ data: p }) => {
             if (p) {
-              setDisplayName(p.display_name || "");
-              setBio(p.bio || "");
-              setAvatarUrl(p.avatar_url);
-              setIsPublic(p.is_public ?? true);
-              const theme = (p as any).theme_preference as string;
+              const pAny = p as any;
+              setDisplayName(pAny.display_name || "");
+              setBio(pAny.bio || "");
+              setAvatarUrl(pAny.avatar_url);
+              setIsPublic(pAny.is_public ?? true);
+              const theme = pAny.theme_preference as string;
               if (theme === "dark") {
                 setDarkMode(true);
                 document.documentElement.classList.add("dark");
