@@ -3,6 +3,7 @@ import { useState, useEffect, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppNav } from "@/components/AppNav";
 import { AuthPromptModal, useAuthPrompt } from "@/components/AuthPromptModal";
+import { EmptyState } from "@/components/EmptyState";
 
 export const Route = createFileRoute("/bible")({
   head: () => ({
@@ -206,7 +207,15 @@ function BiblePage() {
           </div>
         </form>
 
-        {searchError && <p className="mb-8 text-center text-sm text-destructive">{searchError}</p>}
+        {searchError && (
+          <div className="mb-8">
+            <EmptyState
+              verse="Seek and you will find"
+              reference="Matthew 7:7"
+              description='Try searching a book name, verse reference, or keyword.'
+            />
+          </div>
+        )}
 
         {searchResult && (
           <div className="mb-10">
