@@ -6,6 +6,49 @@ import { AuthPromptModal, useAuthPrompt } from "@/components/AuthPromptModal";
 import { EmptyState } from "@/components/EmptyState";
 import { toast } from "sonner";
 
+function PaperStack({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="relative group mb-6" style={{ perspective: "800px" }}>
+      {/* Bottom shadow page */}
+      <div
+        className="absolute inset-0 rounded-lg"
+        style={{
+          background: "var(--card)",
+          border: "1px solid var(--border)",
+          transform: "rotate(1.2deg) translateY(4px)",
+          zIndex: 0,
+          boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+        }}
+      />
+      {/* Middle shadow page */}
+      <div
+        className="absolute inset-0 rounded-lg"
+        style={{
+          background: "var(--card)",
+          border: "1px solid var(--border)",
+          transform: "rotate(-0.6deg) translateY(2px)",
+          zIndex: 1,
+          boxShadow: "0 1px 2px rgba(0,0,0,0.06)",
+        }}
+      />
+      {/* Top page — lifts on hover */}
+      <div
+        className="relative rounded-lg transition-all duration-200 ease-out group-hover:-translate-y-1"
+        style={{
+          background: "var(--card)",
+          border: "1px solid var(--border)",
+          borderLeft: "3px solid #B8860B",
+          zIndex: 2,
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+        }}
+      >
+        <style>{`.group:hover > .relative { box-shadow: 0 8px 20px rgba(0,0,0,0.15); }`}</style>
+        <div className="p-5">{children}</div>
+      </div>
+    </div>
+  );
+}
+
 export const Route = createFileRoute("/profile/$userId")({
   head: () => ({
     meta: [{ title: "Profile — Testimonies" }],
@@ -392,7 +435,7 @@ function ProfilePage() {
 
               {/* Battlefield Tab */}
               {activeTab === "battlefield" && isOwnProfile && (
-                <div className="space-y-4">
+                <div className="space-y-2">
                   <p className="text-xs text-muted-foreground italic" style={{ fontFamily: "'Georgia', serif" }}>
                     Your personal war journal — every battle analyzed, every lesson preserved.
                   </p>
@@ -405,11 +448,11 @@ function ProfilePage() {
                       description="Save an analysis from Thinkers to begin your war journal."
                     />
                   ) : (
-                    archive.map((item) => {
+                    archive.map((item, idx) => {
                       const color = getRatingColor(item.attack_rating);
                       return (
-                        <div key={item.id} className="rounded-xl border border-border bg-card p-5">
-                          <p className="text-sm text-foreground leading-relaxed">{item.original_thought}</p>
+                        <PaperStack key={item.id}>
+                          <p className="text-sm text-foreground leading-relaxed" style={{ fontFamily: "'Georgia', serif" }}>{item.original_thought}</p>
                           <div className="mt-3 flex items-center gap-3">
                             <span className={`text-lg font-bold ${color.text}`}>{item.attack_rating}/10</span>
                             <span className="text-xs text-muted-foreground">{color.label}</span>
@@ -421,7 +464,7 @@ function ProfilePage() {
                           <p className="mt-2 text-[10px] text-muted-foreground">
                             {new Date(item.saved_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
                           </p>
-                        </div>
+                        </PaperStack>
                       );
                     })
                   )}
@@ -514,7 +557,7 @@ function ProfilePage() {
 
               {/* Journal Tab — notebook style */}
               {activeTab === "journal" && isOwnProfile && (
-                <div className="mt-2">
+                <div className="mt-2 space-y-2">
                   <p className="text-xs text-muted-foreground italic mb-6" style={{ fontFamily: "'Georgia', serif" }}>
                     Your private journal — these entries stay between you and God.
                   </p>
@@ -527,13 +570,9 @@ function ProfilePage() {
                       description="This space is yours alone. Write freely."
                     />
                   ) : (
-                    <div className="space-y-0">
+                    <div className="space-y-2">
                       {journals.map((item, idx) => (
-                        <div
-                          key={item.id}
-                          className="py-6"
-                          style={idx < journals.length - 1 ? { borderBottom: "1px solid var(--border)" } : {}}
-                        >
+                        <PaperStack key={item.id}>
                           {item.title && (
                             <h3
                               className="text-lg font-bold text-foreground mb-2"
@@ -551,7 +590,7 @@ function ProfilePage() {
                           <p className="mt-4 text-[10px] text-muted-foreground italic">
                             {new Date(item.created_at).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
                           </p>
-                        </div>
+                        </PaperStack>
                       ))}
                     </div>
                   )}
