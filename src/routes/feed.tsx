@@ -363,7 +363,7 @@ function FeedPage() {
         ) : (
           <div className="space-y-3">
             {displayPosts.map((t) => (
-              <TestimonyCard key={t.id} testimony={t} onAuthRequired={userId ? undefined : openAuthPrompt} />
+              <TestimonyCard key={t.id} testimony={t} userId={userId} onAuthRequired={userId ? undefined : openAuthPrompt} />
             ))}
           </div>
         )}
