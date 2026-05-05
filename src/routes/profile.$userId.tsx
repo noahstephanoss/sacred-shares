@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppNav } from "@/components/AppNav";
@@ -67,7 +67,6 @@ type TabId = "testimonies" | "thinkers" | "battlefield" | "drafts" | "journal";
 
 function ProfilePage() {
   const { userId } = Route.useParams();
-  const navigate = useNavigate();
   const { showModal, openAuthPrompt, closeAuthPrompt } = useAuthPrompt();
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
