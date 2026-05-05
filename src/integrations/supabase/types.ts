@@ -174,6 +174,7 @@ export type Database = {
           body: string
           created_at: string
           id: string
+          is_public: boolean
           score: number | null
           tags: string[]
           user_id: string
@@ -184,6 +185,7 @@ export type Database = {
           body: string
           created_at?: string
           id?: string
+          is_public?: boolean
           score?: number | null
           tags?: string[]
           user_id: string
@@ -194,6 +196,7 @@ export type Database = {
           body?: string
           created_at?: string
           id?: string
+          is_public?: boolean
           score?: number | null
           tags?: string[]
           user_id?: string
