@@ -33,7 +33,7 @@ function PaperStack({ children }: { children: React.ReactNode }) {
       />
       {/* Top page — lifts on hover */}
       <div
-        className="relative rounded-lg transition-all duration-200 ease-out group-hover:-translate-y-1"
+        className="relative rounded-lg transition-all duration-200 ease-out group-hover:-translate-y-1 group-hover:shadow-lg"
         style={{
           background: "var(--card)",
           border: "1px solid var(--border)",
@@ -42,7 +42,6 @@ function PaperStack({ children }: { children: React.ReactNode }) {
           boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
         }}
       >
-        <style>{`.group:hover > .relative { box-shadow: 0 8px 20px rgba(0,0,0,0.15); }`}</style>
         <div className="p-5">{children}</div>
       </div>
     </div>
