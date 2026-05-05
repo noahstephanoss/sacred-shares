@@ -29,14 +29,18 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Testimonies — A Faith-Based Community" },
-      { name: "description", content: "Share your spiritual journey, seek counsel, and grow in faith together." },
+      { title: "Testimonies" },
+      { name: "description", content: "Share your testimony, seek righteous counsel, and grow in faith with a community rooted in truth." },
       { name: "author", content: "Testimonies" },
-      { property: "og:title", content: "Testimonies — A Faith-Based Community" },
-      { property: "og:description", content: "Share your spiritual journey, seek counsel, and grow in faith together." },
+      { property: "og:title", content: "Testimonies" },
+      { property: "og:description", content: "Share your testimony, seek righteous counsel, and grow in faith with a community rooted in truth." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Testimonies" },
+      { name: "twitter:description", content: "Share your testimony, seek righteous counsel, and grow in faith with a community rooted in truth." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3394a1df-65d3-4845-8656-2add5155d598/id-preview-ca2d4348--b2381dad-9f27-4886-994f-f6021b80319e.lovable.app-1777948387662.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3394a1df-65d3-4845-8656-2add5155d598/id-preview-ca2d4348--b2381dad-9f27-4886-994f-f6021b80319e.lovable.app-1777948387662.png" },
     ],
     links: [
       {
