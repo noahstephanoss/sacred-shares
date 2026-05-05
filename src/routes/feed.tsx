@@ -52,34 +52,104 @@ function PrivateBadge() {
   );
 }
 
-function ReactionButtons({ onAuthRequired }: { onAuthRequired?: () => void }) {
-  const [praying, setPraying] = useState(0);
-  const [amen, setAmen] = useState(0);
-  const [prayedClicked, setPrayedClicked] = useState(false);
-  const [amenClicked, setAmenClicked] = useState(false);
+type ReactionType = "praying" | "amen" | "peace";
+
+const REACTION_CONFIG: { type: ReactionType; icon: string; label: string }[] = [
+  { type: "praying", icon: "🙏", label: "Praying" },
+  { type: "amen", icon: "✝️", label: "Amen" },
+  { type: "peace", icon: "🕊️", label: "Peace" },
+];
+
+function ReactionButtons({
+  testimonyId,
+  userId,
+  onAuthRequired,
+}: {
+  testimonyId: string;
+  userId: string | null;
+  onAuthRequired?: () => void;
+}) {
+  const [counts, setCounts] = useState<Record<ReactionType, number>>({ praying: 0, amen: 0, peace: 0 });
+  const [myReactions, setMyReactions] = useState<Set<ReactionType>>(new Set());
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    // Fetch counts
+    supabase
+      .from("testimony_reactions")
+      .select("type")
+      .eq("testimony_id", testimonyId)
+      .then(({ data }) => {
+        if (!data) return;
+        const c: Record<ReactionType, number> = { praying: 0, amen: 0, peace: 0 };
+        data.forEach((r: any) => {
+          if (r.type in c) c[r.type as ReactionType]++;
+        });
+        setCounts(c);
+      });
+
+    // Fetch user's own reactions
+    if (userId) {
+      supabase
+        .from("testimony_reactions")
+        .select("type")
+        .eq("testimony_id", testimonyId)
+        .eq("user_id", userId)
+        .then(({ data }) => {
+          if (data) {
+            setMyReactions(new Set(data.map((r: any) => r.type as ReactionType)));
+          }
+        });
+    }
+  }, [testimonyId, userId]);
+
+  const toggle = async (type: ReactionType) => {
+    if (!userId) {
+      onAuthRequired?.();
+      return;
+    }
+    if (busy) return;
+    setBusy(true);
+
+    const has = myReactions.has(type);
+    if (has) {
+      await supabase
+        .from("testimony_reactions")
+        .delete()
+        .eq("testimony_id", testimonyId)
+        .eq("user_id", userId)
+        .eq("type", type);
+      setMyReactions((prev) => { const n = new Set(prev); n.delete(type); return n; });
+      setCounts((prev) => ({ ...prev, [type]: Math.max(0, prev[type] - 1) }));
+    } else {
+      await supabase
+        .from("testimony_reactions")
+        .insert({ testimony_id: testimonyId, user_id: userId, type } as any);
+      setMyReactions((prev) => new Set(prev).add(type));
+      setCounts((prev) => ({ ...prev, [type]: prev[type] + 1 }));
+    }
+    setBusy(false);
+  };
 
   return (
     <div className="mt-3 flex items-center gap-3 border-t border-border pt-3">
-      <button
-        onClick={() => { if (onAuthRequired) { onAuthRequired(); return; } if (!prayedClicked) { setPraying((p) => p + 1); setPrayedClicked(true); } }}
-        className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-          prayedClicked
-            ? "bg-primary/10 text-primary"
-            : "text-muted-foreground hover:bg-muted hover:text-foreground"
-        }`}
-      >
-        🙏 Praying{praying > 0 && <span>{praying}</span>}
-      </button>
-      <button
-        onClick={() => { if (onAuthRequired) { onAuthRequired(); return; } if (!amenClicked) { setAmen((a) => a + 1); setAmenClicked(true); } }}
-        className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-          amenClicked
-            ? "bg-primary/10 text-primary"
-            : "text-muted-foreground hover:bg-muted hover:text-foreground"
-        }`}
-      >
-        ✝️ Amen{amen > 0 && <span>{amen}</span>}
-      </button>
+      {REACTION_CONFIG.map((r) => {
+        const active = myReactions.has(r.type);
+        return (
+          <button
+            key={r.type}
+            onClick={() => toggle(r.type)}
+            className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+              active
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+            }`}
+          >
+            {r.icon} {r.label}
+            {counts[r.type] > 0 && <span>{counts[r.type]}</span>}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -98,7 +168,7 @@ function TestimonyCard({ testimony, onAuthRequired }: { testimony: Testimony; on
       <p className="mt-2 text-sm text-foreground leading-relaxed whitespace-pre-wrap">
         {testimony.body}
       </p>
-      <ReactionButtons onAuthRequired={onAuthRequired} />
+      <ReactionButtons testimonyId={testimony.id} userId={userId} onAuthRequired={onAuthRequired} />
     </div>
   );
 }
