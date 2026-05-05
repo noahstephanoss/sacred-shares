@@ -1,44 +1,46 @@
 
 ## Overview
 
-Add three writing modes (Journal, Draft, Post) to the Thinkers page, replacing the current implicit "always public" behavior. Drafts can be promoted to public posts from the profile page. Journals stay private forever.
+Rebuild the settings page into three card-based sections with Georgia serif headings and amber dividers. Add avatar upload via storage bucket, profile visibility toggle, theme persistence, and account management (password reset, account deletion).
 
-## Database Migration
+## Database Changes
 
-Add two columns to `thinker_posts`:
-- `post_type TEXT NOT NULL DEFAULT 'post' CHECK (post_type IN ('journal', 'draft', 'post'))`
-- `title TEXT` (nullable, used for journal entries)
+1. **Add `theme_preference` column to `profiles`** — `TEXT NOT NULL DEFAULT 'light'` with check constraint for `'light'` or `'dark'`.
 
-Add an RLS UPDATE policy so users can update their own posts (needed for draft promotion):
-```sql
-CREATE POLICY "Users can update own posts"
-ON public.thinker_posts FOR UPDATE TO authenticated
-USING (auth.uid() = user_id)
-WITH CHECK (auth.uid() = user_id);
-```
+2. **Create `avatars` storage bucket** — public bucket for avatar images. RLS policies:
+   - Authenticated users can upload to their own folder (`user_id/`)
+   - Anyone can read (public bucket)
+   - Users can update/delete their own files
 
-## Thinkers Page Changes (`src/routes/thinkers.tsx`)
+## Frontend Changes
 
-1. **Writing mode selector**: Add three pill buttons above the form: "Journal", "Draft", "Post". Default to "Post" (current behavior).
+**Rebuild `src/routes/settings.tsx`** with three sections:
 
-2. **Form behavior per mode**:
-   - **Journal**: Show title input + body textarea. Hide tags, AI button, and scripture suggestions. On submit, save with `post_type='journal'`, `is_public=false`. Skip AI analysis and daily limit increment.
-   - **Draft**: Show body + tags + AI analysis button (current form minus nothing). Save with `post_type='draft'`, `is_public=false`.
-   - **Post**: Current full experience unchanged. Save with `post_type='post'`, `is_public=true`.
+### Section 1 — Profile (card)
+- Circular avatar upload area showing current avatar or initials
+- File picker for jpg/png, uploads to `avatars` bucket at `{userId}/avatar.{ext}`
+- Saves public URL to `profiles.avatar_url`
+- Upload progress indicator
+- Display name and bio fields (existing)
+- "Public Profile" toggle with description, saves to `profiles.is_public`
+- Save button at bottom of this section only
 
-3. **Community feed query**: Filter to only show `post_type='post'` AND `is_public=true`.
+### Section 2 — Appearance (card)
+- Light/Dark mode toggle, saves immediately
+- Updates `profiles.theme_preference` and syncs with existing localStorage/class-based theme system
+- On page load, reads saved preference from profile and applies it
 
-## Profile Page Changes (`src/routes/profile.$userId.tsx`)
+### Section 3 — Account (card)
+- Read-only email display from auth user
+- "Change Password" button — calls `supabase.auth.resetPasswordForEmail()`, shows confirmation message
+- Danger zone with red "Delete Account" button
+- Confirmation modal with warning text, Cancel and Delete buttons
+- On confirm, deletes user via `supabase.rpc` or admin endpoint (will use a server function with `supabaseAdmin.auth.admin.deleteUser()`)
 
-1. Add a **"My Drafts"** and **"My Journal"** tabs (alongside existing Profile and Battlefield tabs) visible only on own profile.
+## Server Function
 
-2. **Drafts tab**: List user's drafts. Each card shows body, tags, AI analysis, attack rating, and a **"Make Public"** button. Clicking it updates the post to `post_type='post'`, `is_public=true`, shows a toast: "Your thought is now shared with the community."
+**Create `src/server/account.functions.ts`** — a `deleteAccount` server function using `requireSupabaseAuth` middleware that calls `supabaseAdmin.auth.admin.deleteUser(userId)` to delete the authenticated user. This ensures secure server-side deletion.
 
-3. **Journal tab**: List user's journal entries showing title + body + date. No "Make Public" button ever appears.
+## Theme Sync
 
-## Technical Details
-
-- Update the `FeedPost` type to include `post_type` and `title` fields
-- The feed query adds `.eq("post_type", "post").eq("is_public", true)`
-- Draft promotion uses `supabase.from("thinker_posts").update({ post_type: "post", is_public: true }).eq("id", postId).eq("user_id", userId)`
-- Use sonner toast for the promotion confirmation message
+Update `AppNav.tsx` (or a shared hook) to load `theme_preference` from the profile on auth state change and apply it, so the saved preference takes effect on login across devices.
