@@ -1,0 +1,3 @@
+
+ALTER TABLE public.profiles
+ADD COLUMN IF NOT EXISTS cover_style INTEGER NOT NULL DEFAULT 1;
