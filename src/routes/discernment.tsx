@@ -33,7 +33,7 @@ function DiscernmentPage() {
   const [closingPrayer, setClosingPrayer] = useState("");
   const [loadingPrayer, setLoadingPrayer] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { remaining, isAtLimit, increment } = useDailyLimit("discernment");
+  const { count, limit, remaining, isAtLimit, increment } = useDailyLimit("discernment");
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -169,7 +169,12 @@ function DiscernmentPage() {
           Nathan
         </h2>
         <p className="text-xs text-muted-foreground italic mb-1" style={{ fontFamily: "'Georgia', serif" }}>A discerning counselor — listens first, speaks with weight.</p>
-        <p className="text-sm text-muted-foreground">{remaining} remaining today</p>
+        <div className="mt-1 h-0.5 w-full rounded-full bg-muted overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all duration-500"
+            style={{ width: `${(count / limit) * 100}%`, backgroundColor: "#B8860B" }}
+          />
+        </div>
       </div>
 
       {/* Messages */}
