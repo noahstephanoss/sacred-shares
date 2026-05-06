@@ -88,6 +88,7 @@ type ProfileData = {
   avatar_url: string | null;
   cover_style: number;
   created_at: string;
+  current_streak: number;
 };
 
 const COVER_GRADIENTS: Record<number, string> = {
@@ -155,7 +156,7 @@ function ProfilePage() {
     if (!currentUserId) { setLoading(false); return; }
     supabase
       .from("profiles")
-      .select("display_name, bio, avatar_url, cover_style, created_at")
+      .select("display_name, bio, avatar_url, cover_style, created_at, current_streak")
       .eq("user_id", userId)
       .single()
       .then(({ data }) => {
@@ -245,8 +246,6 @@ function ProfilePage() {
     setProfile((p) => p ? { ...p, cover_style: style } : p);
     setShowCoverPicker(false);
   }, [userId]);
-
-  const daysActive = profile?.created_at ? Math.max(1, Math.floor((Date.now() - new Date(profile.created_at).getTime()) / (1000 * 60 * 60 * 24))) : 1;
 
   if (authChecked && !currentUserId) {
     return (
@@ -339,13 +338,38 @@ function ProfilePage() {
                 {[
                   { value: testimoniesCount, label: "Testimonies" },
                   { value: thoughtsCount, label: "Thoughts" },
-                  { value: daysActive, label: "Days Active" },
                 ].map((s) => (
                   <div key={s.label} className="text-center">
                     <p className="text-2xl font-bold" style={{ color: "#B8860B", fontFamily: "'Georgia', serif" }}>{s.value}</p>
                     <p className="text-[10px] text-muted-foreground tracking-wide">{s.label}</p>
                   </div>
                 ))}
+                {/* Candle Streak */}
+                <div className="text-center group/candle relative">
+                  {(() => {
+                    const streak = profile.current_streak ?? 0;
+                    const brightness = streak >= 30 ? 1.4 : streak >= 7 ? 1.0 : 0.6;
+                    const goldShadow = streak >= 30 ? "0 0 8px rgba(184,134,11,0.5)" : "none";
+                    const displayText = streak <= 1 ? "Begin your journey" : String(streak);
+                    return (
+                      <>
+                        <div className="flex items-center justify-center gap-1">
+                          <span style={{ filter: `brightness(${brightness})`, fontSize: "1.5rem", transition: "filter 0.3s ease" }}>🕯️</span>
+                          <p className="text-2xl font-bold" style={{ color: "#B8860B", fontFamily: "'Georgia', serif", textShadow: goldShadow }}>
+                            {streak <= 1 ? "" : streak}
+                          </p>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground tracking-wide">
+                          {streak <= 1 ? "Begin your journey" : "days in the Word"}
+                        </p>
+                        {/* Tooltip */}
+                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-foreground/90 px-2 py-1 text-[10px] text-background opacity-0 group-hover/candle:opacity-100 transition-opacity pointer-events-none z-10">
+                          {streak <= 1 ? "Begin walking in the Word" : `${streak} days walking in the Word`}
+                        </div>
+                      </>
+                    );
+                  })()}
+                  </div>
               </div>
             </div>
 

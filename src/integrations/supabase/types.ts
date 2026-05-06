@@ -110,9 +110,11 @@ export type Database = {
           bio: string | null
           cover_style: number
           created_at: string
+          current_streak: number
           display_name: string | null
           id: string
           is_public: boolean
+          last_active_date: string | null
           theme_preference: string
           updated_at: string
           user_id: string
@@ -122,9 +124,11 @@ export type Database = {
           bio?: string | null
           cover_style?: number
           created_at?: string
+          current_streak?: number
           display_name?: string | null
           id?: string
           is_public?: boolean
+          last_active_date?: string | null
           theme_preference?: string
           updated_at?: string
           user_id: string
@@ -134,9 +138,11 @@ export type Database = {
           bio?: string | null
           cover_style?: number
           created_at?: string
+          current_streak?: number
           display_name?: string | null
           id?: string
           is_public?: boolean
+          last_active_date?: string | null
           theme_preference?: string
           updated_at?: string
           user_id?: string
@@ -385,6 +391,13 @@ export type Database = {
       increment_usage: {
         Args: { _field: string; _user_id: string }
         Returns: number
+      }
+      update_user_streak: {
+        Args: { p_user_id: string }
+        Returns: {
+          current_streak: number
+          last_active_date: string
+        }[]
       }
     }
     Enums: {
