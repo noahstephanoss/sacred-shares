@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect, type FormEvent } from "react";
+import { useState, useEffect, useRef, useCallback, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppNav } from "@/components/AppNav";
 import { AuthPromptModal, useAuthPrompt } from "@/components/AuthPromptModal";
@@ -64,10 +64,12 @@ function ReactionButtons({
   testimonyId,
   userId,
   onAuthRequired,
+  disabled,
 }: {
   testimonyId: string;
   userId: string | null;
   onAuthRequired?: () => void;
+  disabled?: boolean;
 }) {
   const [counts, setCounts] = useState<Record<ReactionType, number>>({ praying: 0, amen: 0, peace: 0 });
   const [myReactions, setMyReactions] = useState<Set<ReactionType>>(new Set());
@@ -104,6 +106,7 @@ function ReactionButtons({
   }, [testimonyId, userId]);
 
   const toggle = async (type: ReactionType) => {
+    if (disabled) return;
     if (!userId) {
       onAuthRequired?.();
       return;
@@ -138,12 +141,13 @@ function ReactionButtons({
         return (
           <button
             key={r.type}
-            onClick={() => toggle(r.type)}
-            className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+            onClick={() => !disabled && toggle(r.type)}
+            disabled={disabled}
+            className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-all duration-500 ${
               active
                 ? "bg-primary/10 text-primary"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
-            }`}
+            } ${disabled ? "cursor-default" : ""}`}
           >
             {r.icon} {r.label}
             {counts[r.type] > 0 && <span>{counts[r.type]}</span>}
@@ -154,9 +158,13 @@ function ReactionButtons({
   );
 }
 
-function TestimonyCard({ testimony, userId, onAuthRequired }: { testimony: Testimony; userId: string | null; onAuthRequired?: () => void }) {
+function TestimonyCard({ testimony, userId, onAuthRequired, onClick }: { testimony: Testimony; userId: string | null; onAuthRequired?: () => void; onClick?: () => void }) {
   return (
-    <div className="rounded-xl bg-card px-5 py-4" style={{ boxShadow: "0 1px 6px rgba(107,63,42,0.08)" }}>
+    <div
+      className="rounded-xl bg-card px-5 py-4 cursor-pointer transition-shadow hover:shadow-md"
+      style={{ boxShadow: "0 1px 6px rgba(107,63,42,0.08)" }}
+      onClick={onClick}
+    >
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <span className="font-medium text-foreground">
           {testimony.profiles?.display_name || "Anonymous"}
@@ -173,6 +181,132 @@ function TestimonyCard({ testimony, userId, onAuthRequired }: { testimony: Testi
   );
 }
 
+function ReadingOverlay({
+  testimony,
+  userId,
+  onAuthRequired,
+  onClose,
+}: {
+  testimony: Testimony;
+  userId: string | null;
+  onAuthRequired?: () => void;
+  onClose: () => void;
+}) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [reachedBottom, setReachedBottom] = useState(false);
+  const [navVisible, setNavVisible] = useState(false);
+
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    // Check if scrolled to bottom (within 40px)
+    if (!reachedBottom && el.scrollHeight - el.scrollTop - el.clientHeight < 40) {
+      setReachedBottom(true);
+    }
+    // Show nav when scrolled near top
+    setNavVisible(el.scrollTop < 60);
+  }, [reachedBottom]);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    setNavVisible(e.clientY < 80);
+  }, []);
+
+  // Lock body scroll
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, []);
+
+  // If testimony is short, auto-enable reactions
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el && el.scrollHeight <= el.clientHeight + 40) {
+      setReachedBottom(true);
+    }
+  }, []);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex flex-col bg-background"
+      onMouseMove={handleMouseMove}
+    >
+      {/* Nav bar overlay */}
+      <header
+        className="border-b border-border bg-background px-4 py-3 transition-opacity duration-300 ease-in-out"
+        style={{ opacity: navVisible ? 1 : 0.15 }}
+      >
+        <div className="mx-auto flex max-w-2xl items-center justify-between">
+          <button
+            onClick={onClose}
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+              <path fillRule="evenodd" d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z" clipRule="evenodd" />
+            </svg>
+            Back to feed
+          </button>
+        </div>
+      </header>
+
+      {/* Scrollable body */}
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto"
+      >
+        <div className="mx-auto max-w-2xl px-6 py-10">
+          {/* Author & time */}
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+            <span className="font-medium text-foreground">
+              {testimony.profiles?.display_name || "Anonymous"}
+            </span>
+            <span>·</span>
+            <span>{timeAgo(testimony.created_at)}</span>
+            {!testimony.is_public && <PrivateBadge />}
+          </div>
+
+          {/* Testimony body — larger text */}
+          <p
+            className="text-foreground whitespace-pre-wrap"
+            style={{ fontSize: "1.125rem", lineHeight: 1.9, fontFamily: "'Georgia', serif" }}
+          >
+            {testimony.body}
+          </p>
+
+          {/* Spacer */}
+          <div className="mt-12 border-t border-border pt-6">
+            {/* "Reflect before you react" */}
+            <p
+              className="text-center text-sm mb-4 transition-opacity duration-500 ease-in-out"
+              style={{
+                fontFamily: "'Georgia', serif",
+                fontStyle: "italic",
+                color: "#B8860B",
+                opacity: reachedBottom ? 0.8 : 0,
+              }}
+            >
+              Reflect before you react
+            </p>
+
+            {/* Reactions with opacity transition */}
+            <div
+              className="transition-opacity duration-500 ease-in-out"
+              style={{ opacity: reachedBottom ? 1 : 0.2 }}
+            >
+              <ReactionButtons
+                testimonyId={testimony.id}
+                userId={userId}
+                onAuthRequired={onAuthRequired}
+                disabled={!reachedBottom}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function FeedPage() {
   const { showModal, openAuthPrompt, closeAuthPrompt } = useAuthPrompt();
   const [testimonies, setTestimonies] = useState<Testimony[]>([]);
@@ -184,6 +318,7 @@ function FeedPage() {
   const [isPublic, setIsPublic] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [tab, setTab] = useState<"public" | "mine">("public");
+  const [readingTestimony, setReadingTestimony] = useState<Testimony | null>(null);
 
   const remaining = MAX_CHARS - body.length;
 
@@ -363,11 +498,19 @@ function FeedPage() {
         ) : (
           <div className="space-y-3">
             {displayPosts.map((t) => (
-              <TestimonyCard key={t.id} testimony={t} userId={userId} onAuthRequired={userId ? undefined : openAuthPrompt} />
+              <TestimonyCard key={t.id} testimony={t} userId={userId} onAuthRequired={userId ? undefined : openAuthPrompt} onClick={() => setReadingTestimony(t)} />
             ))}
           </div>
         )}
       </main>
+      {readingTestimony && (
+        <ReadingOverlay
+          testimony={readingTestimony}
+          userId={userId}
+          onAuthRequired={userId ? undefined : openAuthPrompt}
+          onClose={() => setReadingTestimony(null)}
+        />
+      )}
       <AuthPromptModal open={showModal} onClose={closeAuthPrompt} />
     </div>
   );
