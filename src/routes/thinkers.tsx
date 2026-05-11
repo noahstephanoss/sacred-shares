@@ -126,6 +126,8 @@ function ThinkersPage() {
   const [myVotes, setMyVotes] = useState<Record<string, "up" | "down">>({});
   const [feedSort, setFeedSort] = useState<"top" | "new">("top");
 
+  const isScriptureMode = selectedTags.includes("Scripture");
+
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
   }, []);
@@ -246,6 +248,44 @@ function ThinkersPage() {
         setContent("");
         setPostTitle("");
         setFormFading(false);
+        setLoading(false);
+        return;
+      }
+
+      // Scripture mode: skip AI analysis and daily limit, post directly
+      if (isScriptureMode) {
+        setFormFading(true);
+        await new Promise((resolve) => setTimeout(resolve, 400));
+        const { data: insertedPost } = await supabase.from("thinker_posts").insert({
+          user_id: userId,
+          body: content.trim(),
+          tags: selectedTags,
+          attack_rating: 0,
+          ai_analysis: "",
+          post_type: writeMode,
+          is_public: writeMode === "post",
+        }).select("id").single();
+
+        setContent("");
+        setSelectedTags([]);
+        setFormFading(false);
+
+        if (writeMode === "post") {
+          const { data } = await supabase
+            .from("thinker_posts")
+            .select("*")
+            .eq("post_type", "post")
+            .eq("is_public", true)
+            .order("created_at", { ascending: false })
+            .limit(50);
+          if (data) {
+            setFeedPosts(data as FeedPost[]);
+            if (insertedPost) {
+              setNewPostId(insertedPost.id);
+              setTimeout(() => setNewPostId(null), 600);
+            }
+          }
+        }
         setLoading(false);
         return;
       }
