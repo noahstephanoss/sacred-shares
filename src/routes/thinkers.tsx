@@ -739,6 +739,7 @@ function ThinkersPage() {
             <div className="space-y-3">
               {sortedFeed.map((post) => {
                 const color = getRatingColor(post.attack_rating);
+                const isScripturePost = post.tags.includes("Scripture");
                 const postUpvotes = (votes[post.id] ?? []).filter((v) => v.vote_type === "up").length;
                 const myVote = myVotes[post.id];
                 return (
@@ -759,11 +760,15 @@ function ThinkersPage() {
                         ))}
                       </div>
                     )}
-                    <div className="mt-3 flex items-center gap-2">
-                      <span className={`text-sm font-bold ${color.text}`}>{post.attack_rating}/10</span>
-                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${color.bg} ${color.text}`}>{color.label}</span>
-                    </div>
-                    <p className="mt-2 text-xs text-muted-foreground leading-relaxed">{post.ai_analysis}</p>
+                    {!isScripturePost && (
+                      <>
+                        <div className="mt-3 flex items-center gap-2">
+                          <span className={`text-sm font-bold ${color.text}`}>{post.attack_rating}/10</span>
+                          <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${color.bg} ${color.text}`}>{color.label}</span>
+                        </div>
+                        <p className="mt-2 text-xs text-muted-foreground leading-relaxed">{post.ai_analysis}</p>
+                      </>
+                    )}
                     <p className="mt-2 text-[10px] text-muted-foreground">{new Date(post.created_at).toLocaleDateString()}</p>
 
                     {/* Voting */}
