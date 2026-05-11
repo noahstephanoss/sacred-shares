@@ -503,7 +503,7 @@ function ThinkersPage() {
           }}
         >
           {/* Daily usage progress bar */}
-          <div className="mb-4">
+          {!isScriptureMode && (<div className="mb-4">
             <div className="h-[3px] w-full overflow-hidden rounded-full" style={{ backgroundColor: "var(--border)" }}>
               <div
                 className="h-full rounded-full transition-all duration-700 ease-in-out"
@@ -511,7 +511,7 @@ function ThinkersPage() {
               />
             </div>
             <p className="mt-1.5 text-[10px] text-muted-foreground tracking-wide">Daily reflection limit</p>
-          </div>
+          </div>)}
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Writing mode selector */}
             <div className="flex gap-2">
