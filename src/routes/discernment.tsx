@@ -54,8 +54,8 @@ function ConversationList({
   onNew: () => void;
 }) {
   return (
-    <div className="flex h-full flex-col" style={{ backgroundColor: "#FAF6EE" }}>
-      <div className="p-3 border-b" style={{ borderColor: "rgba(184,134,11,0.2)" }}>
+    <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
+      <div className="p-3 border-b border-sidebar-border">
         <button
           onClick={onNew}
           className="flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
@@ -68,7 +68,7 @@ function ConversationList({
       <div className="flex-1 overflow-y-auto p-2">
         {conversations.length === 0 ? (
           <p
-            className="px-3 py-6 text-center text-sm italic text-muted-foreground"
+            className="px-3 py-6 text-center text-sm italic text-sidebar-foreground/60"
             style={{ fontFamily: "'Georgia', serif" }}
           >
             Your conversations with Nathan will appear here
@@ -82,20 +82,20 @@ function ConversationList({
                 <li key={c.id}>
                   <button
                     onClick={() => onSelect(c.id)}
-                    className="block w-full rounded-md px-3 py-2 text-left transition-colors hover:bg-[#F1E9D6]"
+                    className="block w-full rounded-md px-3 py-2 text-left transition-colors hover:bg-sidebar-accent"
                     style={{
                       borderLeft: active ? "3px solid #B8860B" : "3px solid transparent",
-                      backgroundColor: active ? "#F1E9D6" : "transparent",
+                      backgroundColor: active ? "var(--sidebar-accent)" : "transparent",
                     }}
                   >
                     <div
-                      className="text-sm text-foreground line-clamp-2"
+                      className="text-sm text-sidebar-foreground line-clamp-2"
                       style={{ fontFamily: "'Georgia', serif" }}
                     >
                       {preview}
                       {(c.first_message?.length ?? 0) > 60 ? "…" : ""}
                     </div>
-                    <div className="mt-0.5 text-xs text-muted-foreground">
+                    <div className="mt-0.5 text-xs text-sidebar-foreground/60">
                       {formatConvDate(c.updated_at)}
                     </div>
                   </button>
