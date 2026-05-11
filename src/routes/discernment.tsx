@@ -383,16 +383,14 @@ function DiscernmentPage() {
                 </h2>
                 <p className="text-xs text-muted-foreground italic mb-1" style={{ fontFamily: "'Georgia', serif" }}>A discerning counselor — listens first, speaks with weight.</p>
               </div>
-              <SheetTrigger asChild>
-                <button
-                  onClick={() => setMobileSidebarOpen(true)}
-                  className="md:hidden flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium"
-                  style={{ borderColor: "rgba(184,134,11,0.3)", color: "#B8860B" }}
-                >
-                  <Menu className="h-3.5 w-3.5" />
-                  Past conversations
-                </button>
-              </SheetTrigger>
+              <button
+                onClick={() => setMobileSidebarOpen(true)}
+                className="md:hidden flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium"
+                style={{ borderColor: "rgba(184,134,11,0.3)", color: "#B8860B" }}
+              >
+                <Menu className="h-3.5 w-3.5" />
+                Past conversations
+              </button>
             </div>
             <div className="mt-1 h-0.5 w-full rounded-full bg-muted overflow-hidden">
               <div
