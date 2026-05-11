@@ -126,6 +126,8 @@ function ThinkersPage() {
   const [myVotes, setMyVotes] = useState<Record<string, "up" | "down">>({});
   const [feedSort, setFeedSort] = useState<"top" | "new">("top");
 
+  const isScriptureMode = selectedTags.includes("Scripture");
+
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
   }, []);
@@ -246,6 +248,44 @@ function ThinkersPage() {
         setContent("");
         setPostTitle("");
         setFormFading(false);
+        setLoading(false);
+        return;
+      }
+
+      // Scripture mode: skip AI analysis and daily limit, post directly
+      if (isScriptureMode) {
+        setFormFading(true);
+        await new Promise((resolve) => setTimeout(resolve, 400));
+        const { data: insertedPost } = await supabase.from("thinker_posts").insert({
+          user_id: userId,
+          body: content.trim(),
+          tags: selectedTags,
+          attack_rating: 0,
+          ai_analysis: "",
+          post_type: writeMode,
+          is_public: writeMode === "post",
+        }).select("id").single();
+
+        setContent("");
+        setSelectedTags([]);
+        setFormFading(false);
+
+        if (writeMode === "post") {
+          const { data } = await supabase
+            .from("thinker_posts")
+            .select("*")
+            .eq("post_type", "post")
+            .eq("is_public", true)
+            .order("created_at", { ascending: false })
+            .limit(50);
+          if (data) {
+            setFeedPosts(data as FeedPost[]);
+            if (insertedPost) {
+              setNewPostId(insertedPost.id);
+              setTimeout(() => setNewPostId(null), 600);
+            }
+          }
+        }
         setLoading(false);
         return;
       }
@@ -463,7 +503,7 @@ function ThinkersPage() {
           }}
         >
           {/* Daily usage progress bar */}
-          <div className="mb-4">
+          {!isScriptureMode && (<div className="mb-4">
             <div className="h-[3px] w-full overflow-hidden rounded-full" style={{ backgroundColor: "var(--border)" }}>
               <div
                 className="h-full rounded-full transition-all duration-700 ease-in-out"
@@ -471,7 +511,7 @@ function ThinkersPage() {
               />
             </div>
             <p className="mt-1.5 text-[10px] text-muted-foreground tracking-wide">Daily reflection limit</p>
-          </div>
+          </div>)}
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Writing mode selector */}
             <div className="flex gap-2">
@@ -586,7 +626,13 @@ function ThinkersPage() {
               disabled={loading || !content.trim() || (writeMode === "journal" && !postTitle.trim())}
               className="rounded-md bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
             >
-              {loading ? (writeMode === "journal" ? "Saving…" : "Analyzing...") : writeMode === "journal" ? "Save Journal Entry" : writeMode === "draft" ? "Save Draft & Analyze" : "Analyze Spiritual Attack"}
+              {loading
+                ? (writeMode === "journal" || isScriptureMode ? "Saving…" : "Analyzing...")
+                : writeMode === "journal"
+                  ? "Save Journal Entry"
+                  : isScriptureMode
+                    ? (writeMode === "draft" ? "Save Draft" : "Share Scripture")
+                    : writeMode === "draft" ? "Save Draft & Analyze" : "Analyze Spiritual Attack"}
             </button>
           </form>
         </div>
@@ -693,6 +739,7 @@ function ThinkersPage() {
             <div className="space-y-3">
               {sortedFeed.map((post) => {
                 const color = getRatingColor(post.attack_rating);
+                const isScripturePost = post.tags.includes("Scripture");
                 const postUpvotes = (votes[post.id] ?? []).filter((v) => v.vote_type === "up").length;
                 const myVote = myVotes[post.id];
                 return (
@@ -713,11 +760,15 @@ function ThinkersPage() {
                         ))}
                       </div>
                     )}
-                    <div className="mt-3 flex items-center gap-2">
-                      <span className={`text-sm font-bold ${color.text}`}>{post.attack_rating}/10</span>
-                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${color.bg} ${color.text}`}>{color.label}</span>
-                    </div>
-                    <p className="mt-2 text-xs text-muted-foreground leading-relaxed">{post.ai_analysis}</p>
+                    {!isScripturePost && (
+                      <>
+                        <div className="mt-3 flex items-center gap-2">
+                          <span className={`text-sm font-bold ${color.text}`}>{post.attack_rating}/10</span>
+                          <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${color.bg} ${color.text}`}>{color.label}</span>
+                        </div>
+                        <p className="mt-2 text-xs text-muted-foreground leading-relaxed">{post.ai_analysis}</p>
+                      </>
+                    )}
                     <p className="mt-2 text-[10px] text-muted-foreground">{new Date(post.created_at).toLocaleDateString()}</p>
 
                     {/* Voting */}
