@@ -626,7 +626,13 @@ function ThinkersPage() {
               disabled={loading || !content.trim() || (writeMode === "journal" && !postTitle.trim())}
               className="rounded-md bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
             >
-              {loading ? (writeMode === "journal" ? "Saving…" : "Analyzing...") : writeMode === "journal" ? "Save Journal Entry" : writeMode === "draft" ? "Save Draft & Analyze" : "Analyze Spiritual Attack"}
+              {loading
+                ? (writeMode === "journal" || isScriptureMode ? "Saving…" : "Analyzing...")
+                : writeMode === "journal"
+                  ? "Save Journal Entry"
+                  : isScriptureMode
+                    ? (writeMode === "draft" ? "Save Draft" : "Share Scripture")
+                    : writeMode === "draft" ? "Save Draft & Analyze" : "Analyze Spiritual Attack"}
             </button>
           </form>
         </div>
