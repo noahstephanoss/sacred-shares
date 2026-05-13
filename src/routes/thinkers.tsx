@@ -128,6 +128,44 @@ function ThinkersPage() {
 
   const isScriptureMode = selectedTags.includes("Scripture");
 
+  // Own-post management
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [editingPostId, setEditingPostId] = useState<string | null>(null);
+  const [editBody, setEditBody] = useState("");
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [savingEdit, setSavingEdit] = useState(false);
+
+  // Close menu on outside click
+  useEffect(() => {
+    if (!openMenuId) return;
+    const handler = () => setOpenMenuId(null);
+    window.addEventListener("click", handler);
+    return () => window.removeEventListener("click", handler);
+  }, [openMenuId]);
+
+  const handleEditSave = async (postId: string) => {
+    if (!editBody.trim() || savingEdit) return;
+    setSavingEdit(true);
+    const { error } = await supabase
+      .from("thinker_posts")
+      .update({ body: editBody.trim() })
+      .eq("id", postId);
+    if (!error) {
+      setFeedPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, body: editBody.trim() } : p)));
+      setEditingPostId(null);
+      setEditBody("");
+    }
+    setSavingEdit(false);
+  };
+
+  const handleDeletePost = async (postId: string) => {
+    const { error } = await supabase.from("thinker_posts").delete().eq("id", postId);
+    if (!error) {
+      setFeedPosts((prev) => prev.filter((p) => p.id !== postId));
+      setDeleteConfirmId(null);
+    }
+  };
+
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
   }, []);
@@ -745,14 +783,88 @@ function ThinkersPage() {
                 return (
                   <div
                     key={post.id}
-                    className="rounded-xl border border-border bg-card p-5"
+                    className="relative rounded-xl border border-border bg-card p-5"
                     data-new-post={newPostId === post.id ? post.id : undefined}
                     style={newPostId === post.id ? { animation: "thinker-enter 500ms ease-in forwards" } : undefined}
                   >
                     {newPostId === post.id && (
                       <style>{`@keyframes thinker-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }`}</style>
                     )}
-                    <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{post.body}</p>
+
+                    {/* Own-post menu */}
+                    {userId === post.user_id && editingPostId !== post.id && (
+                      <div className="absolute top-3 right-3">
+                        <button
+                          type="button"
+                          aria-label="Post options"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenMenuId(openMenuId === post.id ? null : post.id);
+                          }}
+                          className="rounded-md px-2 py-1 text-base leading-none text-muted-foreground hover:bg-muted hover:text-foreground"
+                        >
+                          ⋯
+                        </button>
+                        {openMenuId === post.id && (
+                          <div
+                            onClick={(e) => e.stopPropagation()}
+                            className="absolute right-0 top-full mt-1 z-10 min-w-[120px] overflow-hidden rounded-md border border-border bg-card shadow-lg"
+                          >
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingPostId(post.id);
+                                setEditBody(post.body);
+                                setOpenMenuId(null);
+                              }}
+                              className="block w-full px-3 py-2 text-left text-xs text-foreground hover:bg-muted"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setDeleteConfirmId(post.id);
+                                setOpenMenuId(null);
+                              }}
+                              className="block w-full px-3 py-2 text-left text-xs text-destructive hover:bg-muted"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {editingPostId === post.id ? (
+                      <div className="space-y-2">
+                        <textarea
+                          value={editBody}
+                          onChange={(e) => setEditBody(e.target.value)}
+                          rows={4}
+                          className="w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring/20"
+                        />
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleEditSave(post.id)}
+                            disabled={savingEdit || !editBody.trim()}
+                            className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                          >
+                            {savingEdit ? "Saving…" : "Save"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { setEditingPostId(null); setEditBody(""); }}
+                            className="rounded-md px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap pr-8">{post.body}</p>
+                    )}
                     {post.tags.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-1.5">
                         {post.tags.map((t) => (
@@ -908,6 +1020,30 @@ function ThinkersPage() {
         </div>
       </main>
       <AuthPromptModal open={showModal} onClose={closeAuthPrompt} />
+      {deleteConfirmId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4" style={{ backdropFilter: "blur(4px)" }}>
+          <div className="w-full max-w-sm rounded-xl border border-border bg-card p-6">
+            <h3 className="text-base font-semibold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>Delete this post?</h3>
+            <p className="mt-2 text-sm text-muted-foreground">Are you sure you want to delete this post? This cannot be undone.</p>
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setDeleteConfirmId(null)}
+                className="rounded-md px-4 py-2 text-sm text-muted-foreground hover:bg-muted"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDeletePost(deleteConfirmId)}
+                className="rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:opacity-90"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
