@@ -373,6 +373,37 @@ function FeedPage() {
   const [submitting, setSubmitting] = useState(false);
   const [tab, setTab] = useState<"public" | "mine">("public");
   const [readingTestimony, setReadingTestimony] = useState<Testimony | null>(null);
+  const [editingTestimony, setEditingTestimony] = useState<Testimony | null>(null);
+  const [editBody, setEditBody] = useState("");
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+
+  const handleEditSave = async () => {
+    if (!editingTestimony || !editBody.trim() || savingEdit) return;
+    setSavingEdit(true);
+    const { error } = await supabase
+      .from("testimonies")
+      .update({ body: editBody.trim() })
+      .eq("id", editingTestimony.id);
+    if (!error) {
+      const id = editingTestimony.id;
+      const newBody = editBody.trim();
+      setTestimonies((prev) => prev.map((t) => (t.id === id ? { ...t, body: newBody } : t)));
+      setMyPosts((prev) => prev.map((t) => (t.id === id ? { ...t, body: newBody } : t)));
+      setEditingTestimony(null);
+      setEditBody("");
+    }
+    setSavingEdit(false);
+  };
+
+  const handleDeleteTestimony = async (id: string) => {
+    const { error } = await supabase.from("testimonies").delete().eq("id", id);
+    if (!error) {
+      setTestimonies((prev) => prev.filter((t) => t.id !== id));
+      setMyPosts((prev) => prev.filter((t) => t.id !== id));
+      setDeleteConfirmId(null);
+    }
+  };
 
   const remaining = MAX_CHARS - body.length;
 
@@ -552,7 +583,15 @@ function FeedPage() {
         ) : (
           <div className="space-y-3">
             {displayPosts.map((t) => (
-              <TestimonyCard key={t.id} testimony={t} userId={userId} onAuthRequired={userId ? undefined : openAuthPrompt} onClick={() => setReadingTestimony(t)} />
+              <TestimonyCard
+                key={t.id}
+                testimony={t}
+                userId={userId}
+                onAuthRequired={userId ? undefined : openAuthPrompt}
+                onClick={() => setReadingTestimony(t)}
+                onEdit={() => { setEditingTestimony(t); setEditBody(t.body); }}
+                onDelete={() => setDeleteConfirmId(t.id)}
+              />
             ))}
           </div>
         )}
@@ -566,6 +605,60 @@ function FeedPage() {
         />
       )}
       <AuthPromptModal open={showModal} onClose={closeAuthPrompt} />
+      {editingTestimony && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4" style={{ backdropFilter: "blur(4px)" }}>
+          <div className="w-full max-w-lg rounded-xl border border-border bg-card p-6">
+            <h3 className="text-base font-semibold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>Edit testimony</h3>
+            <textarea
+              value={editBody}
+              onChange={(e) => { if (e.target.value.length <= MAX_CHARS) setEditBody(e.target.value); }}
+              rows={5}
+              className="mt-3 w-full resize-none rounded-md border border-input bg-background px-3 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20"
+            />
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => { setEditingTestimony(null); setEditBody(""); }}
+                className="rounded-md px-4 py-2 text-sm text-muted-foreground hover:bg-muted"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleEditSave}
+                disabled={savingEdit || !editBody.trim()}
+                className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+              >
+                {savingEdit ? "Saving…" : "Save"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {deleteConfirmId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4" style={{ backdropFilter: "blur(4px)" }}>
+          <div className="w-full max-w-sm rounded-xl border border-border bg-card p-6">
+            <h3 className="text-base font-semibold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>Delete this post?</h3>
+            <p className="mt-2 text-sm text-muted-foreground">Are you sure you want to delete this post? This cannot be undone.</p>
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setDeleteConfirmId(null)}
+                className="rounded-md px-4 py-2 text-sm text-muted-foreground hover:bg-muted"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDeleteTestimony(deleteConfirmId)}
+                className="rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:opacity-90"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
