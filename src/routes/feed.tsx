@@ -158,13 +158,67 @@ function ReactionButtons({
   );
 }
 
-function TestimonyCard({ testimony, userId, onAuthRequired, onClick }: { testimony: Testimony; userId: string | null; onAuthRequired?: () => void; onClick?: () => void }) {
+function TestimonyCard({
+  testimony,
+  userId,
+  onAuthRequired,
+  onClick,
+  onEdit,
+  onDelete,
+}: {
+  testimony: Testimony;
+  userId: string | null;
+  onAuthRequired?: () => void;
+  onClick?: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
+}) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const isOwn = userId === testimony.user_id;
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handler = () => setMenuOpen(false);
+    window.addEventListener("click", handler);
+    return () => window.removeEventListener("click", handler);
+  }, [menuOpen]);
+
   return (
     <div
-      className="rounded-xl bg-card px-5 py-4 cursor-pointer transition-shadow hover:shadow-md"
+      className="relative rounded-xl bg-card px-5 py-4 cursor-pointer transition-shadow hover:shadow-md"
       style={{ boxShadow: "0 1px 6px rgba(107,63,42,0.08)" }}
       onClick={onClick}
     >
+      {isOwn && (
+        <div className="absolute top-3 right-3" onClick={(e) => e.stopPropagation()}>
+          <button
+            type="button"
+            aria-label="Post options"
+            onClick={(e) => { e.stopPropagation(); setMenuOpen((v) => !v); }}
+            className="rounded-md px-2 py-1 text-base leading-none text-muted-foreground hover:bg-muted hover:text-foreground"
+          >
+            ⋯
+          </button>
+          {menuOpen && (
+            <div className="absolute right-0 top-full mt-1 z-10 min-w-[120px] overflow-hidden rounded-md border border-border bg-card shadow-lg">
+              <button
+                type="button"
+                onClick={() => { setMenuOpen(false); onEdit?.(); }}
+                className="block w-full px-3 py-2 text-left text-xs text-foreground hover:bg-muted"
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                onClick={() => { setMenuOpen(false); onDelete?.(); }}
+                className="block w-full px-3 py-2 text-left text-xs text-destructive hover:bg-muted"
+              >
+                Delete
+              </button>
+            </div>
+          )}
+        </div>
+      )}
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <span className="font-medium text-foreground">
           {testimony.profiles?.display_name || "Anonymous"}
@@ -173,7 +227,7 @@ function TestimonyCard({ testimony, userId, onAuthRequired, onClick }: { testimo
         <span>{timeAgo(testimony.created_at)}</span>
         {!testimony.is_public && <PrivateBadge />}
       </div>
-      <p className="mt-2 text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+      <p className="mt-2 text-sm text-foreground leading-relaxed whitespace-pre-wrap pr-8">
         {testimony.body}
       </p>
       <ReactionButtons testimonyId={testimony.id} userId={userId} onAuthRequired={onAuthRequired} />
