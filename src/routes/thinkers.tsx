@@ -128,6 +128,44 @@ function ThinkersPage() {
 
   const isScriptureMode = selectedTags.includes("Scripture");
 
+  // Own-post management
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [editingPostId, setEditingPostId] = useState<string | null>(null);
+  const [editBody, setEditBody] = useState("");
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [savingEdit, setSavingEdit] = useState(false);
+
+  // Close menu on outside click
+  useEffect(() => {
+    if (!openMenuId) return;
+    const handler = () => setOpenMenuId(null);
+    window.addEventListener("click", handler);
+    return () => window.removeEventListener("click", handler);
+  }, [openMenuId]);
+
+  const handleEditSave = async (postId: string) => {
+    if (!editBody.trim() || savingEdit) return;
+    setSavingEdit(true);
+    const { error } = await supabase
+      .from("thinker_posts")
+      .update({ body: editBody.trim() })
+      .eq("id", postId);
+    if (!error) {
+      setFeedPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, body: editBody.trim() } : p)));
+      setEditingPostId(null);
+      setEditBody("");
+    }
+    setSavingEdit(false);
+  };
+
+  const handleDeletePost = async (postId: string) => {
+    const { error } = await supabase.from("thinker_posts").delete().eq("id", postId);
+    if (!error) {
+      setFeedPosts((prev) => prev.filter((p) => p.id !== postId));
+      setDeleteConfirmId(null);
+    }
+  };
+
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
   }, []);
