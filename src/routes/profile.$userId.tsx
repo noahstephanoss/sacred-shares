@@ -285,42 +285,9 @@ function ProfilePage() {
         <p className="text-center text-muted-foreground py-24">Loading...</p>
       ) : profile ? (
         <>
-          {/* Cover Banner */}
-          <div className="relative w-full" style={{ height: 120, background: coverGradient }}>
-            {isOwnProfile && (
-              <button
-                onClick={() => setShowCoverPicker(!showCoverPicker)}
-                className="absolute bottom-3 right-4 rounded-md px-3 py-1 text-[10px] font-medium transition-colors"
-                style={{ backgroundColor: "rgba(0,0,0,0.4)", color: "#FDF8F0" }}
-              >
-                ✏️ Edit cover
-              </button>
-            )}
-            {showCoverPicker && (
-              <div className="absolute bottom-12 right-4 rounded-lg p-3 space-y-2 z-10" style={{ backgroundColor: "var(--card)", border: "1px solid var(--border)" }}>
-                <p className="text-[10px] font-medium text-muted-foreground mb-1">Choose a cover</p>
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4, 5].map((n) => (
-                    <button
-                      key={n}
-                      onClick={() => handleCoverChange(n)}
-                      className="rounded-md transition-transform hover:scale-110"
-                      style={{
-                        width: 48, height: 28,
-                        background: COVER_GRADIENTS[n],
-                        border: (profile.cover_style ?? 1) === n ? "2px solid #B8860B" : "1px solid var(--border)",
-                      }}
-                      title={COVER_NAMES[n - 1]}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          <main className="mx-auto max-w-2xl px-4">
-            {/* Avatar — overlapping the banner */}
-            <div className="flex flex-col items-center -mt-12">
+          <main className="mx-auto max-w-2xl px-4 pt-8">
+            {/* Avatar */}
+            <div className="flex flex-col items-center">
               {profile.avatar_url ? (
                 <img src={profile.avatar_url} alt="" className="h-24 w-24 rounded-full object-cover border-4" style={{ borderColor: "var(--background)" }} />
               ) : (
