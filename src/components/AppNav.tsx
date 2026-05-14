@@ -70,6 +70,15 @@ export function AppNav() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
+  useEffect(() => {
+    function onAvatarUpdated(e: Event) {
+      const detail = (e as CustomEvent<{ url: string }>).detail;
+      if (detail?.url) setAvatarUrl(detail.url);
+    }
+    window.addEventListener("avatar-updated", onAvatarUpdated);
+    return () => window.removeEventListener("avatar-updated", onAvatarUpdated);
+  }, []);
+
   const initials = displayName
     ? displayName.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2)
     : user?.email?.charAt(0).toUpperCase() ?? "?";

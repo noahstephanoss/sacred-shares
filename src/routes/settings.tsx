@@ -38,6 +38,8 @@ function SettingsPage() {
   const [profileMsg, setProfileMsg] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [avatarMsg, setAvatarMsg] = useState("");
+  const [avatarError, setAvatarError] = useState("");
 
   // Appearance
   const [darkMode, setDarkMode] = useState(false);
@@ -89,25 +91,56 @@ function SettingsPage() {
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !authedUserId) return;
-    if (!file.type.startsWith("image/")) return;
+    setAvatarMsg("");
+    setAvatarError("");
+
+    const allowed = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowed.includes(file.type)) {
+      setAvatarError("Please choose a JPG, PNG, or WebP image.");
+      e.target.value = "";
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setAvatarError("Image must be 5MB or smaller.");
+      e.target.value = "";
+      return;
+    }
+
+    // Instant local preview
+    const previewUrl = URL.createObjectURL(file);
+    setAvatarUrl(previewUrl);
 
     setUploading(true);
     setUploadProgress(30);
 
-    const ext = file.name.split(".").pop() || "jpg";
+    const extMap: Record<string, string> = {
+      "image/jpeg": "jpg",
+      "image/png": "png",
+      "image/webp": "webp",
+    };
+    const ext = extMap[file.type] || "jpg";
     const path = `${authedUserId}/avatar.${ext}`;
 
-    // Remove old avatar if exists
-    await supabase.storage.from("avatars").remove([path]);
+    // Remove any prior avatar variants
+    await supabase.storage
+      .from("avatars")
+      .remove([
+        `${authedUserId}/avatar.jpg`,
+        `${authedUserId}/avatar.png`,
+        `${authedUserId}/avatar.webp`,
+      ]);
     setUploadProgress(50);
 
     const { error: uploadError } = await supabase.storage
       .from("avatars")
-      .upload(path, file, { upsert: true });
+      .upload(path, file, { upsert: true, contentType: file.type });
 
     if (uploadError) {
       console.error("Upload failed:", uploadError);
+      setAvatarError("Upload failed. Please try again.");
       setUploading(false);
+      setUploadProgress(0);
+      URL.revokeObjectURL(previewUrl);
       return;
     }
 
@@ -121,12 +154,18 @@ function SettingsPage() {
       .update({ avatar_url: publicUrl })
       .eq("user_id", authedUserId);
 
+    URL.revokeObjectURL(previewUrl);
     setAvatarUrl(publicUrl);
     setUploadProgress(100);
+    setAvatarMsg("Profile photo updated");
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("avatar-updated", { detail: { url: publicUrl } }));
+    }
     setTimeout(() => {
       setUploading(false);
       setUploadProgress(0);
     }, 500);
+    setTimeout(() => setAvatarMsg(""), 3000);
   };
 
   // Save profile
@@ -245,7 +284,7 @@ function SettingsPage() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border-2 border-border transition-colors hover:border-primary focus:outline-none"
+                  className="group relative h-20 w-20 shrink-0 overflow-hidden rounded-full border-2 border-border transition-colors hover:border-primary focus:outline-none"
                 >
                   {avatarUrl ? (
                     <img src={avatarUrl} alt="Avatar" className="h-full w-full object-cover" />
@@ -254,20 +293,34 @@ function SettingsPage() {
                       {initials}
                     </div>
                   )}
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity hover:opacity-100">
-                    <span className="text-xs font-medium text-white">Change</span>
-                  </div>
+                  {uploading && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                      <svg className="h-6 w-6 animate-spin text-white" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" className="opacity-25" />
+                        <path d="M4 12a8 8 0 0 1 8-8" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                      </svg>
+                    </div>
+                  )}
+                  {/* Camera icon overlay */}
+                  <span
+                    className="absolute bottom-0 right-0 flex h-6 w-6 items-center justify-center rounded-full border-2 border-background text-white shadow"
+                    style={{ backgroundColor: "#B8860B" }}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-3 w-3">
+                      <path fillRule="evenodd" d="M1 8a2 2 0 0 1 2-2h.93a2 2 0 0 0 1.664-.89l.812-1.22A2 2 0 0 1 8.07 3h3.86a2 2 0 0 1 1.664.89l.812 1.22A2 2 0 0 0 16.07 6H17a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8Zm13.5 3a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm-1.5 0a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" clipRule="evenodd" />
+                    </svg>
+                  </span>
                 </button>
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/jpeg,image/png"
+                  accept="image/jpeg,image/png,image/webp"
                   className="hidden"
                   onChange={handleAvatarUpload}
                 />
                 <div className="flex-1">
                   <p className="text-sm font-medium text-foreground">Profile Photo</p>
-                  <p className="text-xs text-muted-foreground">Click to upload JPG or PNG</p>
+                  <p className="text-xs text-muted-foreground">JPG, PNG, or WebP — max 5MB</p>
                   {uploading && (
                     <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-muted">
                       <div
@@ -276,6 +329,8 @@ function SettingsPage() {
                       />
                     </div>
                   )}
+                  {avatarMsg && <p className="mt-1.5 text-xs font-medium" style={{ color: "#B8860B" }}>✓ {avatarMsg}</p>}
+                  {avatarError && <p className="mt-1.5 text-xs text-destructive">{avatarError}</p>}
                 </div>
               </div>
 
