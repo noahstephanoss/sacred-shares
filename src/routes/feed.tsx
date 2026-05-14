@@ -507,6 +507,7 @@ function FeedPage() {
                 }}
                 placeholder="What is God doing in your life today?"
                 rows={3}
+                aria-label="Share a testimony"
                 className="w-full resize-none rounded-md border border-input bg-card px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20"
               />
               <div className="flex items-center justify-between">
