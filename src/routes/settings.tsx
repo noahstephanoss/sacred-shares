@@ -287,7 +287,7 @@ function SettingsPage() {
                   className="group relative h-20 w-20 shrink-0 overflow-hidden rounded-full border-2 border-border transition-colors hover:border-primary focus:outline-none"
                 >
                   {avatarUrl ? (
-                    <img src={avatarUrl} alt="Avatar" className="h-full w-full object-cover" />
+                    <img src={avatarUrl} alt="Your profile photo" className="h-full w-full object-cover" />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center bg-muted text-lg font-bold text-muted-foreground">
                       {initials}
