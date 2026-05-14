@@ -11,6 +11,9 @@ export const Route = createFileRoute("/thinkers")({
     meta: [
       { title: "Thinkers — Testimonies" },
       { name: "description", content: "Share your thoughts and struggles. Get a spiritual attack strength assessment." },
+      { property: "og:title", content: "Thinkers — Testimonies" },
+      { property: "og:description", content: "Share your thoughts and struggles. Get a spiritual attack strength assessment." },
+      { property: "og:url", content: "https://testimonies.chat/thinkers" },
     ],
   }),
   component: ThinkersPage,
@@ -526,7 +529,7 @@ function ThinkersPage() {
       )}
 
       <div className="mx-auto max-w-3xl px-4 py-4">
-        <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>Thinkers</h2>
+        <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>Thinkers</h1>
         <p className="text-sm text-muted-foreground">Share your struggle. Know your battlefield.</p>
       </div>
 
