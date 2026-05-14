@@ -5,6 +5,9 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "Testimonies — A Faith-Based Community" },
       { name: "description", content: "Share your spiritual journey, seek counsel, and grow in faith together." },
+      { property: "og:title", content: "Testimonies — A Faith-Based Community" },
+      { property: "og:description", content: "Share your spiritual journey, seek counsel, and grow in faith together." },
+      { property: "og:url", content: "https://testimonies.chat/" },
     ],
   }),
   component: Index,
@@ -36,7 +39,7 @@ function Index() {
           className="text-6xl font-bold tracking-tight sm:text-8xl"
           style={{ fontFamily: "'Georgia', serif" }}
         >
-          Testimonies
+          Testimonies<span className="sr-only"> — A Faith-Based Community</span>
         </h1>
         <p
           className="mt-6 text-lg leading-relaxed sm:text-sm"
