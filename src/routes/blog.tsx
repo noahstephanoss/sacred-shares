@@ -8,6 +8,21 @@ export const Route = createFileRoute("/blog")({
     meta: [
       { title: "Reflections — Testimonies" },
       { name: "description", content: "Deep writings on faith and truth from the Testimonies community." },
+      { property: "og:title", content: "Reflections — Testimonies" },
+      { property: "og:description", content: "Deep writings on faith and truth from the Testimonies community." },
+      { property: "og:url", content: "https://testimonies.chat/blog" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Blog",
+          name: "Reflections",
+          url: "https://testimonies.chat/blog",
+          description: "Deep writings on faith and truth from the Testimonies community.",
+        }),
+      },
     ],
   }),
   component: BlogListPage,
@@ -61,9 +76,9 @@ function BlogListPage() {
       <AppNav />
       <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-6">
         <div>
-          <h2 className="text-3xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
+          <h1 className="text-3xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
             Reflections
-          </h2>
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">Deep writings on faith and truth</p>
         </div>
         {isAdmin && (
