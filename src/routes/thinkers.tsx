@@ -11,6 +11,9 @@ export const Route = createFileRoute("/thinkers")({
     meta: [
       { title: "Thinkers — Testimonies" },
       { name: "description", content: "Share your thoughts and struggles. Get a spiritual attack strength assessment." },
+      { property: "og:title", content: "Thinkers — Testimonies" },
+      { property: "og:description", content: "Share your thoughts and struggles. Get a spiritual attack strength assessment." },
+      { property: "og:url", content: "https://testimonies.chat/thinkers" },
     ],
   }),
   component: ThinkersPage,
@@ -526,7 +529,7 @@ function ThinkersPage() {
       )}
 
       <div className="mx-auto max-w-3xl px-4 py-4">
-        <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>Thinkers</h2>
+        <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>Thinkers</h1>
         <p className="text-sm text-muted-foreground">Share your struggle. Know your battlefield.</p>
       </div>
 
@@ -589,6 +592,7 @@ function ThinkersPage() {
               onChange={(e) => setContent(e.target.value)}
               placeholder={writeMode === "journal" ? "Write your private reflections…" : "What thought or struggle is weighing on you?"}
               rows={4}
+              aria-label="Share your thought or struggle"
               className="w-full resize-none rounded-md border border-input bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20"
             />
 
@@ -961,6 +965,7 @@ function ThinkersPage() {
                                 onChange={(e) => setResponseBody(e.target.value)}
                                 placeholder={respondingTo.type === "affirm" ? "Share encouragement…" : "Speak truth in love…"}
                                 rows={2}
+                                aria-label={respondingTo.type === "affirm" ? "Affirm this thought" : "Challenge with truth"}
                                 className="w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                               />
                               {respondingTo.type === "challenge" && (
@@ -968,6 +973,7 @@ function ThinkersPage() {
                                   value={responseScripture}
                                   onChange={(e) => setResponseScripture(e.target.value)}
                                   placeholder="Scripture reference (required)"
+                                  aria-label="Scripture reference"
                                   className="w-full rounded-md border border-input bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                                 />
                               )}

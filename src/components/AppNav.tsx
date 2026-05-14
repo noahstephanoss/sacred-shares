@@ -121,6 +121,7 @@ export function AppNav() {
                 value={discernInput}
                 onChange={(e) => setDiscernInput(e.target.value)}
                 placeholder="Ask for discernment..."
+                aria-label="Ask for discernment"
                 className="w-52 rounded-full border border-input bg-card px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
               />
               {discernInput.trim() && (
@@ -187,6 +188,7 @@ export function AppNav() {
             <div className="relative" ref={menuRef}>
               <button
                 onClick={() => setOpen(!open)}
+                aria-label="Profile"
                 className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 overflow-hidden"
               >
                 {avatarUrl ? (
@@ -255,6 +257,7 @@ export function AppNav() {
               onChange={(e) => setDiscernInput(e.target.value)}
               placeholder="Ask for discernment..."
               autoFocus
+              aria-label="Ask for discernment"
               className="w-full rounded-full border border-input bg-card px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
             <button

@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ThinkersRouteImport } from './routes/thinkers'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as FeedRouteImport } from './routes/feed'
@@ -26,6 +27,11 @@ import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 const ThinkersRoute = ThinkersRouteImport.update({
   id: '/thinkers',
   path: '/thinkers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/feed': typeof FeedRoute
   '/login': typeof LoginRoute
   '/settings': typeof SettingsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/thinkers': typeof ThinkersRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -113,6 +120,7 @@ export interface FileRoutesByTo {
   '/feed': typeof FeedRoute
   '/login': typeof LoginRoute
   '/settings': typeof SettingsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/thinkers': typeof ThinkersRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -129,6 +137,7 @@ export interface FileRoutesById {
   '/feed': typeof FeedRoute
   '/login': typeof LoginRoute
   '/settings': typeof SettingsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/thinkers': typeof ThinkersRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -146,6 +155,7 @@ export interface FileRouteTypes {
     | '/feed'
     | '/login'
     | '/settings'
+    | '/sitemap.xml'
     | '/thinkers'
     | '/auth/callback'
     | '/blog/$slug'
@@ -161,6 +171,7 @@ export interface FileRouteTypes {
     | '/feed'
     | '/login'
     | '/settings'
+    | '/sitemap.xml'
     | '/thinkers'
     | '/auth/callback'
     | '/blog/$slug'
@@ -176,6 +187,7 @@ export interface FileRouteTypes {
     | '/feed'
     | '/login'
     | '/settings'
+    | '/sitemap.xml'
     | '/thinkers'
     | '/auth/callback'
     | '/blog/$slug'
@@ -192,6 +204,7 @@ export interface RootRouteChildren {
   FeedRoute: typeof FeedRoute
   LoginRoute: typeof LoginRoute
   SettingsRoute: typeof SettingsRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ThinkersRoute: typeof ThinkersRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   BlogNewRoute: typeof BlogNewRoute
@@ -205,6 +218,13 @@ declare module '@tanstack/react-router' {
       path: '/thinkers'
       fullPath: '/thinkers'
       preLoaderRoute: typeof ThinkersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -313,6 +333,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeedRoute: FeedRoute,
   LoginRoute: LoginRoute,
   SettingsRoute: SettingsRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   ThinkersRoute: ThinkersRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   BlogNewRoute: BlogNewRoute,

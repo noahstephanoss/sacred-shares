@@ -3,11 +3,50 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/blog/$slug")({
-  head: () => ({
-    meta: [
-      { title: "Blog Post — Testimonies" },
-    ],
-  }),
+  loader: async ({ params }) => {
+    const { data } = await supabase
+      .from("blog_posts")
+      .select("title, excerpt, body, created_at")
+      .eq("slug", params.slug)
+      .eq("published", true)
+      .maybeSingle();
+    return { meta: data };
+  },
+  head: ({ params, loaderData }) => {
+    const meta = loaderData?.meta;
+    const title = meta?.title ? `${meta.title} — Testimonies` : "Reflection — Testimonies";
+    const description =
+      meta?.excerpt ||
+      (meta?.body ? meta.body.replace(/\s+/g, " ").slice(0, 155) : "A reflection from the Testimonies community.");
+    const url = `https://testimonies.chat/blog/${params.slug}`;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "article" },
+        { property: "og:url", content: url },
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: meta
+        ? [
+            {
+              type: "application/ld+json",
+              children: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "Article",
+                headline: meta.title,
+                description,
+                datePublished: meta.created_at,
+                url,
+                author: { "@type": "Organization", name: "Testimonies" },
+              }),
+            },
+          ]
+        : [],
+    };
+  },
   component: BlogPostPage,
 });
 

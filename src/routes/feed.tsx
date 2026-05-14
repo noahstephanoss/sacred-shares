@@ -10,6 +10,9 @@ export const Route = createFileRoute("/feed")({
     meta: [
       { title: "Feed — Testimonies" },
       { name: "description", content: "Read and share spiritual testimonies from the community." },
+      { property: "og:title", content: "Feed — Testimonies" },
+      { property: "og:description", content: "Read and share spiritual testimonies from the community." },
+      { property: "og:url", content: "https://testimonies.chat/feed" },
     ],
   }),
   component: FeedPage,
@@ -468,9 +471,9 @@ function FeedPage() {
       <div className="mx-auto max-w-2xl px-4 py-6">
         <div className="flex items-center justify-between mb-1">
           <div>
-            <h2 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
+            <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
               Testimonies Feed
-            </h2>
+            </h1>
             <p className="text-sm text-muted-foreground">Share what God is doing in your life</p>
           </div>
           {userId && (
@@ -504,6 +507,7 @@ function FeedPage() {
                 }}
                 placeholder="What is God doing in your life today?"
                 rows={3}
+                aria-label="Share a testimony"
                 className="w-full resize-none rounded-md border border-input bg-card px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20"
               />
               <div className="flex items-center justify-between">

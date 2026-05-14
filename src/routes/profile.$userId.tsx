@@ -49,9 +49,33 @@ function PaperStack({ children }: { children: React.ReactNode }) {
 }
 
 export const Route = createFileRoute("/profile/$userId")({
-  head: () => ({
-    meta: [{ title: "Profile — Testimonies" }],
-  }),
+  loader: async ({ params }) => {
+    const { data } = await supabase
+      .from("profiles")
+      .select("display_name, bio")
+      .eq("user_id", params.userId)
+      .maybeSingle();
+    return { profileMeta: data };
+  },
+  head: ({ params, loaderData }) => {
+    const p = loaderData?.profileMeta;
+    const name = p?.display_name?.trim() || "Member";
+    const title = `${name} — Testimonies`;
+    const description =
+      (p?.bio && p.bio.trim().slice(0, 155)) ||
+      `${name}'s testimonies and reflections on the Testimonies community.`;
+    const url = `https://testimonies.chat/profile/${params.userId}`;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "profile" },
+        { property: "og:url", content: url },
+      ],
+    };
+  },
   component: ProfilePage,
 });
 
@@ -370,7 +394,7 @@ function ProfilePage() {
                   ) : (
                     testimonies.map((t) => (
                       <div key={t.id} className="rounded-xl border border-border bg-card p-5">
-                        <h3 className="text-base font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>{t.title}</h3>
+                        <h2 className="text-base font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>{t.title}</h2>
                         <p className="mt-2 text-sm text-foreground leading-relaxed whitespace-pre-wrap">{t.body}</p>
                         <p className="mt-3 text-[10px] text-muted-foreground">
                           {new Date(t.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
