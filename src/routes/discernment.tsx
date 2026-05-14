@@ -18,6 +18,9 @@ export const Route = createFileRoute("/discernment")({
     meta: [
       { title: "Nathan — Testimonies" },
       { name: "description", content: "Seek discerning counsel from Nathan — listens first, speaks with weight." },
+      { property: "og:title", content: "Nathan — Testimonies" },
+      { property: "og:description", content: "Seek discerning counsel from Nathan — listens first, speaks with weight." },
+      { property: "og:url", content: "https://testimonies.chat/discernment" },
     ],
   }),
   component: DiscernmentPage,
@@ -312,9 +315,9 @@ function DiscernmentPage() {
             <rect x="16" y="4" width="8" height="32" rx="1.5" fill="#B8860B" />
             <rect x="4" y="14" width="32" height="8" rx="1.5" fill="#B8860B" />
           </svg>
-          <h2 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
+          <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
             Nathan
-          </h2>
+          </h1>
           <p className="text-xs text-muted-foreground italic" style={{ fontFamily: "'Georgia', serif" }}>A discerning counselor — listens first, speaks with weight.</p>
           <p className="mt-2 max-w-md text-sm text-muted-foreground">
             Seek discerning counsel. Sign in or create an account to begin.
@@ -378,9 +381,9 @@ function DiscernmentPage() {
           <div className="mx-auto w-full max-w-3xl px-4 py-3">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
+                <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
                   Nathan
-                </h2>
+                </h1>
                 <p className="text-xs text-muted-foreground italic mb-1" style={{ fontFamily: "'Georgia', serif" }}>A discerning counselor — listens first, speaks with weight.</p>
               </div>
               <button
