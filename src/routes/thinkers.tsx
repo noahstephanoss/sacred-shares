@@ -965,6 +965,7 @@ function ThinkersPage() {
                                 onChange={(e) => setResponseBody(e.target.value)}
                                 placeholder={respondingTo.type === "affirm" ? "Share encouragement…" : "Speak truth in love…"}
                                 rows={2}
+                                aria-label={respondingTo.type === "affirm" ? "Affirm this thought" : "Challenge with truth"}
                                 className="w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                               />
                               {respondingTo.type === "challenge" && (
@@ -972,6 +973,7 @@ function ThinkersPage() {
                                   value={responseScripture}
                                   onChange={(e) => setResponseScripture(e.target.value)}
                                   placeholder="Scripture reference (required)"
+                                  aria-label="Scripture reference"
                                   className="w-full rounded-md border border-input bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                                 />
                               )}
