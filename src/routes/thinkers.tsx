@@ -592,6 +592,7 @@ function ThinkersPage() {
               onChange={(e) => setContent(e.target.value)}
               placeholder={writeMode === "journal" ? "Write your private reflections…" : "What thought or struggle is weighing on you?"}
               rows={4}
+              aria-label="Share your thought or struggle"
               className="w-full resize-none rounded-md border border-input bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20"
             />
 
