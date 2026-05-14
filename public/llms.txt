@@ -1,0 +1,13 @@
+# Testimonies
+
+> A faith-based community for sharing spiritual testimonies, seeking discerning counsel, reading scripture, and growing in truth together.
+
+## Pages
+
+- [Home](/): Landing page introducing the community.
+- [Feed](/feed): Public testimonies from the community.
+- [Thinkers](/thinkers): Share thoughts and receive a spiritual attack analysis.
+- [Discernment](/discernment): Seek counsel from Nathan, a discerning AI counselor.
+- [Bible](/bible): Search scripture and read the verse of the day.
+- [Blog](/blog): Long-form reflections on faith and truth.
+- [Sign in](/login): Account access.
