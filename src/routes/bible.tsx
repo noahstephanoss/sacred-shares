@@ -10,6 +10,9 @@ export const Route = createFileRoute("/bible")({
     meta: [
       { title: "Bible — Testimonies" },
       { name: "description", content: "Search scripture and discover the verse of the day." },
+      { property: "og:title", content: "Bible — Testimonies" },
+      { property: "og:description", content: "Search scripture and discover the verse of the day." },
+      { property: "og:url", content: "https://testimonies.chat/bible" },
     ],
   }),
   component: BiblePage,
@@ -198,6 +201,7 @@ function BiblePage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder='Search a verse — e.g. John 3:16'
+              aria-label="Search scripture"
               className="flex-1 rounded-lg border border-border bg-card px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               style={{ fontFamily: SERIF }}
             />
@@ -307,6 +311,7 @@ function BiblePage() {
                   value={commentBody}
                   onChange={e => setCommentBody(e.target.value)}
                   placeholder={userId ? "Share a reflection on this chapter…" : "Sign in to leave a note…"}
+                  aria-label="Leave a reflection on this chapter"
                   className="flex-1 rounded-lg border border-border bg-card px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                   onFocus={() => { if (!userId) openAuthPrompt(); }}
                 />
