@@ -444,7 +444,7 @@ function FeedPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!body.trim() || body.length > MAX_CHARS || submitting || !userId) return;
+    if (!body.trim() || submitting || !userId) return;
     setSubmitting(true);
 
     const { error } = await supabase.from("testimonies").insert({
@@ -502,7 +502,7 @@ function FeedPage() {
             <form onSubmit={handleSubmit} className="space-y-3">
               <textarea
                 value={body}
-                onChange={(e) => setBody(e.target.value.slice(0, MAX_CHARS))}
+                onChange={(e) => setBody(e.target.value)}
                 placeholder="What is God doing in your life today?"
                 rows={3}
                 aria-label="Share a testimony"
@@ -519,21 +519,10 @@ function FeedPage() {
                     />
                     Private
                   </label>
-                  <span
-                    className={`text-xs font-medium tabular-nums ${
-                      remaining <= 0
-                        ? "text-destructive"
-                        : remaining <= 50
-                          ? "text-primary"
-                          : "text-muted-foreground"
-                    }`}
-                  >
-                    {remaining}
-                  </span>
                 </div>
                 <button
                   type="submit"
-                  disabled={submitting || !body.trim() || remaining < 0}
+                  disabled={submitting || !body.trim()}
                   className="rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                 >
                   {submitting ? "Posting..." : "Post"}
@@ -613,7 +602,7 @@ function FeedPage() {
             <h3 className="text-base font-semibold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>Edit testimony</h3>
             <textarea
               value={editBody}
-              onChange={(e) => setEditBody(e.target.value.slice(0, MAX_CHARS))}
+              onChange={(e) => setEditBody(e.target.value)}
               rows={5}
               className="mt-3 w-full resize-none rounded-md border border-input bg-background px-3 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20"
             />
