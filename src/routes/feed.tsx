@@ -444,7 +444,7 @@ function FeedPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!body.trim() || body.length > MAX_CHARS || submitting || !userId) return;
+    if (!body.trim() || submitting || !userId) return;
     setSubmitting(true);
 
     const { error } = await supabase.from("testimonies").insert({
