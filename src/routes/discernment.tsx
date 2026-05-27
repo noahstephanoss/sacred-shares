@@ -352,7 +352,7 @@ function DiscernmentPage() {
       <div className="flex flex-1 overflow-hidden">
         {/* Desktop sidebar */}
         <aside
-          className="hidden md:flex md:flex-col md:border-r"
+          className="hidden md:flex md:flex-col md:border-r md:shrink-0"
           style={{ width: "260px", borderColor: "rgba(184,134,11,0.2)" }}
         >
           <ConversationList
