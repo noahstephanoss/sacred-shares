@@ -50,6 +50,42 @@ export type Database = {
         }
         Relationships: []
       }
+      burden_sitters: {
+        Row: {
+          burden_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          burden_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          burden_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "burden_sitters_burden_id_fkey"
+            columns: ["burden_id"]
+            isOneToOne: false
+            referencedRelation: "burdens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "burden_sitters_burden_id_fkey"
+            columns: ["burden_id"]
+            isOneToOne: false
+            referencedRelation: "burdens_feed"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       burdens: {
         Row: {
           body: string
