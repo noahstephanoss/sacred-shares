@@ -154,6 +154,9 @@ export function AppNav() {
           <Link to="/feed" className="text-sm text-muted-foreground hover:text-foreground" activeProps={{ className: "text-sm text-foreground font-medium" }}>
             Feed
           </Link>
+          <Link to="/burdens" className="text-sm text-muted-foreground hover:text-foreground" activeProps={{ className: "text-sm text-foreground font-medium" }}>
+            Burdens
+          </Link>
           <Link to="/discernment" className="text-sm text-muted-foreground hover:text-foreground" activeProps={{ className: "text-sm text-foreground font-medium" }}>
             Discernment
           </Link>
