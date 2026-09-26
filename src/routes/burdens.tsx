@@ -100,6 +100,123 @@ function SitWithButton({
         🤍 {sitting ? "Sitting with them" : "Sit with them"}
       </button>
       {label && <p className="mt-1.5 px-3 text-xs text-muted-foreground">{label}</p>}
+      <PrayerCircle burdenId={burdenId} userId={userId} isMine={isMine} sitting={sitting} sitterCount={count} />
+    </div>
+  );
+}
+
+const CIRCLE_MAX = 8;
+
+function PrayerCircle({
+  burdenId,
+  userId,
+  isMine,
+  sitting,
+  sitterCount,
+}: {
+  burdenId: string;
+  userId: string | null;
+  isMine: boolean;
+  sitting: boolean;
+  sitterCount: number;
+}) {
+  const [circle, setCircle] = useState<{ id: string; status: string } | null | undefined>(undefined);
+  const [isMember, setIsMember] = useState(false);
+  const [memberCount, setMemberCount] = useState(0);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    const { data } = await (supabase as any)
+      .from("burden_circles")
+      .select("id, status")
+      .eq("burden_id", burdenId)
+      .maybeSingle();
+    setCircle(data ?? null);
+    if (data && userId) {
+      const { data: n } = await (supabase as any).rpc("circle_member_count", { circle: data.id });
+      setMemberCount(typeof n === "number" ? n : 0);
+      const { data: me } = await (supabase as any)
+        .from("circle_members")
+        .select("id")
+        .eq("circle_id", data.id)
+        .eq("user_id", userId)
+        .maybeSingle();
+      setIsMember(!!me);
+    }
+  }, [burdenId, userId]);
+
+  useEffect(() => { load(); }, [load]);
+
+  const start = async () => {
+    if (!userId || busy) return;
+    setBusy(true); setErr(null);
+    const { data, error } = await (supabase as any)
+      .from("burden_circles")
+      .insert({ burden_id: burdenId })
+      .select("id")
+      .single();
+    if (!error && data) {
+      await (supabase as any).from("circle_members").insert({ circle_id: data.id, user_id: userId, role: "author" });
+    } else setErr("Couldn't start the circle. Please try again.");
+    await load();
+    setBusy(false);
+  };
+
+  const join = async () => {
+    if (!userId || !circle || busy) return;
+    setBusy(true); setErr(null);
+    const { error } = await (supabase as any)
+      .from("circle_members")
+      .insert({ circle_id: circle.id, user_id: userId, role: "member" });
+    if (error) setErr("Couldn't join the circle. It may be full or closed.");
+    await load();
+    setBusy(false);
+  };
+
+  if (circle === undefined) return null;
+
+  if (!circle) {
+    if (isMine && sitterCount >= 2) {
+      return (
+        <div className="mt-2 px-3">
+          <button
+            onClick={start}
+            disabled={busy}
+            className="rounded-md border border-primary/40 px-3 py-1 text-xs font-medium text-primary hover:bg-primary/10 disabled:opacity-50"
+          >
+            {busy ? "Starting..." : "Start a prayer circle"}
+          </button>
+          {err && <p className="mt-1 text-xs text-destructive">{err}</p>}
+        </div>
+      );
+    }
+    return null;
+  }
+
+  const full = memberCount >= CIRCLE_MAX;
+  return (
+    <div className="mt-2 px-3 space-y-1">
+      <p className="text-xs italic text-muted-foreground">A prayer circle is carrying this.</p>
+      {isMember && (
+        <p className="text-xs text-muted-foreground">
+          {memberCount} {memberCount === 1 ? "member" : "members"} in this circle
+        </p>
+      )}
+      {!isMember && !isMine && sitting && circle.status === "open" && (
+        full ? (
+          <p className="text-xs text-muted-foreground">This circle is full</p>
+        ) : (
+          <button
+            onClick={join}
+            disabled={busy}
+            className="rounded-md border border-primary/40 px-3 py-1 text-xs font-medium text-primary hover:bg-primary/10 disabled:opacity-50"
+          >
+            {busy ? "Joining..." : "Join the circle"}
+          </button>
+        )
+      )}
+      {err && <p className="text-xs text-destructive">{err}</p>}
     </div>
   );
 }

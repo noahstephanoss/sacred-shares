@@ -50,6 +50,45 @@ export type Database = {
         }
         Relationships: []
       }
+      burden_circles: {
+        Row: {
+          burden_id: string
+          created_at: string
+          ends_at: string | null
+          id: string
+          status: string
+        }
+        Insert: {
+          burden_id: string
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          status?: string
+        }
+        Update: {
+          burden_id?: string
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "burden_circles_burden_id_fkey"
+            columns: ["burden_id"]
+            isOneToOne: true
+            referencedRelation: "burdens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "burden_circles_burden_id_fkey"
+            columns: ["burden_id"]
+            isOneToOne: true
+            referencedRelation: "burdens_feed"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       burden_sitters: {
         Row: {
           burden_id: string
@@ -109,6 +148,38 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      circle_members: {
+        Row: {
+          circle_id: string
+          id: string
+          joined_at: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          circle_id: string
+          id?: string
+          joined_at?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          circle_id?: string
+          id?: string
+          joined_at?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "circle_members_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "burden_circles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       daily_usage: {
         Row: {
@@ -519,6 +590,8 @@ export type Database = {
       }
     }
     Functions: {
+      can_join_circle: { Args: { circle: string }; Returns: boolean }
+      circle_member_count: { Args: { circle: string }; Returns: number }
       get_daily_usage: {
         Args: { _user_id: string }
         Returns: {
@@ -537,6 +610,9 @@ export type Database = {
         Args: { _field: string; _user_id: string }
         Returns: number
       }
+      is_burden_author: { Args: { _burden: string }; Returns: boolean }
+      is_circle_author: { Args: { circle: string }; Returns: boolean }
+      is_circle_member: { Args: { circle: string }; Returns: boolean }
       update_user_streak: {
         Args: { p_user_id: string }
         Returns: {
