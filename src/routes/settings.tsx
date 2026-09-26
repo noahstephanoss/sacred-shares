@@ -3,7 +3,7 @@ import { useState, useEffect, useRef, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppNav } from "@/components/AppNav";
 import { AuthPromptModal, useAuthPrompt } from "@/components/AuthPromptModal";
-import { deleteAccount } from "@/server/account.functions";
+import { deleteAccount } from "@/lib/account.functions";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
