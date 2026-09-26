@@ -1,0 +1,2 @@
+REVOKE EXECUTE ON FUNCTION public.is_circle_member(uuid), public.circle_member_count(uuid), public.is_burden_author(uuid), public.can_join_circle(uuid), public.is_circle_author(uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.is_circle_member(uuid), public.circle_member_count(uuid), public.is_burden_author(uuid), public.can_join_circle(uuid), public.is_circle_author(uuid) TO authenticated;
