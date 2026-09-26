@@ -32,6 +32,78 @@ interface Burden {
 }
 interface Author { display_name: string | null; avatar_url: string | null }
 
+function SitWithButton({
+  burdenId,
+  userId,
+  isMine,
+  onAuthRequired,
+}: {
+  burdenId: string;
+  userId: string | null;
+  isMine: boolean;
+  onAuthRequired: () => void;
+}) {
+  const [count, setCount] = useState(0);
+  const [sitting, setSitting] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    (supabase as any)
+      .from("burden_sitters")
+      .select("user_id")
+      .eq("burden_id", burdenId)
+      .then(({ data }: { data: { user_id: string }[] | null }) => {
+        if (!data) return;
+        setCount(data.length);
+        if (userId) setSitting(data.some((r) => r.user_id === userId));
+      });
+  }, [burdenId, userId]);
+
+  const toggle = async () => {
+    if (!userId) return onAuthRequired();
+    if (busy) return;
+    setBusy(true);
+    if (sitting) {
+      await (supabase as any)
+        .from("burden_sitters")
+        .delete()
+        .eq("burden_id", burdenId)
+        .eq("user_id", userId);
+      setSitting(false);
+      setCount((c) => Math.max(0, c - 1));
+    } else {
+      await (supabase as any)
+        .from("burden_sitters")
+        .insert({ burden_id: burdenId, user_id: userId });
+      setSitting(true);
+      setCount((c) => c + 1);
+    }
+    setBusy(false);
+  };
+
+  let label: string | null = null;
+  if (count > 0) {
+    if (isMine) label = `${count} ${count === 1 ? "person is" : "people are"} sitting with you`;
+    else if (sitting) label = count === 1 ? "You are sitting with them" : `You and ${count - 1} ${count - 1 === 1 ? "other" : "others"} are sitting with them`;
+  }
+
+  return (
+    <div className="mt-3 border-t border-border pt-3">
+      <button
+        onClick={toggle}
+        className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-all duration-500 ${
+          sitting
+            ? "bg-primary/10 text-primary"
+            : "text-muted-foreground hover:bg-muted hover:text-foreground"
+        }`}
+      >
+        🤍 {sitting ? "Sitting with them" : "Sit with them"}
+      </button>
+      {label && <p className="mt-1.5 px-3 text-xs text-muted-foreground">{label}</p>}
+    </div>
+  );
+}
+
 function BurdensPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [burdens, setBurdens] = useState<Burden[]>([]);
@@ -156,6 +228,12 @@ function BurdensPage() {
                     )}
                   </div>
                   <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-foreground" style={{ fontFamily: "'Georgia', serif" }}>{b.body}</p>
+                  <SitWithButton
+                    burdenId={b.id}
+                    userId={userId}
+                    isMine={!!b.is_mine}
+                    onAuthRequired={openAuthPrompt}
+                  />
                 </article>
               );
             })
