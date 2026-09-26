@@ -50,6 +50,30 @@ export type Database = {
         }
         Relationships: []
       }
+      burdens: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          is_anonymous: boolean
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          is_anonymous?: boolean
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          is_anonymous?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
       daily_usage: {
         Row: {
           discernment_count: number
@@ -430,7 +454,33 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      burdens_feed: {
+        Row: {
+          body: string | null
+          created_at: string | null
+          id: string | null
+          is_anonymous: boolean | null
+          is_mine: boolean | null
+          user_id: string | null
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_anonymous?: boolean | null
+          is_mine?: never
+          user_id?: never
+        }
+        Update: {
+          body?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_anonymous?: boolean | null
+          is_mine?: never
+          user_id?: never
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_daily_usage: {
