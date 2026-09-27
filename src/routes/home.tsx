@@ -77,6 +77,18 @@ const REACTION_CONFIG: { type: ReactionType; icon: string; label: string }[] = [
   { type: "peace", icon: "🕊️", label: "Peace" },
 ];
 
+const SHARE_PROMPTS = [
+  "What is God doing in your life today?",
+  "Where did you see God this week?",
+  "What prayer did He answer?",
+  "What's something He brought you through?",
+  "What verse has been speaking to you lately?",
+  "How has God been faithful to you?",
+  "What are you thankful for today?",
+  "What did God teach you recently?",
+];
+
+
 function ReactionButtons({
   testimonyId,
   userId,
@@ -176,7 +188,7 @@ function ReactionButtons({
   const reactorCount = uniqueReactors.length;
   const lead = currentUserReacted ? "You" : otherRecent?.display_name;
   const summary = lead
-    ? reactorCount === 1 ? `${lead} reacted` : `${lead} and ${reactorCount - 1} others reacted`
+    ? reactorCount === 1 ? `${lead} reacted` : `${lead} and ${reactorCount - 1 === 1 ? "1 other" : `${reactorCount - 1} others`} reacted`
     : "";
   const visibleReactors = reactionTab === "all"
     ? sortedReactors
@@ -484,6 +496,7 @@ function FeedPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [body, setBody] = useState("");
+  const [sharePrompt] = useState(() => SHARE_PROMPTS[Math.floor(Math.random() * SHARE_PROMPTS.length)]);
   const [isPublic, setIsPublic] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [tab, setTab] = useState<"public" | "mine">("public");
@@ -655,7 +668,7 @@ function FeedPage() {
               <textarea
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
-                placeholder="What is God doing in your life today?"
+                placeholder={sharePrompt}
                 rows={3}
                 aria-label="Share a testimony"
                 className="w-full resize-none rounded-md border border-input bg-card px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20"
