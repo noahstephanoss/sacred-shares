@@ -37,8 +37,8 @@ function LoginPage() {
         // Browser is redirecting to the provider — nothing more to do.
         return;
       }
-      // Session already set — go to the feed.
-      navigate({ to: "/feed" });
+      // Session already set — go Home.
+      navigate({ to: "/home" });
     } catch {
       setError("An unexpected error occurred.");
       setLoading(false);
@@ -67,7 +67,7 @@ function LoginPage() {
           // Email confirmation required
           navigate({ to: "/check-email", search: { email } });
         } else if (data.session) {
-          navigate({ to: "/feed" });
+          navigate({ to: "/home" });
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -77,7 +77,7 @@ function LoginPage() {
         if (error) {
           setError(error.message);
         } else {
-          navigate({ to: "/feed" });
+          navigate({ to: "/home" });
         }
       }
     } catch {

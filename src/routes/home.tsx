@@ -12,11 +12,13 @@ export const Route = createFileRoute("/home")({
   }),
   head: () => ({
     meta: [
-      { title: "Feed — Testimonies" },
+      { title: "Home — Testimonies" },
       { name: "description", content: "Read and share spiritual testimonies from the community." },
-      { property: "og:title", content: "Feed — Testimonies" },
+      { property: "og:title", content: "Home — Testimonies" },
       { property: "og:description", content: "Read and share spiritual testimonies from the community." },
-      { property: "og:url", content: "https://testimonies.chat/feed" },
+      { property: "og:url", content: "https://testimonies.chat/home" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: FeedPage,
@@ -81,6 +83,7 @@ function ReactionButtons({
   const [counts, setCounts] = useState<Record<ReactionType, number>>({ praying: 0, amen: 0, peace: 0 });
   const [myReactions, setMyReactions] = useState<Set<ReactionType>>(new Set());
   const [busy, setBusy] = useState(false);
+  const [popping, setPopping] = useState<ReactionType | null>(null);
 
   useEffect(() => {
     // Fetch counts
@@ -119,24 +122,36 @@ function ReactionButtons({
       return;
     }
     if (busy) return;
-    setBusy(true);
-
     const has = myReactions.has(type);
+    const previousReactions = new Set(myReactions);
+    const previousCounts = { ...counts };
+    setBusy(true);
+    setPopping(type);
+    window.setTimeout(() => setPopping((current) => current === type ? null : current), 260);
+
     if (has) {
-      await supabase
+      setMyReactions((prev) => { const next = new Set(prev); next.delete(type); return next; });
+      setCounts((prev) => ({ ...prev, [type]: Math.max(0, prev[type] - 1) }));
+      const { error } = await supabase
         .from("testimony_reactions")
         .delete()
         .eq("testimony_id", testimonyId)
         .eq("user_id", userId)
         .eq("type", type);
-      setMyReactions((prev) => { const n = new Set(prev); n.delete(type); return n; });
-      setCounts((prev) => ({ ...prev, [type]: Math.max(0, prev[type] - 1) }));
+      if (error) {
+        setMyReactions(previousReactions);
+        setCounts(previousCounts);
+      }
     } else {
-      await supabase
-        .from("testimony_reactions")
-        .insert({ testimony_id: testimonyId, user_id: userId, type } as any);
       setMyReactions((prev) => new Set(prev).add(type));
       setCounts((prev) => ({ ...prev, [type]: prev[type] + 1 }));
+      const { error } = await supabase
+        .from("testimony_reactions")
+        .insert({ testimony_id: testimonyId, user_id: userId, type } as any);
+      if (error) {
+        setMyReactions(previousReactions);
+        setCounts(previousCounts);
+      }
     }
     setBusy(false);
   };
@@ -150,11 +165,11 @@ function ReactionButtons({
             key={r.type}
             onClick={() => !disabled && toggle(r.type)}
             disabled={disabled}
-            className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-all duration-500 ${
+            className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors duration-200 ${
               active
                 ? "bg-primary/10 text-primary"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
-            } ${disabled ? "cursor-default" : ""}`}
+            } ${disabled ? "cursor-default" : ""} ${popping === r.type ? "animate-reaction-pop" : ""}`}
           >
             {r.icon} {r.label}
             {counts[r.type] > 0 && <span>{counts[r.type]}</span>}
@@ -192,8 +207,7 @@ function TestimonyCard({
 
   return (
     <div
-      className="relative rounded-xl bg-card px-5 py-4 cursor-pointer transition-shadow hover:shadow-md"
-      style={{ boxShadow: "0 1px 6px rgba(107,63,42,0.08)" }}
+      className="relative cursor-pointer rounded-lg border border-border/70 bg-card px-6 py-5 shadow-sm transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-1 hover:shadow-md active:-translate-y-0.5 active:shadow-md motion-reduce:transform-none motion-reduce:transition-none"
       onClick={onClick}
     >
       {isOwn && (
@@ -304,7 +318,7 @@ function ReadingOverlay({
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
               <path fillRule="evenodd" d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z" clipRule="evenodd" />
             </svg>
-            Back to feed
+            Back to Home
           </button>
         </div>
       </header>
@@ -476,7 +490,7 @@ function FeedPage() {
       setBody("");
       setIsPublic(true);
       setShowForm(false);
-      if (burdenId) navigate({ to: "/feed", search: {}, replace: true });
+      if (burdenId) navigate({ to: "/home", search: {}, replace: true });
       await loadTestimonies();
     }
     setSubmitting(false);
@@ -491,7 +505,7 @@ function FeedPage() {
         <div className="flex items-center justify-between mb-1">
           <div>
             <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
-              Testimonies Feed
+              Home
             </h1>
             <p className="text-sm text-muted-foreground">Share what God is doing in your life</p>
           </div>
@@ -561,7 +575,7 @@ function FeedPage() {
                 tab === "public" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              Public Feed
+              Public Home
             </button>
             <button
               onClick={() => setTab("mine")}

@@ -174,8 +174,8 @@ function BiblePage() {
     setTimeout(() => setCopied(false), 2000);
   }
 
-  function handleShareToFeed(text: string, ref: string) {
-    navigate({ to: "/feed", search: { prefill: `"${text}" — ${ref}` } as any });
+  function handleShareToHome(text: string, ref: string) {
+    navigate({ to: "/home", search: { prefill: `"${text}" — ${ref}` } as any });
   }
 
   function goBack() {
@@ -223,7 +223,7 @@ function BiblePage() {
 
         {searchResult && (
           <div className="mb-10">
-            <VerseCard verse={searchResult} onCopy={() => handleCopy(searchResult.text, searchResult.reference)} onShare={() => handleShareToFeed(searchResult.text, searchResult.reference)} copied={copied} />
+            <VerseCard verse={searchResult} onCopy={() => handleCopy(searchResult.text, searchResult.reference)} onShare={() => handleShareToHome(searchResult.text, searchResult.reference)} copied={copied} />
           </div>
         )}
 
@@ -237,7 +237,7 @@ function BiblePage() {
           {dailyLoading ? (
             <p className="text-center text-muted-foreground">Loading…</p>
           ) : dailyVerse ? (
-            <VerseCard verse={dailyVerse} onCopy={() => handleCopy(dailyVerse.text, dailyVerse.reference)} onShare={() => handleShareToFeed(dailyVerse.text, dailyVerse.reference)} copied={copied} />
+            <VerseCard verse={dailyVerse} onCopy={() => handleCopy(dailyVerse.text, dailyVerse.reference)} onShare={() => handleShareToHome(dailyVerse.text, dailyVerse.reference)} copied={copied} />
           ) : (
             <p className="text-center text-muted-foreground">Could not load today's verse.</p>
           )}
@@ -357,7 +357,7 @@ function VerseCard({ verse, onCopy, onShare, copied }: { verse: VerseResult; onC
           {copied ? "Copied ✓" : "Copy"}
         </button>
         <button onClick={onShare} className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
-          Share to Feed
+          Share to Home
         </button>
       </div>
     </div>
