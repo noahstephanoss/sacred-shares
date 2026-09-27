@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -20,23 +21,30 @@ function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleAppleSignIn = async () => {
+  const handleSocialSignIn = async (provider: "apple" | "google") => {
     setError("");
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "apple",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
+      const result = await lovable.auth.signInWithOAuth(provider, {
+        redirect_uri: `${window.location.origin}/auth/callback`,
       });
-      if (error) setError(error.message);
+      if (result.error) {
+        setError(result.error.message || "Sign-in failed. Please try again.");
+        setLoading(false);
+        return;
+      }
+      if (result.redirected) {
+        // Browser is redirecting to the provider — nothing more to do.
+        return;
+      }
+      // Session already set — go to the feed.
+      navigate({ to: "/feed" });
     } catch {
       setError("An unexpected error occurred.");
       setLoading(false);
     }
-    // On success the browser is redirected to Apple — no further handling here.
   };
+
 
 
   const handleSubmit = async (e: FormEvent) => {
