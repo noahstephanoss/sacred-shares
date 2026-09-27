@@ -21,6 +21,7 @@ import { Route as BlogRouteImport } from './routes/blog'
 import { Route as BibleRouteImport } from './routes/bible'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProfileUserIdRouteImport } from './routes/profile.$userId'
+import { Route as CirclesCircleIdRouteImport } from './routes/circles.$circleId'
 import { Route as BlogNewRouteImport } from './routes/blog_.new'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
@@ -85,6 +86,11 @@ const ProfileUserIdRoute = ProfileUserIdRouteImport.update({
   path: '/profile/$userId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CirclesCircleIdRoute = CirclesCircleIdRouteImport.update({
+  id: '/circles/$circleId',
+  path: '/circles/$circleId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogNewRoute = BlogNewRouteImport.update({
   id: '/blog_/new',
   path: '/blog/new',
@@ -116,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/new': typeof BlogNewRoute
+  '/circles/$circleId': typeof CirclesCircleIdRoute
   '/profile/$userId': typeof ProfileUserIdRoute
 }
 export interface FileRoutesByTo {
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/new': typeof BlogNewRoute
+  '/circles/$circleId': typeof CirclesCircleIdRoute
   '/profile/$userId': typeof ProfileUserIdRoute
 }
 export interface FileRoutesById {
@@ -151,6 +159,7 @@ export interface FileRoutesById {
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog_/new': typeof BlogNewRoute
+  '/circles/$circleId': typeof CirclesCircleIdRoute
   '/profile/$userId': typeof ProfileUserIdRoute
 }
 export interface FileRouteTypes {
@@ -170,6 +179,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/blog/$slug'
     | '/blog/new'
+    | '/circles/$circleId'
     | '/profile/$userId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -187,6 +197,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/blog/$slug'
     | '/blog/new'
+    | '/circles/$circleId'
     | '/profile/$userId'
   id:
     | '__root__'
@@ -204,6 +215,7 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/blog/$slug'
     | '/blog_/new'
+    | '/circles/$circleId'
     | '/profile/$userId'
   fileRoutesById: FileRoutesById
 }
@@ -221,6 +233,7 @@ export interface RootRouteChildren {
   ThinkersRoute: typeof ThinkersRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   BlogNewRoute: typeof BlogNewRoute
+  CirclesCircleIdRoute: typeof CirclesCircleIdRoute
   ProfileUserIdRoute: typeof ProfileUserIdRoute
 }
 
@@ -310,6 +323,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileUserIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/circles/$circleId': {
+      id: '/circles/$circleId'
+      path: '/circles/$circleId'
+      fullPath: '/circles/$circleId'
+      preLoaderRoute: typeof CirclesCircleIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog_/new': {
       id: '/blog_/new'
       path: '/blog/new'
@@ -358,6 +378,7 @@ const rootRouteChildren: RootRouteChildren = {
   ThinkersRoute: ThinkersRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   BlogNewRoute: BlogNewRoute,
+  CirclesCircleIdRoute: CirclesCircleIdRoute,
   ProfileUserIdRoute: ProfileUserIdRoute,
 }
 export const routeTree = rootRouteImport

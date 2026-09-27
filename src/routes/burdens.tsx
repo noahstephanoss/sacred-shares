@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect, useCallback, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppNav } from "@/components/AppNav";
@@ -199,9 +199,18 @@ function PrayerCircle({
     <div className="mt-2 px-3 space-y-1">
       <p className="text-xs italic text-muted-foreground">A prayer circle is carrying this.</p>
       {isMember && (
-        <p className="text-xs text-muted-foreground">
-          {memberCount} {memberCount === 1 ? "member" : "members"} in this circle
-        </p>
+        <div className="flex items-center gap-3">
+          <p className="text-xs text-muted-foreground">
+            {memberCount} {memberCount === 1 ? "member" : "members"} in this circle
+          </p>
+          <Link
+            to="/circles/$circleId"
+            params={{ circleId: circle.id }}
+            className="rounded-md border border-primary/40 px-3 py-1 text-xs font-medium text-primary hover:bg-primary/10"
+          >
+            Open circle
+          </Link>
+        </div>
       )}
       {!isMember && !isMine && sitting && circle.status === "open" && (
         full ? (
