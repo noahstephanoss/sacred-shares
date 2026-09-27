@@ -33,7 +33,7 @@ export function AppNav() {
 
   const getPageContext = (): string => {
     const path = routerState.location.pathname;
-    if (path === "/feed") return "Browsing the Testimonies feed";
+    if (path === "/home") return "Browsing Testimonies Home";
     if (path === "/thinkers") return "Browsing the Thinkers section";
     if (path === "/bible") return "Reading the Bible";
     if (path.startsWith("/blog")) return "Reading the blog";
@@ -151,8 +151,8 @@ export function AppNav() {
             </button>
           )}
 
-          <Link to="/feed" className="text-sm text-muted-foreground hover:text-foreground" activeProps={{ className: "text-sm text-foreground font-medium" }}>
-            Feed
+          <Link to="/home" className="text-sm text-muted-foreground hover:text-foreground" activeProps={{ className: "text-sm text-foreground font-medium" }}>
+            Home
           </Link>
           <Link to="/burdens" className="text-sm text-muted-foreground hover:text-foreground" activeProps={{ className: "text-sm text-foreground font-medium" }}>
             Burdens

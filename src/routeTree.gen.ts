@@ -13,6 +13,7 @@ import { Route as ThinkersRouteImport } from './routes/thinkers'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as HomeRouteImport } from './routes/home'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as DiscernmentRouteImport } from './routes/discernment'
 import { Route as CheckEmailRouteImport } from './routes/check-email'
@@ -44,6 +45,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HomeRoute = HomeRouteImport.update({
+  id: '/home',
+  path: '/home',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeedRoute = FeedRouteImport.update({
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/check-email': typeof CheckEmailRoute
   '/discernment': typeof DiscernmentRoute
   '/feed': typeof FeedRoute
+  '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/check-email': typeof CheckEmailRoute
   '/discernment': typeof DiscernmentRoute
   '/feed': typeof FeedRoute
+  '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -152,6 +160,7 @@ export interface FileRoutesById {
   '/check-email': typeof CheckEmailRoute
   '/discernment': typeof DiscernmentRoute
   '/feed': typeof FeedRoute
+  '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -172,6 +181,7 @@ export interface FileRouteTypes {
     | '/check-email'
     | '/discernment'
     | '/feed'
+    | '/home'
     | '/login'
     | '/settings'
     | '/sitemap.xml'
@@ -190,6 +200,7 @@ export interface FileRouteTypes {
     | '/check-email'
     | '/discernment'
     | '/feed'
+    | '/home'
     | '/login'
     | '/settings'
     | '/sitemap.xml'
@@ -208,6 +219,7 @@ export interface FileRouteTypes {
     | '/check-email'
     | '/discernment'
     | '/feed'
+    | '/home'
     | '/login'
     | '/settings'
     | '/sitemap.xml'
@@ -227,6 +239,7 @@ export interface RootRouteChildren {
   CheckEmailRoute: typeof CheckEmailRoute
   DiscernmentRoute: typeof DiscernmentRoute
   FeedRoute: typeof FeedRoute
+  HomeRoute: typeof HomeRoute
   LoginRoute: typeof LoginRoute
   SettingsRoute: typeof SettingsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -265,6 +278,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/home': {
+      id: '/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof HomeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/feed': {
@@ -372,6 +392,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckEmailRoute: CheckEmailRoute,
   DiscernmentRoute: DiscernmentRoute,
   FeedRoute: FeedRoute,
+  HomeRoute: HomeRoute,
   LoginRoute: LoginRoute,
   SettingsRoute: SettingsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

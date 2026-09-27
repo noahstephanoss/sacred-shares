@@ -366,10 +366,10 @@ function BurdensPage() {
                       <button onClick={() => setLiftingId(b.id)} className="text-xs font-medium text-primary hover:underline">Mark as lifted</button>
                     )}
                     {b.is_mine && b.lifted_at && !b.testimony_id && (
-                      <Link to="/feed" search={{ burden: b.id }} className="text-xs text-primary hover:underline">Write testimony</Link>
+                      <Link to="/home" search={{ burden: b.id }} className="text-xs text-primary hover:underline">Write testimony</Link>
                     )}
                     {!b.is_anonymous && b.lifted_at && b.testimony_id && (
-                      <Link to="/feed" search={{ testimony: b.testimony_id }} className="text-xs text-primary hover:underline">Read the testimony</Link>
+                      <Link to="/home" search={{ testimony: b.testimony_id }} className="text-xs text-primary hover:underline">Read the testimony</Link>
                     )}
                   </div>
                   <SitWithButton

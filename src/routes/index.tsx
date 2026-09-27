@@ -80,8 +80,8 @@ function Index() {
 
         {/* Quick nav */}
         <div className="mt-16 flex flex-wrap justify-center gap-6 text-sm">
-          <Link to="/feed" className="text-foreground transition-colors hover:underline hover:decoration-primary hover:underline-offset-4">
-            Feed
+          <Link to="/home" className="text-foreground transition-colors hover:underline hover:decoration-primary hover:underline-offset-4">
+            Home
           </Link>
           <span style={{ color: "#B8860B" }}>·</span>
           <Link to="/discernment" className="text-foreground transition-colors hover:underline hover:decoration-primary hover:underline-offset-4">

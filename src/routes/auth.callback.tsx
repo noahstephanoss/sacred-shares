@@ -21,14 +21,14 @@ function AuthCallbackPage() {
         }
 
         if (data.session) {
-          navigate({ to: "/feed" });
+          navigate({ to: "/home" });
         } else {
           // No session yet — listen for the auth state change
           const { data: { subscription } } = supabase.auth.onAuthStateChange(
             (event, session) => {
               if (session) {
                 subscription.unsubscribe();
-                navigate({ to: "/feed" });
+                navigate({ to: "/home" });
               }
             }
           );

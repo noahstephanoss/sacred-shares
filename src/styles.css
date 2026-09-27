@@ -61,6 +61,22 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+@keyframes reaction-pop {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.16); }
+  100% { transform: scale(1); }
+}
+
+@utility animate-reaction-pop {
+  animation: reaction-pop 220ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-reaction-pop {
+    animation: none;
+  }
+}
+
 :root {
   --radius: 0.625rem;
   /* Leather Bible — aged ivory / leather brown (light) */
