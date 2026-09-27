@@ -77,6 +77,18 @@ const REACTION_CONFIG: { type: ReactionType; icon: string; label: string }[] = [
   { type: "peace", icon: "🕊️", label: "Peace" },
 ];
 
+const SHARE_PROMPTS = [
+  "What is God doing in your life today?",
+  "Where did you see God this week?",
+  "What prayer did He answer?",
+  "What's something He brought you through?",
+  "What verse has been speaking to you lately?",
+  "How has God been faithful to you?",
+  "What are you thankful for today?",
+  "What did God teach you recently?",
+];
+
+
 function ReactionButtons({
   testimonyId,
   userId,
