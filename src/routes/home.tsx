@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef, useCallback, type FormEvent } from "react";
+import { createPortal } from "react-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { AppNav } from "@/components/AppNav";
 import { AuthPromptModal, useAuthPrompt } from "@/components/AuthPromptModal";
@@ -63,6 +64,13 @@ function PrivateBadge() {
 
 type ReactionType = "praying" | "amen" | "peace";
 
+type Reactor = {
+  user_id: string;
+  display_name: string;
+  reaction_type: ReactionType;
+  reacted_at: string;
+};
+
 const REACTION_CONFIG: { type: ReactionType; icon: string; label: string }[] = [
   { type: "praying", icon: "🙏", label: "Praying" },
   { type: "amen", icon: "✝️", label: "Amen" },
@@ -84,36 +92,26 @@ function ReactionButtons({
   const [myReactions, setMyReactions] = useState<Set<ReactionType>>(new Set());
   const [busy, setBusy] = useState(false);
   const [popping, setPopping] = useState<ReactionType | null>(null);
+  const [reactors, setReactors] = useState<Reactor[]>([]);
+  const [showReactors, setShowReactors] = useState(false);
+  const [reactionTab, setReactionTab] = useState<"all" | ReactionType>("all");
+
+  const loadReactors = useCallback(async () => {
+    const { data } = await supabase.rpc("get_testimony_reactors", { _testimony_id: testimonyId });
+    const next = ((data ?? []) as unknown as Reactor[]).filter((reactor) =>
+      REACTION_CONFIG.some(({ type }) => type === reactor.reaction_type),
+    );
+    setReactors(next);
+
+    const nextCounts: Record<ReactionType, number> = { praying: 0, amen: 0, peace: 0 };
+    next.forEach((reactor) => { nextCounts[reactor.reaction_type] += 1; });
+    setCounts(nextCounts);
+    setMyReactions(new Set(next.filter((reactor) => reactor.user_id === userId).map((reactor) => reactor.reaction_type)));
+  }, [testimonyId, userId]);
 
   useEffect(() => {
-    // Fetch counts
-    supabase
-      .from("testimony_reactions")
-      .select("type")
-      .eq("testimony_id", testimonyId)
-      .then(({ data }) => {
-        if (!data) return;
-        const c: Record<ReactionType, number> = { praying: 0, amen: 0, peace: 0 };
-        data.forEach((r: any) => {
-          if (r.type in c) c[r.type as ReactionType]++;
-        });
-        setCounts(c);
-      });
-
-    // Fetch user's own reactions
-    if (userId) {
-      supabase
-        .from("testimony_reactions")
-        .select("type")
-        .eq("testimony_id", testimonyId)
-        .eq("user_id", userId)
-        .then(({ data }) => {
-          if (data) {
-            setMyReactions(new Set(data.map((r: any) => r.type as ReactionType)));
-          }
-        });
-    }
-  }, [testimonyId, userId]);
+    void loadReactors();
+  }, [loadReactors]);
 
   const toggle = async (type: ReactionType) => {
     if (disabled) return;
@@ -141,6 +139,8 @@ function ReactionButtons({
       if (error) {
         setMyReactions(previousReactions);
         setCounts(previousCounts);
+      } else {
+        await loadReactors();
       }
     } else {
       setMyReactions((prev) => new Set(prev).add(type));
@@ -151,35 +151,126 @@ function ReactionButtons({
       if (error) {
         setMyReactions(previousReactions);
         setCounts(previousCounts);
+      } else {
+        await loadReactors();
       }
     }
     setBusy(false);
   };
 
+  const uniqueReactors = Array.from(
+    reactors.reduce((people, reactor) => {
+      const person = people.get(reactor.user_id);
+      if (person) person.reactions.push(reactor.reaction_type);
+      else people.set(reactor.user_id, { ...reactor, reactions: [reactor.reaction_type] });
+      return people;
+    }, new Map<string, Reactor & { reactions: ReactionType[] }>()),
+  ).map(([, reactor]) => reactor);
+  const sortedReactors = [...uniqueReactors].sort((a, b) => {
+    if (a.user_id === userId) return -1;
+    if (b.user_id === userId) return 1;
+    return new Date(b.reacted_at).getTime() - new Date(a.reacted_at).getTime();
+  });
+  const otherRecent = sortedReactors.find((reactor) => reactor.user_id !== userId);
+  const currentUserReacted = uniqueReactors.some((reactor) => reactor.user_id === userId);
+  const reactorCount = uniqueReactors.length;
+  const lead = currentUserReacted ? "You" : otherRecent?.display_name;
+  const summary = lead
+    ? reactorCount === 1 ? `${lead} reacted` : `${lead} and ${reactorCount - 1} others reacted`
+    : "";
+  const visibleReactors = reactionTab === "all"
+    ? sortedReactors
+    : sortedReactors.filter((reactor) => reactor.reactions.includes(reactionTab));
+  const reactionIcon = (type: ReactionType) => REACTION_CONFIG.find((item) => item.type === type)?.icon;
+
   return (
-    <div className="mt-3 flex items-center gap-3 border-t border-border pt-3">
-      {REACTION_CONFIG.map((r) => {
-        const active = myReactions.has(r.type);
-        return (
+    <>
+      <div className="mt-3 border-t border-border pt-3">
+        <div className="flex items-center gap-3">
+          {REACTION_CONFIG.map((r) => {
+            const active = myReactions.has(r.type);
+            return (
+              <button
+                key={r.type}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  if (!disabled) void toggle(r.type);
+                }}
+                disabled={disabled}
+                className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors duration-200 ${
+                  active
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                } ${disabled ? "cursor-default" : ""} ${popping === r.type ? "animate-reaction-pop" : ""}`}
+              >
+                {r.icon} {r.label}
+                {counts[r.type] > 0 && <span>{counts[r.type]}</span>}
+              </button>
+            );
+          })}
+        </div>
+        {summary && (
           <button
-            key={r.type}
-            onClick={(event) => {
-              event.stopPropagation();
-              if (!disabled) toggle(r.type);
-            }}
-            disabled={disabled}
-            className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors duration-200 ${
-              active
-                ? "bg-primary/10 text-primary"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground"
-            } ${disabled ? "cursor-default" : ""} ${popping === r.type ? "animate-reaction-pop" : ""}`}
+            type="button"
+            onClick={(event) => { event.stopPropagation(); setShowReactors(true); }}
+            className="mt-2 text-left text-xs text-muted-foreground transition-colors hover:text-foreground"
           >
-            {r.icon} {r.label}
-            {counts[r.type] > 0 && <span>{counts[r.type]}</span>}
+            {summary}
           </button>
-        );
-      })}
-    </div>
+        )}
+      </div>
+
+      {showReactors && createPortal(
+        <div
+          className="fixed inset-0 z-[60] flex items-end justify-center bg-foreground/40 px-4 pb-4 sm:items-center sm:pb-0"
+          onClick={(event) => { event.stopPropagation(); setShowReactors(false); }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={`reactors-${testimonyId}`}
+            className="w-full max-w-md overflow-hidden rounded-lg border border-border bg-card shadow-lg"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-border px-4 py-3">
+              <h2 id={`reactors-${testimonyId}`} className="font-semibold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
+                Reactions
+              </h2>
+              <button type="button" aria-label="Close reactions" onClick={() => setShowReactors(false)} className="rounded-md px-2 py-1 text-muted-foreground hover:bg-muted hover:text-foreground">×</button>
+            </div>
+            <div className="flex border-b border-border px-2" role="tablist" aria-label="Filter reactions">
+              {(["all", ...REACTION_CONFIG.map(({ type }) => type)] as const).map((value) => {
+                const label = value === "all" ? "All" : reactionIcon(value);
+                const count = value === "all" ? reactorCount : counts[value];
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    role="tab"
+                    aria-selected={reactionTab === value}
+                    onClick={() => setReactionTab(value)}
+                    className={`flex-1 border-b-2 px-2 py-3 text-xs font-medium transition-colors ${reactionTab === value ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+                  >
+                    {label} {count}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="max-h-[55vh] overflow-y-auto px-4 py-2">
+              {visibleReactors.map((reactor) => (
+                <div key={reactor.user_id} className="flex items-center justify-between border-b border-border/60 py-3 last:border-b-0">
+                  <span className="text-sm font-medium text-foreground">{reactor.user_id === userId ? "You" : reactor.display_name}</span>
+                  <span className="flex gap-1.5 text-sm" aria-label={reactor.reactions.join(", ")}>
+                    {reactor.reactions.map((type) => <span key={type}>{reactionIcon(type)}</span>)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>,
+        document.body,
+      )}
+    </>
   );
 }
 
@@ -401,6 +492,7 @@ function FeedPage() {
   const [editBody, setEditBody] = useState("");
   const [savingEdit, setSavingEdit] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [newPostIds, setNewPostIds] = useState<string[]>([]);
   const search = Route.useSearch();
   const navigate = useNavigate();
   const burdenId = search.burden ?? null;
@@ -438,7 +530,7 @@ function FeedPage() {
     supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
   }, []);
 
-  const loadTestimonies = async () => {
+  const loadTestimonies = useCallback(async () => {
     setLoading(true);
 
     const { data: publicData } = await supabase
@@ -460,11 +552,34 @@ function FeedPage() {
     }
 
     setLoading(false);
-  };
+  }, [userId]);
 
   useEffect(() => {
-    loadTestimonies();
+    void loadTestimonies();
+  }, [loadTestimonies]);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("home-public-testimonies")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "testimonies", filter: "is_public=eq.true" },
+        (payload) => {
+          const post = payload.new as Pick<Testimony, "id" | "user_id" | "is_public">;
+          if (!post.is_public || post.user_id === userId) return;
+          setNewPostIds((current) => current.includes(post.id) ? current : [...current, post.id]);
+        },
+      )
+      .subscribe();
+
+    return () => { void supabase.removeChannel(channel); };
   }, [userId]);
+
+  const revealNewPosts = async () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    await loadTestimonies();
+    setNewPostIds([]);
+  };
 
   useEffect(() => {
     if (burdenId && userId) setShowForm(true);
@@ -587,6 +702,18 @@ function FeedPage() {
               }`}
             >
               My Posts
+            </button>
+          </div>
+        )}
+
+        {tab === "public" && newPostIds.length > 0 && (
+          <div className="mb-4 flex justify-center">
+            <button
+              type="button"
+              onClick={() => void revealNewPosts()}
+              className="rounded-full border border-border bg-card px-4 py-2 text-xs font-medium text-primary shadow-sm transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-md motion-reduce:transform-none"
+            >
+              ↑ {newPostIds.length} new {newPostIds.length === 1 ? "testimony" : "testimonies"}
             </button>
           </div>
         )}

@@ -768,6 +768,15 @@ export type Database = {
           thinkers_count: number
         }[]
       }
+      get_testimony_reactors: {
+        Args: { _testimony_id: string }
+        Returns: {
+          display_name: string
+          reacted_at: string
+          reaction_type: string
+          user_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
