@@ -89,6 +89,42 @@ export type Database = {
           },
         ]
       }
+      burden_reports: {
+        Row: {
+          burden_id: string
+          created_at: string
+          id: string
+          reporter_id: string
+        }
+        Insert: {
+          burden_id: string
+          created_at?: string
+          id?: string
+          reporter_id: string
+        }
+        Update: {
+          burden_id?: string
+          created_at?: string
+          id?: string
+          reporter_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "burden_reports_burden_id_fkey"
+            columns: ["burden_id"]
+            isOneToOne: false
+            referencedRelation: "burdens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "burden_reports_burden_id_fkey"
+            columns: ["burden_id"]
+            isOneToOne: false
+            referencedRelation: "burdens_feed"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       burden_sitters: {
         Row: {
           burden_id: string
