@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { AutoTextarea, WordCounter, isOverWordLimit } from "@/components/WordLimit";
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppNav } from "@/components/AppNav";
@@ -507,14 +508,14 @@ function ProfilePage() {
                         <div key={item.id} className="rounded-xl border border-border bg-card p-5">
                           {isEditing ? (
                             <div className="space-y-3">
-                              <textarea
+                              <div><AutoTextarea
                                 value={editBody}
                                 onChange={(e) => setEditBody(e.target.value)}
                                 rows={4}
                                 className="w-full resize-none rounded-md border border-input bg-background px-3 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20"
-                              />
+                              /><WordCounter text={editBody} /></div>
                               <div className="flex gap-2">
-                                <button onClick={() => handleSaveEdit(item.id)} className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground">Save</button>
+                                <button onClick={() => handleSaveEdit(item.id)} disabled={isOverWordLimit(editBody)} className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground">Save</button>
                                 <button onClick={() => setEditingDraft(null)} className="rounded-md px-3 py-1.5 text-xs text-muted-foreground">Cancel</button>
                               </div>
                             </div>

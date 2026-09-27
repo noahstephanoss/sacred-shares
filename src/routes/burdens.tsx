@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { AutoTextarea, WordCounter, isOverWordLimit } from "@/components/WordLimit";
 import { useState, useEffect, useCallback, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppNav } from "@/components/AppNav";
@@ -277,7 +278,7 @@ function BurdensPage() {
     if (!userId) return openAuthPrompt();
     const text = body.trim();
     if (!text) return;
-    if (text.length > 1000) return setError("Please keep it under 1000 characters.");
+    if (isOverWordLimit(text)) return setError("Please keep it under 900 words.");
     setPosting(true);
     setError(null);
     const { error: err } = await (supabase as any)
@@ -304,16 +305,16 @@ function BurdensPage() {
         <p className="mt-1 text-sm text-muted-foreground">"Carry each other's burdens" — Galatians 6:2</p>
 
         <form onSubmit={submit} className="mt-6 rounded-lg border border-border bg-card p-4">
-          <textarea
+          <AutoTextarea
             value={body}
             onChange={(e) => setBody(e.target.value)}
             onFocus={() => { if (!userId) openAuthPrompt(); }}
             placeholder="What are you carrying right now?"
             aria-label="What are you carrying right now?"
-            maxLength={1000}
             rows={4}
             className="w-full resize-none rounded-md border border-input bg-background p-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
+          <WordCounter text={body} />
           <div className="mt-3 flex items-center justify-between gap-3">
             <label className="flex items-center gap-2 text-sm text-muted-foreground">
               <input type="checkbox" checked={anon} onChange={(e) => setAnon(e.target.checked)} className="accent-primary" />
@@ -321,7 +322,7 @@ function BurdensPage() {
             </label>
             <button
               type="submit"
-              disabled={posting || (!!userId && !body.trim())}
+              disabled={posting || (!!userId && !body.trim()) || isOverWordLimit(body)}
               className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
             >
               {posting ? "Sharing..." : "Share burden"}

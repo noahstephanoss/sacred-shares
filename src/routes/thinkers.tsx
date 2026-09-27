@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { AutoTextarea, WordCounter, isOverWordLimit } from "@/components/WordLimit";
 import { useState, useEffect, useCallback, type FormEvent, useRef } from "react";
 import { analyzeThinkerPost } from "@/lib/ai";
 import { useDailyLimit } from "@/hooks/useDailyLimit";
@@ -587,14 +588,14 @@ function ThinkersPage() {
               />
             )}
 
-            <textarea
+            <div><AutoTextarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder={writeMode === "journal" ? "Write your private reflections…" : "What thought or struggle is weighing on you?"}
               rows={4}
               aria-label="Share your thought or struggle"
               className="w-full resize-none rounded-md border border-input bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20"
-            />
+            /><WordCounter text={content} /></div>
 
             {/* Tag selector — hidden in journal mode */}
             {writeMode !== "journal" && (<div>
@@ -665,7 +666,7 @@ function ThinkersPage() {
             )}
             <button
               type="submit"
-              disabled={loading || !content.trim() || (writeMode === "journal" && !postTitle.trim())}
+              disabled={loading || !content.trim() || isOverWordLimit(content) || (writeMode === "journal" && !postTitle.trim())}
               className="rounded-md bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
             >
               {loading
@@ -842,17 +843,17 @@ function ThinkersPage() {
 
                     {editingPostId === post.id ? (
                       <div className="space-y-2">
-                        <textarea
+                        <div><AutoTextarea
                           value={editBody}
                           onChange={(e) => setEditBody(e.target.value)}
                           rows={4}
                           className="w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring/20"
-                        />
+                        /><WordCounter text={editBody} /></div>
                         <div className="flex gap-2">
                           <button
                             type="button"
                             onClick={() => handleEditSave(post.id)}
-                            disabled={savingEdit || !editBody.trim()}
+                            disabled={savingEdit || !editBody.trim() || isOverWordLimit(editBody)}
                             className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                           >
                             {savingEdit ? "Saving…" : "Save"}
@@ -960,14 +961,14 @@ function ThinkersPage() {
                               <p className="text-xs font-medium" style={{ color: respondingTo.type === "affirm" ? "var(--primary)" : "#7C2D12" }}>
                                 {respondingTo.type === "affirm" ? "💬 Affirm this thought" : "⚔️ Challenge with truth"}
                               </p>
-                              <textarea
+                              <div><AutoTextarea
                                 value={responseBody}
                                 onChange={(e) => setResponseBody(e.target.value)}
                                 placeholder={respondingTo.type === "affirm" ? "Share encouragement…" : "Speak truth in love…"}
                                 rows={2}
                                 aria-label={respondingTo.type === "affirm" ? "Affirm this thought" : "Challenge with truth"}
                                 className="w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-                              />
+                              /><WordCounter text={responseBody} /></div>
                               {respondingTo.type === "challenge" && (
                                 <input
                                   value={responseScripture}
@@ -981,7 +982,7 @@ function ThinkersPage() {
                                 <button
                                   type="button"
                                   onClick={handleSubmitResponse}
-                                  disabled={responseSubmitting || !responseBody.trim() || (respondingTo.type === "challenge" && !responseScripture.trim())}
+                                  disabled={responseSubmitting || !responseBody.trim() || isOverWordLimit(responseBody) || (respondingTo.type === "challenge" && !responseScripture.trim())}
                                   className="rounded px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50"
                                   style={{ backgroundColor: respondingTo.type === "affirm" ? "var(--primary)" : "#7C2D12" }}
                                 >
