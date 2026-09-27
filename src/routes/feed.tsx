@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef, useCallback, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppNav } from "@/components/AppNav";
@@ -6,6 +6,10 @@ import { AuthPromptModal, useAuthPrompt } from "@/components/AuthPromptModal";
 import { EmptyState } from "@/components/EmptyState";
 
 export const Route = createFileRoute("/feed")({
+  validateSearch: (s: Record<string, unknown>): { burden?: string; testimony?: string } => ({
+    burden: typeof s.burden === "string" ? s.burden : undefined,
+    testimony: typeof s.testimony === "string" ? s.testimony : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Feed — Testimonies" },
@@ -380,6 +384,9 @@ function FeedPage() {
   const [editBody, setEditBody] = useState("");
   const [savingEdit, setSavingEdit] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const search = Route.useSearch();
+  const navigate = useNavigate();
+  const burdenId = search.burden ?? null;
 
   const handleEditSave = async () => {
     if (!editingTestimony || !editBody.trim() || savingEdit) return;
@@ -442,6 +449,16 @@ function FeedPage() {
     loadTestimonies();
   }, [userId]);
 
+  useEffect(() => {
+    if (burdenId && userId) setShowForm(true);
+  }, [burdenId, userId]);
+
+  useEffect(() => {
+    if (!search.testimony || loading) return;
+    const t = testimonies.find((x) => x.id === search.testimony);
+    if (t) setReadingTestimony(t);
+  }, [search.testimony, loading, testimonies]);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!body.trim() || submitting || !userId) return;
@@ -452,12 +469,14 @@ function FeedPage() {
       title: "",
       body: body.trim(),
       is_public: isPublic,
-    });
+      ...(burdenId ? { burden_id: burdenId } : {}),
+    } as any);
 
     if (!error) {
       setBody("");
       setIsPublic(true);
       setShowForm(false);
+      if (burdenId) navigate({ to: "/feed", search: {}, replace: true });
       await loadTestimonies();
     }
     setSubmitting(false);
@@ -499,6 +518,7 @@ function FeedPage() {
         {/* Post form */}
         {showForm && userId && (
           <div className="mb-6 rounded-xl bg-card px-5 py-4" style={{ boxShadow: "0 1px 6px rgba(107,63,42,0.08)" }}>
+            {burdenId && <p className="mb-2 text-xs text-muted-foreground">🕊️ Sharing how God lifted your burden</p>}
             <form onSubmit={handleSubmit} className="space-y-3">
               <textarea
                 value={body}
