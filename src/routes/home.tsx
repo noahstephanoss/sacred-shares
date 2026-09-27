@@ -5,7 +5,7 @@ import { AppNav } from "@/components/AppNav";
 import { AuthPromptModal, useAuthPrompt } from "@/components/AuthPromptModal";
 import { EmptyState } from "@/components/EmptyState";
 
-export const Route = createFileRoute("/feed")({
+export const Route = createFileRoute("/home")({
   validateSearch: (s: Record<string, unknown>): { burden?: string; testimony?: string } => ({
     burden: typeof s.burden === "string" ? s.burden : undefined,
     testimony: typeof s.testimony === "string" ? s.testimony : undefined,
