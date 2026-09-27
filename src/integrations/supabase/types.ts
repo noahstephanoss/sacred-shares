@@ -181,6 +181,109 @@ export type Database = {
           },
         ]
       }
+      circle_messages: {
+        Row: {
+          body: string
+          circle_id: string
+          created_at: string
+          id: string
+          is_update: boolean
+          user_id: string
+        }
+        Insert: {
+          body: string
+          circle_id: string
+          created_at?: string
+          id?: string
+          is_update?: boolean
+          user_id: string
+        }
+        Update: {
+          body?: string
+          circle_id?: string
+          created_at?: string
+          id?: string
+          is_update?: boolean
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "circle_messages_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "burden_circles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      circle_prayers: {
+        Row: {
+          circle_id: string
+          id: string
+          prayed_on: string
+          user_id: string
+        }
+        Insert: {
+          circle_id: string
+          id?: string
+          prayed_on?: string
+          user_id: string
+        }
+        Update: {
+          circle_id?: string
+          id?: string
+          prayed_on?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "circle_prayers_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "burden_circles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      circle_reports: {
+        Row: {
+          circle_id: string
+          created_at: string
+          id: string
+          message_id: string
+          reporter_id: string
+        }
+        Insert: {
+          circle_id: string
+          created_at?: string
+          id?: string
+          message_id: string
+          reporter_id: string
+        }
+        Update: {
+          circle_id?: string
+          created_at?: string
+          id?: string
+          message_id?: string
+          reporter_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "circle_reports_circle_id_fkey"
+            columns: ["circle_id"]
+            isOneToOne: false
+            referencedRelation: "burden_circles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "circle_reports_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "circle_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       daily_usage: {
         Row: {
           discernment_count: number
@@ -591,7 +694,46 @@ export type Database = {
     }
     Functions: {
       can_join_circle: { Args: { circle: string }; Returns: boolean }
+      circle_is_active: { Args: { circle: string }; Returns: boolean }
       circle_member_count: { Args: { circle: string }; Returns: number }
+      extend_circle: { Args: { circle: string }; Returns: string }
+      get_circle_members: {
+        Args: { circle: string }
+        Returns: {
+          avatar_url: string
+          display_name: string
+          is_masked: boolean
+          is_me: boolean
+          member_id: string
+          role: string
+        }[]
+      }
+      get_circle_messages: {
+        Args: { circle: string }
+        Returns: {
+          avatar_url: string
+          body: string
+          created_at: string
+          display_name: string
+          id: string
+          is_author: boolean
+          is_masked: boolean
+          is_mine: boolean
+          is_update: boolean
+        }[]
+      }
+      get_circle_overview: {
+        Args: { circle: string }
+        Returns: {
+          burden_body: string
+          ends_at: string
+          i_prayed: boolean
+          is_anonymous: boolean
+          is_author: boolean
+          prayed_today: number
+          status: string
+        }[]
+      }
       get_daily_usage: {
         Args: { _user_id: string }
         Returns: {
