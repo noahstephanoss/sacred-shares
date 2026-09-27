@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.guard_testimony_burden() FROM authenticated;
