@@ -74,6 +74,8 @@ function CirclePage() {
   );
 
   const ended = ov.status !== "open" || (ov.ends_at ? new Date(ov.ends_at).getTime() <= Date.now() : false);
+  const lifted = ov.status === "lifted";
+  const endedText = lifted ? "This burden has been lifted. Thank you for carrying it together." : "This circle has ended.";
   const daysLeft = ov.ends_at ? Math.max(0, Math.ceil((new Date(ov.ends_at).getTime() - Date.now()) / 86400000)) : null;
 
   const send = async (e: FormEvent) => {
@@ -126,9 +128,22 @@ function CirclePage() {
       <section className="mt-4 rounded-lg border border-border bg-card p-5">
         <p className="whitespace-pre-wrap text-base leading-relaxed text-foreground" style={{ fontFamily: "'Georgia', serif" }}>{ov.burden_body}</p>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
-          <span>{ended ? "This circle has ended." : `${daysLeft} ${daysLeft === 1 ? "day" : "days"} left`}</span>
+          <span>{lifted ? "🕊️ Lifted" : ended ? endedText : `${daysLeft} ${daysLeft === 1 ? "day" : "days"} left`}</span>
           {ov.is_author && ov.status === "open" && (
-            <button onClick={extend} disabled={busy} className="rounded-md border border-primary/40 px-3 py-1 font-medium text-primary hover:bg-primary/10 disabled:opacity-50">Extend 7 days</button>
+            <span className="flex gap-2">
+              <button onClick={() => setConfirmLift(true)} disabled={busy} className="rounded-md border border-primary/40 px-3 py-1 font-medium text-primary hover:bg-primary/10 disabled:opacity-50">Mark as lifted</button>
+              <button onClick={extend} disabled={busy} className="rounded-md border border-primary/40 px-3 py-1 font-medium text-primary hover:bg-primary/10 disabled:opacity-50">Extend 7 days</button>
+            </span>
+          )}
+          {confirmLift && (
+            <LiftConfirm busy={busy} onNo={() => setConfirmLift(false)} onYes={async () => {
+              setBusy(true);
+              const { data, error } = await sb.rpc("lift_circle_burden", { circle: circleId });
+              setBusy(false); setConfirmLift(false);
+              if (!error && data) { setShareId(data as string); load(); }
+            }} />
+          )}
+          {shareId && <SharePrompt burdenId={shareId} onClose={() => setShareId(null)} />
           )}
         </div>
         <div className="mt-4 border-t border-border pt-4">
@@ -182,7 +197,7 @@ function CirclePage() {
       </section>
 
       {ended ? (
-        <p className="mt-4 text-center text-sm italic text-muted-foreground">This circle has ended.</p>
+        <p className="mt-4 text-center text-sm italic text-muted-foreground">{endedText}</p>
       ) : (
         <form onSubmit={send} className="mt-4 rounded-lg border border-border bg-card p-3">
           <textarea value={body} onChange={(e) => setBody(e.target.value)} maxLength={1000} rows={3} placeholder="Share a prayer or encouragement..." aria-label="Message"
