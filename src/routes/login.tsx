@@ -20,6 +20,25 @@ function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const handleAppleSignIn = async () => {
+    setError("");
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "apple",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (error) setError(error.message);
+    } catch {
+      setError("An unexpected error occurred.");
+      setLoading(false);
+    }
+    // On success the browser is redirected to Apple — no further handling here.
+  };
+
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
