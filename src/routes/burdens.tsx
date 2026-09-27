@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppNav } from "@/components/AppNav";
 import { AuthPromptModal, useAuthPrompt } from "@/components/AuthPromptModal";
 import { EmptyState } from "@/components/EmptyState";
+import { LiftConfirm, SharePrompt } from "@/components/LiftBurden";
 
 const TITLE = "Burdens — Share What You're Carrying | Testimonies";
 const DESC = "Share what you're carrying, openly or anonymously, and let others carry it with you in prayer.";
@@ -29,6 +30,8 @@ interface Burden {
   created_at: string;
   user_id: string | null;
   is_mine: boolean | null;
+  lifted_at: string | null;
+  testimony_id: string | null;
 }
 interface Author { display_name: string | null; avatar_url: string | null }
 
@@ -232,6 +235,9 @@ function PrayerCircle({
 
 function BurdensPage() {
   const [userId, setUserId] = useState<string | null>(null);
+  const [liftingId, setLiftingId] = useState<string | null>(null);
+  const [lifting, setLifting] = useState(false);
+  const [shareId, setShareId] = useState<string | null>(null);
   const [burdens, setBurdens] = useState<Burden[]>([]);
   const [authors, setAuthors] = useState<Record<string, Author>>({});
   const [loading, setLoading] = useState(true);
@@ -244,7 +250,7 @@ function BurdensPage() {
   const load = useCallback(async () => {
     const { data } = await (supabase as any)
       .from("burdens_feed")
-      .select("id, body, is_anonymous, created_at, user_id, is_mine")
+      .select("id, body, is_anonymous, created_at, user_id, is_mine, lifted_at, testimony_id")
       .order("created_at", { ascending: false });
     const rows = (data ?? []) as Burden[];
     setBurdens(rows);
@@ -354,6 +360,18 @@ function BurdensPage() {
                     )}
                   </div>
                   <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-foreground" style={{ fontFamily: "'Georgia', serif" }}>{b.body}</p>
+                  <div className="mt-2 flex flex-wrap items-center gap-3">
+                    {b.lifted_at && <span className="text-xs font-medium text-primary">🕊️ Lifted</span>}
+                    {b.is_mine && !b.lifted_at && (
+                      <button onClick={() => setLiftingId(b.id)} className="text-xs font-medium text-primary hover:underline">Mark as lifted</button>
+                    )}
+                    {b.is_mine && b.lifted_at && !b.testimony_id && (
+                      <Link to="/feed" search={{ burden: b.id }} className="text-xs text-primary hover:underline">Write testimony</Link>
+                    )}
+                    {!b.is_anonymous && b.lifted_at && b.testimony_id && (
+                      <Link to="/feed" search={{ testimony: b.testimony_id }} className="text-xs text-primary hover:underline">Read the testimony</Link>
+                    )}
+                  </div>
                   <SitWithButton
                     burdenId={b.id}
                     userId={userId}
@@ -366,6 +384,21 @@ function BurdensPage() {
           )}
         </section>
       </main>
+      {liftingId && (
+        <LiftConfirm
+          busy={lifting}
+          onNo={() => setLiftingId(null)}
+          onYes={async () => {
+            setLifting(true);
+            const { error: e } = await (supabase as any).rpc("lift_burden", { _burden: liftingId });
+            setLifting(false);
+            const id = liftingId;
+            setLiftingId(null);
+            if (!e) { setShareId(id); load(); }
+          }}
+        />
+      )}
+      {shareId && <SharePrompt burdenId={shareId} onClose={() => setShareId(null)} />}
       <AuthPromptModal open={showModal} onClose={closeAuthPrompt} />
     </div>
   );
