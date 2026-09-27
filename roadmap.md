@@ -1,0 +1,1 @@
+- [x] Apple + Google sign-in buttons on /login
