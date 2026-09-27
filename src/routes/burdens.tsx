@@ -6,6 +6,9 @@ import { AppNav } from "@/components/AppNav";
 import { AuthPromptModal, useAuthPrompt } from "@/components/AuthPromptModal";
 import { EmptyState } from "@/components/EmptyState";
 import { LiftConfirm, SharePrompt } from "@/components/LiftBurden";
+import { Toaster, toast } from "sonner";
+
+const CRISIS_RE = /\b(suicid(e|al)|kill myself|end it all|want to die|self[- ]harm|cut myself|hurt myself|no reason to live)\b/i;
 
 const TITLE = "Burdens — Share What You're Carrying | Testimonies";
 const DESC = "Share what you're carrying, openly or anonymously, and let others carry it with you in prayer.";
@@ -273,12 +276,29 @@ function BurdensPage() {
     load();
   }, [load]);
 
+  const [crisisOpen, setCrisisOpen] = useState(false);
+
+  const report = async (id: string) => {
+    if (!userId) return openAuthPrompt();
+    const { error: err } = await (supabase as any).from("burden_reports").insert({ burden_id: id, reporter_id: userId });
+    if (!err) toast("Thanks, we'll take a look.");
+    else if (err.code === "23505") toast("You already reported this.");
+    else toast("Couldn't send the report. Please try again.");
+  };
+
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     if (!userId) return openAuthPrompt();
     const text = body.trim();
     if (!text) return;
     if (isOverWordLimit(text)) return setError("Please keep it under 900 words.");
+    if (CRISIS_RE.test(text)) return setCrisisOpen(true);
+    await post();
+  };
+
+  const post = async () => {
+    const text = body.trim();
+    if (!userId || !text) return;
     setPosting(true);
     setError(null);
     const { error: err } = await (supabase as any)
@@ -315,6 +335,7 @@ function BurdensPage() {
             className="w-full resize-none rounded-md border border-input bg-background p-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
           <WordCounter text={body} />
+          <p className="mt-1 text-xs text-muted-foreground">If you're in danger or thinking about hurting yourself, call or text 988 or text HOME to 741741.</p>
           <div className="mt-3 flex items-center justify-between gap-3">
             <label className="flex items-center gap-2 text-sm text-muted-foreground">
               <input type="checkbox" checked={anon} onChange={(e) => setAnon(e.target.checked)} className="accent-primary" />
@@ -356,8 +377,10 @@ function BurdensPage() {
                       <p className="text-sm font-medium text-foreground">{name}</p>
                       <p className="text-xs text-muted-foreground">{new Date(b.created_at).toLocaleDateString()}</p>
                     </div>
-                    {b.is_mine && (
+                    {b.is_mine ? (
                       <button onClick={() => remove(b.id)} className="text-xs text-destructive hover:underline">Delete</button>
+                    ) : (
+                      <button onClick={() => report(b.id)} className="text-xs text-muted-foreground hover:underline">Report</button>
                     )}
                   </div>
                   <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-foreground" style={{ fontFamily: "'Georgia', serif" }}>{b.body}</p>
@@ -401,6 +424,22 @@ function BurdensPage() {
       )}
       {shareId && <SharePrompt burdenId={shareId} onClose={() => setShareId(null)} />}
       <AuthPromptModal open={showModal} onClose={closeAuthPrompt} />
+      {crisisOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4" role="dialog" aria-modal="true">
+          <div className="w-full max-w-md rounded-xl border border-border bg-card p-6">
+            <p className="text-lg text-foreground" style={{ fontFamily: "'Georgia', serif" }}>You matter, and you don't have to carry this alone. Please reach out right now.</p>
+            <ul className="mt-4 space-y-2 text-sm text-foreground">
+              <li><strong>Call or text 988</strong> — Suicide &amp; Crisis Lifeline (US)</li>
+              <li><strong>Text HOME to 741741</strong> — Crisis Text Line</li>
+            </ul>
+            <div className="mt-6 flex justify-end gap-2">
+              <button onClick={() => { setCrisisOpen(false); post(); }} className="rounded-md px-4 py-2 text-sm text-muted-foreground hover:bg-muted">Post anyway</button>
+              <button onClick={() => setCrisisOpen(false)} className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">Go back</button>
+            </div>
+          </div>
+        </div>
+      )}
+      <Toaster position="bottom-center" />
     </div>
   );
 }
