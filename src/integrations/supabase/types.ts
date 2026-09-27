@@ -131,6 +131,7 @@ export type Database = {
           created_at: string
           id: string
           is_anonymous: boolean
+          lifted_at: string | null
           user_id: string
         }
         Insert: {
@@ -138,6 +139,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_anonymous?: boolean
+          lifted_at?: string | null
           user_id: string
         }
         Update: {
@@ -145,6 +147,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_anonymous?: boolean
+          lifted_at?: string | null
           user_id?: string
         }
         Relationships: []
@@ -445,6 +448,7 @@ export type Database = {
       testimonies: {
         Row: {
           body: string
+          burden_id: string | null
           created_at: string
           id: string
           is_public: boolean
@@ -454,6 +458,7 @@ export type Database = {
         }
         Insert: {
           body: string
+          burden_id?: string | null
           created_at?: string
           id?: string
           is_public?: boolean
@@ -463,6 +468,7 @@ export type Database = {
         }
         Update: {
           body?: string
+          burden_id?: string | null
           created_at?: string
           id?: string
           is_public?: boolean
@@ -470,7 +476,22 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "testimonies_burden_id_fkey"
+            columns: ["burden_id"]
+            isOneToOne: false
+            referencedRelation: "burdens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "testimonies_burden_id_fkey"
+            columns: ["burden_id"]
+            isOneToOne: false
+            referencedRelation: "burdens_feed"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       testimony_reactions: {
         Row: {
@@ -671,6 +692,8 @@ export type Database = {
           id: string | null
           is_anonymous: boolean | null
           is_mine: boolean | null
+          lifted_at: string | null
+          testimony_id: string | null
           user_id: string | null
         }
         Insert: {
@@ -679,6 +702,8 @@ export type Database = {
           id?: string | null
           is_anonymous?: boolean | null
           is_mine?: never
+          lifted_at?: string | null
+          testimony_id?: never
           user_id?: never
         }
         Update: {
@@ -687,6 +712,8 @@ export type Database = {
           id?: string | null
           is_anonymous?: boolean | null
           is_mine?: never
+          lifted_at?: string | null
+          testimony_id?: never
           user_id?: never
         }
         Relationships: []
@@ -755,6 +782,8 @@ export type Database = {
       is_burden_author: { Args: { _burden: string }; Returns: boolean }
       is_circle_author: { Args: { circle: string }; Returns: boolean }
       is_circle_member: { Args: { circle: string }; Returns: boolean }
+      lift_burden: { Args: { _burden: string }; Returns: string }
+      lift_circle_burden: { Args: { circle: string }; Returns: string }
       update_user_streak: {
         Args: { p_user_id: string }
         Returns: {
