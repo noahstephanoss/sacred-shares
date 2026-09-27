@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef, useCallback, type FormEvent } from "react";
+import { createPortal } from "react-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { AppNav } from "@/components/AppNav";
 import { AuthPromptModal, useAuthPrompt } from "@/components/AuthPromptModal";
@@ -219,7 +220,7 @@ function ReactionButtons({
         )}
       </div>
 
-      {showReactors && (
+      {showReactors && createPortal(
         <div
           className="fixed inset-0 z-[60] flex items-end justify-center bg-foreground/40 px-4 pb-4 sm:items-center sm:pb-0"
           onClick={(event) => { event.stopPropagation(); setShowReactors(false); }}
@@ -266,7 +267,8 @@ function ReactionButtons({
               ))}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );
