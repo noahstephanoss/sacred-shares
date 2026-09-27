@@ -1,1 +1,4 @@
-- [x] Apple + Google sign-in buttons on /login
+- [ ] Rename the testimony Feed route and wording to Home
+- [ ] Preserve /feed as a query-forwarding redirect
+- [ ] Polish testimony cards and optimistic reaction animation
+- [ ] Verify desktop/mobile flows and build health
