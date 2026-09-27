@@ -8,7 +8,7 @@ export const Route = createFileRoute("/feed")({
     testimony: typeof search.testimony === "string" ? search.testimony : undefined,
   }),
   beforeLoad: ({ search }) => {
-    throw redirect({ to: "/home", search, replace: true });
+    throw redirect({ to: "/home", search, replace: true, statusCode: 301 });
   },
   head: () => ({
     meta: [

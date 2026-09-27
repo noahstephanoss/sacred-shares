@@ -163,7 +163,10 @@ function ReactionButtons({
         return (
           <button
             key={r.type}
-            onClick={() => !disabled && toggle(r.type)}
+            onClick={(event) => {
+              event.stopPropagation();
+              if (!disabled) toggle(r.type);
+            }}
             disabled={disabled}
             className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors duration-200 ${
               active
