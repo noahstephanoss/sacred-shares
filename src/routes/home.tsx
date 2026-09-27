@@ -176,7 +176,7 @@ function ReactionButtons({
   const reactorCount = uniqueReactors.length;
   const lead = currentUserReacted ? "You" : otherRecent?.display_name;
   const summary = lead
-    ? reactorCount === 1 ? `${lead} reacted` : `${lead} and ${reactorCount - 1} others reacted`
+    ? reactorCount === 1 ? `${lead} reacted` : `${lead} and ${reactorCount - 1 === 1 ? "1 other" : `${reactorCount - 1} others`} reacted`
     : "";
   const visibleReactors = reactionTab === "all"
     ? sortedReactors
@@ -655,7 +655,7 @@ function FeedPage() {
               <textarea
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
-                placeholder="What is God doing in your life today?"
+                placeholder={sharePrompt}
                 rows={3}
                 aria-label="Share a testimony"
                 className="w-full resize-none rounded-md border border-input bg-card px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20"
