@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useCallback, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppNav } from "@/components/AppNav";
+import { LiftConfirm, SharePrompt } from "@/components/LiftBurden";
 
 export const Route = createFileRoute("/circles/$circleId")({
   ssr: false,
@@ -44,6 +45,8 @@ function CirclePage() {
   const [asUpdate, setAsUpdate] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [confirmLift, setConfirmLift] = useState(false);
+  const [shareId, setShareId] = useState<string | null>(null);
   const [reported, setReported] = useState<Set<string>>(new Set());
 
   const load = useCallback(async () => {
