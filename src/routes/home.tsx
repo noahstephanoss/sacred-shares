@@ -496,6 +496,7 @@ function FeedPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [body, setBody] = useState("");
+  const [sharePrompt] = useState(() => SHARE_PROMPTS[Math.floor(Math.random() * SHARE_PROMPTS.length)]);
   const [isPublic, setIsPublic] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [tab, setTab] = useState<"public" | "mine">("public");
