@@ -143,8 +143,7 @@ function CirclePage() {
               if (!error && data) { setShareId(data as string); load(); }
             }} />
           )}
-          {shareId && <SharePrompt burdenId={shareId} onClose={() => setShareId(null)} />
-          )}
+          {shareId && <SharePrompt burdenId={shareId} onClose={() => setShareId(null)} />}
         </div>
         <div className="mt-4 border-t border-border pt-4">
           <h2 className="text-sm font-medium text-foreground">Members</h2>
