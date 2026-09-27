@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { AutoTextarea, WordCounter, isOverWordLimit } from "@/components/WordLimit";
 import { useState, useEffect, useCallback, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppNav } from "@/components/AppNav";
@@ -84,7 +85,7 @@ function CirclePage() {
   const send = async (e: FormEvent) => {
     e.preventDefault();
     const text = body.trim();
-    if (!text || busy || !userId) return;
+    if (!text || busy || !userId || isOverWordLimit(text)) return;
     setBusy(true); setErr(null);
     const { error } = await sb.from("circle_messages").insert({ circle_id: circleId, user_id: userId, body: text, is_update: ov.is_author && asUpdate });
     setBusy(false);
@@ -202,15 +203,16 @@ function CirclePage() {
         <p className="mt-4 text-center text-sm italic text-muted-foreground">{endedText}</p>
       ) : (
         <form onSubmit={send} className="mt-4 rounded-lg border border-border bg-card p-3">
-          <textarea value={body} onChange={(e) => setBody(e.target.value)} maxLength={1000} rows={3} placeholder="Share a prayer or encouragement..." aria-label="Message"
+          <AutoTextarea value={body} onChange={(e) => setBody(e.target.value)} rows={3} placeholder="Share a prayer or encouragement..." aria-label="Message"
             className="w-full resize-none rounded-md border border-input bg-background p-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none" />
+          <WordCounter text={body} />
           <div className="mt-2 flex items-center justify-between gap-2">
             {ov.is_author ? (
               <label className="flex items-center gap-2 text-sm text-muted-foreground">
                 <input type="checkbox" checked={asUpdate} onChange={(e) => setAsUpdate(e.target.checked)} className="accent-primary" /> Post as update
               </label>
             ) : <span />}
-            <button type="submit" disabled={busy || !body.trim()} className="rounded-md bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50">Send</button>
+            <button type="submit" disabled={busy || !body.trim() || isOverWordLimit(body)} className="rounded-md bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50">Send</button>
           </div>
           {err && <p className="mt-1 text-xs text-destructive">{err}</p>}
         </form>

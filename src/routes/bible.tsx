@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { AutoTextarea, WordCounter, isOverWordLimit } from "@/components/WordLimit";
 import { useState, useEffect, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppNav } from "@/components/AppNav";
@@ -137,7 +138,7 @@ function BiblePage() {
   async function submitComment(e: FormEvent) {
     e.preventDefault();
     if (!userId) { openAuthPrompt(); return; }
-    if (!commentBody.trim() || !chapterData || !selectedBook) return;
+    if (!commentBody.trim() || isOverWordLimit(commentBody) || !chapterData || !selectedBook) return;
     const chapterNum = parseInt(chapterData.reference.split(" ").pop() ?? "1");
     setCommentSubmitting(true);
     await supabase.from("verse_comments").insert({
@@ -305,17 +306,17 @@ function BiblePage() {
                 </div>
               )}
 
-              <form onSubmit={submitComment} className="flex gap-3">
-                <input
-                  type="text"
+              <form onSubmit={submitComment} className="flex items-start gap-3">
+                <div className="flex-1"><AutoTextarea
+                  rows={1}
                   value={commentBody}
                   onChange={e => setCommentBody(e.target.value)}
                   placeholder={userId ? "Share a reflection on this chapter…" : "Sign in to leave a note…"}
                   aria-label="Leave a reflection on this chapter"
-                  className="flex-1 rounded-lg border border-border bg-card px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                  className="w-full resize-none rounded-lg border border-border bg-card px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                   onFocus={() => { if (!userId) openAuthPrompt(); }}
-                />
-                <button type="submit" disabled={commentSubmitting || !commentBody.trim()} className="rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
+                /><WordCounter text={commentBody} /></div>
+                <button type="submit" disabled={commentSubmitting || !commentBody.trim() || isOverWordLimit(commentBody)} className="rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
                   Post
                 </button>
               </form>

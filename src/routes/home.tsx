@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { AutoTextarea, WordCounter, isOverWordLimit } from "@/components/WordLimit";
 import { useState, useEffect, useRef, useCallback, type FormEvent } from "react";
 import { createPortal } from "react-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,7 +26,6 @@ export const Route = createFileRoute("/home")({
   component: FeedPage,
 });
 
-const MAX_CHARS = 280;
 
 type Testimony = {
   id: string;
@@ -537,8 +537,6 @@ function FeedPage() {
     }
   };
 
-  const remaining = MAX_CHARS - body.length;
-
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
   }, []);
@@ -665,14 +663,14 @@ function FeedPage() {
           <div className="mb-6 rounded-xl bg-card px-5 py-4" style={{ boxShadow: "0 1px 6px rgba(107,63,42,0.08)" }}>
             {burdenId && <p className="mb-2 text-xs text-muted-foreground">🕊️ Sharing how God lifted your burden</p>}
             <form onSubmit={handleSubmit} className="space-y-3">
-              <textarea
+              <div><AutoTextarea
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
                 placeholder={sharePrompt}
                 rows={3}
                 aria-label="Share a testimony"
                 className="w-full resize-none rounded-md border border-input bg-card px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20"
-              />
+              /><WordCounter text={body} /></div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <label className="flex items-center gap-2 text-xs text-foreground">
@@ -687,7 +685,7 @@ function FeedPage() {
                 </div>
                 <button
                   type="submit"
-                  disabled={submitting || !body.trim()}
+                  disabled={submitting || !body.trim() || isOverWordLimit(body)}
                   className="rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                 >
                   {submitting ? "Posting..." : "Post"}
@@ -777,12 +775,13 @@ function FeedPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4" style={{ backdropFilter: "blur(4px)" }}>
           <div className="w-full max-w-lg rounded-xl border border-border bg-card p-6">
             <h3 className="text-base font-semibold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>Edit testimony</h3>
-            <textarea
+            <AutoTextarea
               value={editBody}
               onChange={(e) => setEditBody(e.target.value)}
               rows={5}
               className="mt-3 w-full resize-none rounded-md border border-input bg-background px-3 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20"
             />
+            <WordCounter text={editBody} />
             <div className="mt-4 flex justify-end gap-2">
               <button
                 type="button"
@@ -794,7 +793,7 @@ function FeedPage() {
               <button
                 type="button"
                 onClick={handleEditSave}
-                disabled={savingEdit || !editBody.trim()}
+                disabled={savingEdit || !editBody.trim() || isOverWordLimit(editBody)}
                 className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
               >
                 {savingEdit ? "Saving…" : "Save"}
