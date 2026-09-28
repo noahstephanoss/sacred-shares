@@ -35,7 +35,43 @@ type Testimony = {
   is_public: boolean;
   created_at: string;
   profiles?: { display_name: string | null } | null;
+  burden_id?: string | null;
 };
+
+function BurdenOrigin({ burdenId }: { burdenId: string }) {
+  const [open, setOpen] = useState(false);
+  const [count, setCount] = useState<number | null>(null);
+  const [text, setText] = useState<string | null>(null);
+
+  useEffect(() => {
+    (supabase as any).from("burden_sitters").select("id", { count: "exact", head: true }).eq("burden_id", burdenId)
+      .then(({ count: c }: { count: number | null }) => setCount(c ?? 0));
+  }, [burdenId]);
+
+  const toggle = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!open && text === null) {
+      const { data } = await (supabase as any).from("burdens_feed").select("body").eq("id", burdenId).maybeSingle();
+      setText(data?.body ?? "");
+    }
+    setOpen((o) => !o);
+  };
+
+  return (
+    <div className="mt-2">
+      <button type="button" onClick={toggle} className="text-xs text-muted-foreground hover:text-foreground" aria-expanded={open}>
+        It started as a burden
+        {count !== null && count > 0 && ` · ${count} ${count === 1 ? "person" : "people"} sat with them`}
+        <span className="ml-1">{open ? "▴" : "▾"}</span>
+      </button>
+      {open && text && (
+        <p className="mt-2 border-l-2 border-primary/30 pl-3 text-xs italic leading-relaxed text-muted-foreground whitespace-pre-wrap" style={{ fontFamily: "'Georgia', serif" }}>
+          {text}
+        </p>
+      )}
+    </div>
+  );
+}
 
 function timeAgo(dateStr: string): string {
   const now = Date.now();
@@ -346,6 +382,9 @@ function TestimonyCard({
           )}
         </div>
       )}
+      {testimony.burden_id && (
+        <span className="mb-2 inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">🕊️ God answered</span>
+      )}
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <span className="font-medium text-foreground">
           {testimony.profiles?.display_name || "Anonymous"}
@@ -357,6 +396,7 @@ function TestimonyCard({
       <p className="mt-2 text-sm text-foreground leading-relaxed whitespace-pre-wrap pr-8">
         {testimony.body}
       </p>
+      {testimony.burden_id && <BurdenOrigin burdenId={testimony.burden_id} />}
       <ReactionButtons testimonyId={testimony.id} userId={userId} onAuthRequired={onAuthRequired} />
     </div>
   );
@@ -506,6 +546,8 @@ function FeedPage() {
   const [savingEdit, setSavingEdit] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [newPostIds, setNewPostIds] = useState<string[]>([]);
+  const [burdenAnon, setBurdenAnon] = useState(false);
+  const [revealBurden, setRevealBurden] = useState(false);
   const search = Route.useSearch();
   const navigate = useNavigate();
   const burdenId = search.burden ?? null;
@@ -597,6 +639,14 @@ function FeedPage() {
   }, [burdenId, userId]);
 
   useEffect(() => {
+    setRevealBurden(false);
+    setBurdenAnon(false);
+    if (!burdenId) return;
+    (supabase as any).from("burdens_feed").select("is_anonymous").eq("id", burdenId).maybeSingle()
+      .then(({ data }: { data: { is_anonymous: boolean } | null }) => setBurdenAnon(!!data?.is_anonymous));
+  }, [burdenId]);
+
+  useEffect(() => {
     if (!search.testimony || loading) return;
     const t = testimonies.find((x) => x.id === search.testimony);
     if (t) setReadingTestimony(t);
@@ -607,12 +657,13 @@ function FeedPage() {
     if (!body.trim() || submitting || !userId) return;
     setSubmitting(true);
 
+    const linkBurden = burdenId && (!burdenAnon || revealBurden);
     const { error } = await supabase.from("testimonies").insert({
       user_id: userId,
       title: "",
       body: body.trim(),
       is_public: isPublic,
-      ...(burdenId ? { burden_id: burdenId } : {}),
+      ...(linkBurden ? { burden_id: burdenId, reveal_burden: burdenAnon && revealBurden } : {}),
     } as any);
 
     if (!error) {
@@ -671,6 +722,17 @@ function FeedPage() {
                 aria-label="Share a testimony"
                 className="w-full resize-none rounded-md border border-input bg-card px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20"
               /><WordCounter text={body} /></div>
+              {burdenId && burdenAnon && (
+                <label className="flex items-start gap-2 text-xs text-foreground">
+                  <input
+                    type="checkbox"
+                    checked={revealBurden}
+                    onChange={(e) => setRevealBurden(e.target.checked)}
+                    className="mt-0.5 rounded border-input"
+                  />
+                  Show that this came from your burden (this will reveal you posted it)
+                </label>
+              )}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <label className="flex items-center gap-2 text-xs text-foreground">
