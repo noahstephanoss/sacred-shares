@@ -13,6 +13,8 @@ export function AppNav() {
   const [discernInput, setDiscernInput] = useState("");
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const isMobile = useIsMobile();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [reportCount, setReportCount] = useState(0);
   const routerState = useRouterState();
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== "undefined") {
@@ -56,9 +58,22 @@ export function AppNav() {
               setAvatarUrl(profile.avatar_url);
             }
           });
+        supabase.rpc("has_role", { _user_id: data.user.id, _role: "admin" }).then(({ data: r }) => {
+          if (r === true) setIsAdmin(true);
+        });
       }
     });
   }, []);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    const refresh = () => {
+      supabase.rpc("admin_open_report_count" as never).then(({ data }) => setReportCount(Number(data) || 0));
+    };
+    refresh();
+    window.addEventListener("reports-changed", refresh);
+    return () => window.removeEventListener("reports-changed", refresh);
+  }, [isAdmin]);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -169,6 +184,16 @@ export function AppNav() {
           <Link to="/bible" className="text-sm text-muted-foreground hover:text-foreground" activeProps={{ className: "text-sm text-foreground font-medium" }}>
             Bible
           </Link>
+          {isAdmin && (
+            <Link to="/admin/reports" className="relative text-sm text-muted-foreground hover:text-foreground" activeProps={{ className: "relative text-sm text-foreground font-medium" }}>
+              Reports
+              {reportCount > 0 && (
+                <span className="absolute -right-3 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold text-destructive-foreground">
+                  {reportCount}
+                </span>
+              )}
+            </Link>
+          )}
 
           {/* Dark mode toggle */}
           <button

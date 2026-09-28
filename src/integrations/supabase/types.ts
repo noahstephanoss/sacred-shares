@@ -756,6 +756,30 @@ export type Database = {
       }
     }
     Functions: {
+      admin_burden_reports: {
+        Args: never
+        Returns: {
+          author_name: string
+          body: string
+          burden_id: string
+          created_at: string
+          is_anonymous: boolean
+          report_count: number
+        }[]
+      }
+      admin_circle_reports: {
+        Args: never
+        Returns: {
+          author_name: string
+          body: string
+          circle_burden: string
+          circle_id: string
+          created_at: string
+          message_id: string
+          report_count: number
+        }[]
+      }
+      admin_open_report_count: { Args: never; Returns: number }
       can_join_circle: { Args: { circle: string }; Returns: boolean }
       circle_is_active: { Args: { circle: string }; Returns: boolean }
       circle_member_count: { Args: { circle: string }; Returns: number }
