@@ -26,6 +26,7 @@ import { Route as CirclesCircleIdRouteImport } from './routes/circles.$circleId'
 import { Route as BlogNewRouteImport } from './routes/blog_.new'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 
 const ThinkersRoute = ThinkersRouteImport.update({
   id: '/thinkers',
@@ -112,6 +113,11 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminReportsRoute = AdminReportsRouteImport.update({
+  id: '/admin/reports',
+  path: '/admin/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -126,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/thinkers': typeof ThinkersRoute
+  '/admin/reports': typeof AdminReportsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/new': typeof BlogNewRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/thinkers': typeof ThinkersRoute
+  '/admin/reports': typeof AdminReportsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/new': typeof BlogNewRoute
@@ -165,6 +173,7 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/thinkers': typeof ThinkersRoute
+  '/admin/reports': typeof AdminReportsRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog_/new': typeof BlogNewRoute
@@ -186,6 +195,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sitemap.xml'
     | '/thinkers'
+    | '/admin/reports'
     | '/auth/callback'
     | '/blog/$slug'
     | '/blog/new'
@@ -205,6 +215,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sitemap.xml'
     | '/thinkers'
+    | '/admin/reports'
     | '/auth/callback'
     | '/blog/$slug'
     | '/blog/new'
@@ -224,6 +235,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sitemap.xml'
     | '/thinkers'
+    | '/admin/reports'
     | '/auth/callback'
     | '/blog/$slug'
     | '/blog_/new'
@@ -244,6 +256,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ThinkersRoute: typeof ThinkersRoute
+  AdminReportsRoute: typeof AdminReportsRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   BlogNewRoute: typeof BlogNewRoute
   CirclesCircleIdRoute: typeof CirclesCircleIdRoute
@@ -371,6 +384,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/reports': {
+      id: '/admin/reports'
+      path: '/admin/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -397,6 +417,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ThinkersRoute: ThinkersRoute,
+  AdminReportsRoute: AdminReportsRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   BlogNewRoute: BlogNewRoute,
   CirclesCircleIdRoute: CirclesCircleIdRoute,
