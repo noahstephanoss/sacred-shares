@@ -22,6 +22,13 @@
       "when": 1791676485337,
       "tag": "0002_home_testimony_structure_privacy_and_official_posts",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791676752432,
+      "tag": "0003_narrow_official_post_guest_grants",
+      "breakpoints": true
     }
   ]
 }
