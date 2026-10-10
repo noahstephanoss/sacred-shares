@@ -1,4 +1,4 @@
-- [x] Rename the testimony Feed route and wording to Home
-- [x] Preserve /feed as a query-forwarding redirect
-- [x] Polish testimony cards and optimistic reaction animation
-- [x] Verify desktop/mobile flows and build health
+- [ ] Build Home testimony sharing, privacy, edits and deletion
+- [ ] Add reaction people list and buffered new testimonies
+- [ ] Add automatic official daily Proverbs and stopping point
+- [ ] Verify privacy rules, tests and Home flows
