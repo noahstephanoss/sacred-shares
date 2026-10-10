@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { AppNav } from "@/components/AppNav";
+import { PageShell } from "@/components/AppNav";
+import { useSession } from "@/components/AuthProvider";
 
 export const Route = createFileRoute("/home")({
   head: () => ({
@@ -30,7 +31,8 @@ const REACTIONS = [
 ] as const;
 
 function HomePage() {
-  const [userId, setUserId] = useState<string | null>(null);
+  const { user, requireAuth } = useSession();
+  const userId = user?.id ?? null;
   const [testimonies, setTestimonies] = useState<Testimony[]>([]);
   const [reactions, setReactions] = useState<Record<string, Record<string, number>>>({});
   const [myReactions, setMyReactions] = useState<Record<string, string>>({});
@@ -76,10 +78,6 @@ function HomePage() {
   }, [userId]);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
-  }, []);
-
-  useEffect(() => {
     load();
   }, [load]);
 
@@ -101,7 +99,7 @@ function HomePage() {
   };
 
   const toggleReaction = async (testimonyId: string, type: string) => {
-    if (!userId) return;
+    if (!requireAuth() || !userId) return;
     const existing = myReactions[testimonyId];
     if (existing === type) {
       await supabase
@@ -127,9 +125,7 @@ function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <AppNav />
-      <main className="mx-auto max-w-2xl px-4 py-8">
+    <PageShell>
         {userId ? (
           <form
             onSubmit={handlePost}
@@ -155,9 +151,9 @@ function HomePage() {
         ) : (
           <div className="mb-8 rounded-lg border border-border/70 bg-card px-6 py-5 text-center shadow-sm">
             <p className="text-sm text-muted-foreground">
-              <Link to="/login" className="font-medium text-primary hover:underline">
+              <button type="button" onClick={requireAuth} className="font-medium text-primary hover:underline">
                 Sign in
-              </Link>{" "}
+              </button>{" "}
               to share your testimony and react to others.
             </p>
           </div>
@@ -167,10 +163,9 @@ function HomePage() {
           <p className="py-12 text-center text-sm text-muted-foreground">Loading…</p>
         ) : testimonies.length === 0 ? (
           <div className="py-16 text-center">
-            <div className="text-3xl" style={{ color: "#B8860B" }}>✝</div>
+            <div className="text-3xl text-gold">✝</div>
             <p
-              className="mt-4 text-sm italic text-muted-foreground"
-              style={{ fontFamily: "'Georgia', serif" }}
+              className="mt-4 font-serif text-sm italic text-muted-foreground"
             >
               No testimonies yet. You can be the first to share what God has done.
             </p>
@@ -184,8 +179,7 @@ function HomePage() {
               >
                 <div className="mb-2 flex items-baseline justify-between gap-3">
                   <span
-                    className="text-sm font-semibold text-foreground"
-                    style={{ fontFamily: "'Georgia', serif" }}
+                    className="font-serif text-sm font-semibold text-foreground"
                   >
                     {t.author_name}
                   </span>
@@ -204,7 +198,6 @@ function HomePage() {
                       <button
                         key={r.type}
                         onClick={() => toggleReaction(t.id, r.type)}
-                        disabled={!userId}
                         className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition-colors ${
                           active
                             ? "border-primary bg-primary/10 text-foreground"
@@ -222,7 +215,6 @@ function HomePage() {
             ))}
           </div>
         )}
-      </main>
-    </div>
+    </PageShell>
   );
 }

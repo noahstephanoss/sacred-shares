@@ -9,12 +9,28 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ThinkersRouteImport } from './routes/thinkers'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as HomeRouteImport } from './routes/home'
+import { Route as DiscernmentRouteImport } from './routes/discernment'
 import { Route as CheckEmailRouteImport } from './routes/check-email'
+import { Route as BurdensRouteImport } from './routes/burdens'
+import { Route as BlogRouteImport } from './routes/blog'
+import { Route as BibleRouteImport } from './routes/bible'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 
+const ThinkersRoute = ThinkersRouteImport.update({
+  id: '/thinkers',
+  path: '/thinkers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -25,9 +41,29 @@ const HomeRoute = HomeRouteImport.update({
   path: '/home',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DiscernmentRoute = DiscernmentRouteImport.update({
+  id: '/discernment',
+  path: '/discernment',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CheckEmailRoute = CheckEmailRouteImport.update({
   id: '/check-email',
   path: '/check-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BurdensRoute = BurdensRouteImport.update({
+  id: '/burdens',
+  path: '/burdens',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BibleRoute = BibleRouteImport.update({
+  id: '/bible',
+  path: '/bible',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -43,44 +79,116 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/bible': typeof BibleRoute
+  '/blog': typeof BlogRoute
+  '/burdens': typeof BurdensRoute
   '/check-email': typeof CheckEmailRoute
+  '/discernment': typeof DiscernmentRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
+  '/thinkers': typeof ThinkersRoute
   '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/bible': typeof BibleRoute
+  '/blog': typeof BlogRoute
+  '/burdens': typeof BurdensRoute
   '/check-email': typeof CheckEmailRoute
+  '/discernment': typeof DiscernmentRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
+  '/thinkers': typeof ThinkersRoute
   '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/bible': typeof BibleRoute
+  '/blog': typeof BlogRoute
+  '/burdens': typeof BurdensRoute
   '/check-email': typeof CheckEmailRoute
+  '/discernment': typeof DiscernmentRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
+  '/thinkers': typeof ThinkersRoute
   '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/check-email' | '/home' | '/login' | '/auth/callback'
+  fullPaths:
+    | '/'
+    | '/bible'
+    | '/blog'
+    | '/burdens'
+    | '/check-email'
+    | '/discernment'
+    | '/home'
+    | '/login'
+    | '/profile'
+    | '/thinkers'
+    | '/auth/callback'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/check-email' | '/home' | '/login' | '/auth/callback'
-  id: '__root__' | '/' | '/check-email' | '/home' | '/login' | '/auth/callback'
+  to:
+    | '/'
+    | '/bible'
+    | '/blog'
+    | '/burdens'
+    | '/check-email'
+    | '/discernment'
+    | '/home'
+    | '/login'
+    | '/profile'
+    | '/thinkers'
+    | '/auth/callback'
+  id:
+    | '__root__'
+    | '/'
+    | '/bible'
+    | '/blog'
+    | '/burdens'
+    | '/check-email'
+    | '/discernment'
+    | '/home'
+    | '/login'
+    | '/profile'
+    | '/thinkers'
+    | '/auth/callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BibleRoute: typeof BibleRoute
+  BlogRoute: typeof BlogRoute
+  BurdensRoute: typeof BurdensRoute
   CheckEmailRoute: typeof CheckEmailRoute
+  DiscernmentRoute: typeof DiscernmentRoute
   HomeRoute: typeof HomeRoute
   LoginRoute: typeof LoginRoute
+  ProfileRoute: typeof ProfileRoute
+  ThinkersRoute: typeof ThinkersRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/thinkers': {
+      id: '/thinkers'
+      path: '/thinkers'
+      fullPath: '/thinkers'
+      preLoaderRoute: typeof ThinkersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -95,11 +203,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HomeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/discernment': {
+      id: '/discernment'
+      path: '/discernment'
+      fullPath: '/discernment'
+      preLoaderRoute: typeof DiscernmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/check-email': {
       id: '/check-email'
       path: '/check-email'
       fullPath: '/check-email'
       preLoaderRoute: typeof CheckEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/burdens': {
+      id: '/burdens'
+      path: '/burdens'
+      fullPath: '/burdens'
+      preLoaderRoute: typeof BurdensRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bible': {
+      id: '/bible'
+      path: '/bible'
+      fullPath: '/bible'
+      preLoaderRoute: typeof BibleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -121,9 +257,15 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BibleRoute: BibleRoute,
+  BlogRoute: BlogRoute,
+  BurdensRoute: BurdensRoute,
   CheckEmailRoute: CheckEmailRoute,
+  DiscernmentRoute: DiscernmentRoute,
   HomeRoute: HomeRoute,
   LoginRoute: LoginRoute,
+  ProfileRoute: ProfileRoute,
+  ThinkersRoute: ThinkersRoute,
   AuthCallbackRoute: AuthCallbackRoute,
 }
 export const routeTree = rootRouteImport
