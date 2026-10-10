@@ -1,4 +1,5 @@
-- [ ] Build Home testimony sharing, privacy, edits and deletion
-- [ ] Add reaction people list and buffered new testimonies
-- [ ] Add automatic official daily Proverbs and stopping point
-- [ ] Verify privacy rules, tests and Home flows
+- [x] Build Home testimony sharing, privacy, edits and deletion
+- [x] Add reaction people list and buffered new testimonies
+- [x] Add automatic official daily Proverbs and stopping point
+- [x] Verify rule tests, database policies, guest flows, desktop/mobile light/dark and build health
+- [ ] Verify signed-in sharing, reactions, editing, deletion and live arrivals — blocked: requester has no matching app account; needs preview sign-in or a selected test account
