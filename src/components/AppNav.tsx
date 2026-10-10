@@ -1,142 +1,104 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useState, useEffect, useRef } from "react";
+import { BookOpen, Home, Lightbulb, MessageCircle, Newspaper, User, HeartHandshake } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useSession } from "@/components/AuthProvider";
+import { ThemeToggle } from "@/components/ThemeToggle";
+
+export const NAV_ITEMS = [
+  { to: "/home", label: "Home", icon: Home },
+  { to: "/burdens", label: "Burdens", icon: HeartHandshake },
+  { to: "/thinkers", label: "Thinkers", icon: Lightbulb },
+  { to: "/bible", label: "Bible", icon: BookOpen },
+  { to: "/discernment", label: "Discernment", icon: MessageCircle },
+  { to: "/blog", label: "Blog", icon: Newspaper },
+  { to: "/profile", label: "Profile", icon: User },
+] as const;
 
 export function AppNav() {
   const navigate = useNavigate();
-  const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
-  const [displayName, setDisplayName] = useState<string | null>(null);
-  const [open, setOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const [darkMode, setDarkMode] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("theme") === "dark";
-    }
-    return false;
-  });
+  const { user } = useSession();
 
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [darkMode]);
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) {
-        setUser({ id: data.user.id, email: data.user.email });
-        supabase
-          .from("profiles")
-          .select("display_name")
-          .eq("user_id", data.user.id)
-          .single()
-          .then(({ data: profile }) => {
-            if (profile) setDisplayName(profile.display_name);
-          });
-      }
-    });
-  }, []);
-
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, []);
-
-  const initials = displayName
-    ? displayName.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2)
-    : user?.email?.charAt(0).toUpperCase() ?? "?";
-
-  const handleSignOut = async () => {
+  const signOut = async () => {
     await supabase.auth.signOut();
-    setOpen(false);
-    navigate({ to: "/" });
+    navigate({ to: "/", replace: true });
   };
 
   return (
-    <header className="border-b border-border bg-background px-4 py-3">
-      <div className="mx-auto flex max-w-3xl items-center justify-between">
-        <Link
-          to="/"
-          className="flex items-center gap-2 text-xl font-bold text-foreground"
-          style={{ fontFamily: "'Georgia', serif" }}
-        >
-          <span style={{ color: "#B8860B", fontSize: "16px" }}>✝</span>
-          Testimonies
-        </Link>
-
-        <nav className="flex items-center gap-5">
-          <Link
-            to="/home"
-            className="text-sm text-muted-foreground hover:text-foreground"
-            activeProps={{ className: "text-sm text-foreground font-medium" }}
-          >
-            Home
+    <>
+      <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
+          <Link to="/" className="flex items-center gap-2 font-serif text-xl text-foreground">
+            <span className="text-gold">✝</span>
+            Testimonies
           </Link>
 
-          <button
-            onClick={() => setDarkMode((prev) => !prev)}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="Toggle dark mode"
-          >
-            {darkMode ? (
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
-                <path d="M10 2a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 10 2ZM10 15a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 10 15ZM10 7a3 3 0 1 0 0 6 3 3 0 0 0 0-6ZM15.657 5.404a.75.75 0 1 0-1.06-1.06l-1.061 1.06a.75.75 0 0 0 1.06 1.061l1.06-1.06ZM6.464 14.596a.75.75 0 1 0-1.06-1.06l-1.061 1.06a.75.75 0 0 0 1.06 1.061l1.06-1.06ZM18 10a.75.75 0 0 1-.75.75h-1.5a.75.75 0 0 1 0-1.5h1.5A.75.75 0 0 1 18 10ZM5 10a.75.75 0 0 1-.75.75h-1.5a.75.75 0 0 1 0-1.5h1.5A.75.75 0 0 1 5 10ZM14.596 15.657a.75.75 0 0 0 1.06-1.06l-1.06-1.061a.75.75 0 1 0-1.061 1.06l1.06-1.06ZM5.404 6.464a.75.75 0 1 0-1.06-1.061a.75.75 0 1 0-1.061 1.06l1.06 1.06Z" />
-              </svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
-                <path fillRule="evenodd" d="M7.455 2.004a.75.75 0 0 1 .26.77 7 7 0 0 0 9.958 7.967.75.75 0 0 1 1.067.853A8.5 8.5 0 1 1 6.647 1.921a.75.75 0 0 1 .808.083Z" clipRule="evenodd" />
-              </svg>
-            )}
-          </button>
-
-          {user && (
-            <div className="relative" ref={menuRef}>
-              <button
-                onClick={() => setOpen(!open)}
-                aria-label="Account"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          <nav className="hidden items-center gap-5 md:flex" aria-label="Main">
+            {NAV_ITEMS.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                activeProps={{ className: "text-sm font-medium text-foreground" }}
               >
-                {initials}
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            {user ? (
+              <button onClick={signOut} className="text-sm text-muted-foreground hover:text-foreground">
+                Sign out
               </button>
+            ) : (
+              <Link to="/login" className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+                Sign in
+              </Link>
+            )}
+          </div>
+        </div>
+      </header>
 
-              {open && (
-                <div className="absolute right-0 top-full z-50 mt-2 w-56 rounded-lg border border-border bg-card py-1 shadow-lg">
-                  <div className="border-b border-border px-4 py-3">
-                    <p className="truncate text-sm font-medium text-foreground">
-                      {displayName || "User"}
-                    </p>
-                    <p className="truncate text-xs text-muted-foreground">{user.email}</p>
-                  </div>
-                  <button
-                    onClick={handleSignOut}
-                    className="w-full px-4 py-2.5 text-left text-sm text-destructive hover:bg-secondary"
-                  >
-                    Log Out
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {!user && (
-            <Link
-              to="/login"
-              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-            >
-              Sign In
-            </Link>
-          )}
-        </nav>
-      </div>
-    </header>
+      <nav
+        aria-label="Main"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
+      >
+        <ul className="grid grid-cols-7">
+          {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
+            <li key={to}>
+              <Link
+                to={to}
+                className="flex flex-col items-center gap-0.5 py-2 text-[10px] text-muted-foreground"
+                activeProps={{ className: "flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium text-primary" }}
+              >
+                <Icon className="h-5 w-5" aria-hidden />
+                <span className="truncate">{label}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </>
   );
 }
+
+export function PageShell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen bg-background">
+      <AppNav />
+      <main className="mx-auto max-w-2xl px-4 py-8 pb-28 md:pb-12">{children}</main>
+    </div>
+  );
+}
+
+export function ComingSoon({ title }: { title: string }) {
+  return (
+    <div className="py-16 text-center">
+      <div className="text-3xl text-gold">✝</div>
+      <h1 className="mt-4 font-serif text-3xl text-foreground">{title}</h1>
+      <p className="mt-3 text-sm text-muted-foreground">This section is being prepared.</p>
+    </div>
+  );
+}
+

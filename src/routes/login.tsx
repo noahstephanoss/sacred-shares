@@ -18,6 +18,8 @@ function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [ageOk, setAgeOk] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -54,11 +56,16 @@ function LoginPage() {
 
     try {
       if (isSignUp) {
+        if (!ageOk) {
+          setError("You need to be 13 or older to join Testimonies.");
+          return;
+        }
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/auth/callback`,
+            data: { display_name: name.trim(), age_confirmed: true },
           },
         });
         if (error) {
@@ -107,6 +114,15 @@ function LoginPage() {
               </div>
             )}
 
+            {isSignUp && (
+              <div>
+                <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-foreground">
+                  Name
+                </label>
+                <input id="name" value={name} onChange={(e) => setName(e.target.value)} required maxLength={60} className="w-full rounded-md border border-input bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20" placeholder="Your name" />
+              </div>
+            )}
+
             <div>
               <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-foreground">
                 Email
@@ -138,9 +154,16 @@ function LoginPage() {
               />
             </div>
 
+            {isSignUp && (
+              <label className="flex items-start gap-2 text-sm text-foreground">
+                <input type="checkbox" checked={ageOk} onChange={(e) => setAgeOk(e.target.checked)} required className="mt-0.5 h-4 w-4 accent-primary" />
+                <span>I confirm I'm 13 or older.</span>
+              </label>
+            )}
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || (isSignUp && !ageOk)}
               className="w-full rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
             >
               {loading ? "Please wait..." : isSignUp ? "Create Account" : "Sign In"}
