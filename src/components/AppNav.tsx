@@ -1,21 +1,13 @@
-import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useState, useEffect, useRef, type FormEvent } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 export function AppNav() {
   const navigate = useNavigate();
   const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
   const [displayName, setDisplayName] = useState<string | null>(null);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const [discernInput, setDiscernInput] = useState("");
-  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
-  const isMobile = useIsMobile();
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [reportCount, setReportCount] = useState(0);
-  const routerState = useRouterState();
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("theme") === "dark";
@@ -33,47 +25,21 @@ export function AppNav() {
     }
   }, [darkMode]);
 
-  const getPageContext = (): string => {
-    const path = routerState.location.pathname;
-    if (path === "/home") return "Browsing Testimonies Home";
-    if (path === "/thinkers") return "Browsing the Thinkers section";
-    if (path === "/bible") return "Reading the Bible";
-    if (path.startsWith("/blog")) return "Reading the blog";
-    if (path === "/discernment") return "";
-    return "Browsing Testimonies";
-  };
-
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) {
         setUser({ id: data.user.id, email: data.user.email });
         supabase
           .from("profiles")
-          .select("display_name, avatar_url")
+          .select("display_name")
           .eq("user_id", data.user.id)
           .single()
           .then(({ data: profile }) => {
-            if (profile) {
-              setDisplayName(profile.display_name);
-              setAvatarUrl(profile.avatar_url);
-            }
+            if (profile) setDisplayName(profile.display_name);
           });
-        supabase.rpc("has_role", { _user_id: data.user.id, _role: "admin" }).then(({ data: r }) => {
-          if (r === true) setIsAdmin(true);
-        });
       }
     });
   }, []);
-
-  useEffect(() => {
-    if (!isAdmin) return;
-    const refresh = () => {
-      supabase.rpc("admin_open_report_count" as never).then(({ data }) => setReportCount(Number(data) || 0));
-    };
-    refresh();
-    window.addEventListener("reports-changed", refresh);
-    return () => window.removeEventListener("reports-changed", refresh);
-  }, [isAdmin]);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -83,15 +49,6 @@ export function AppNav() {
     }
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
-  }, []);
-
-  useEffect(() => {
-    function onAvatarUpdated(e: Event) {
-      const detail = (e as CustomEvent<{ url: string }>).detail;
-      if (detail?.url) setAvatarUrl(detail.url);
-    }
-    window.addEventListener("avatar-updated", onAvatarUpdated);
-    return () => window.removeEventListener("avatar-updated", onAvatarUpdated);
   }, []);
 
   const initials = displayName
@@ -104,98 +61,27 @@ export function AppNav() {
     navigate({ to: "/" });
   };
 
-  const handleDiscernSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (!discernInput.trim()) return;
-    const ctx = getPageContext();
-    if (routerState.location.pathname === "/discernment") {
-      // Already on discernment — don't redirect, just clear
-      setDiscernInput("");
-      setMobileSearchOpen(false);
-      return;
-    }
-    navigate({ to: "/discernment", search: { prefill: discernInput.trim(), context: ctx || undefined } });
-    setDiscernInput("");
-    setMobileSearchOpen(false);
-  };
-
   return (
     <header className="border-b border-border bg-background px-4 py-3">
-      <div className="mx-auto flex max-w-5xl items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 text-xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
-          <span style={{ color: "#B8860B", fontSize: "16px", textShadow: "1px 1px 0px rgba(0,0,0,0.2)" }}>✝</span>
+      <div className="mx-auto flex max-w-3xl items-center justify-between">
+        <Link
+          to="/"
+          className="flex items-center gap-2 text-xl font-bold text-foreground"
+          style={{ fontFamily: "'Georgia', serif" }}
+        >
+          <span style={{ color: "#B8860B", fontSize: "16px" }}>✝</span>
           Testimonies
         </Link>
 
         <nav className="flex items-center gap-5">
-          {/* Discernment input bar — authenticated only */}
-          {user && !isMobile && (
-            <form onSubmit={handleDiscernSubmit} className="relative flex items-center">
-              <input
-                type="text"
-                value={discernInput}
-                onChange={(e) => setDiscernInput(e.target.value)}
-                placeholder="Ask for discernment..."
-                aria-label="Ask for discernment"
-                className="w-52 rounded-full border border-input bg-card px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-              />
-              {discernInput.trim() && (
-                <button
-                  type="submit"
-                  className="absolute right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-                  aria-label="Send"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5">
-                    <path d="M3.105 2.288a.75.75 0 0 0-.826.95l1.414 4.926A1.5 1.5 0 0 0 5.135 9.25h6.115a.75.75 0 0 1 0 1.5H5.135a1.5 1.5 0 0 0-1.442 1.086l-1.414 4.926a.75.75 0 0 0 .826.95l14.095-5.638a.75.75 0 0 0 0-1.392L3.105 2.288Z" />
-                  </svg>
-                </button>
-              )}
-            </form>
-          )}
-
-          {/* Mobile: search icon toggle */}
-          {user && isMobile && !mobileSearchOpen && (
-            <button
-              onClick={() => setMobileSearchOpen(true)}
-              className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground transition-colors"
-              aria-label="Ask for discernment"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
-                <path fillRule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z" clipRule="evenodd" />
-              </svg>
-            </button>
-          )}
-
-          <Link to="/home" className="text-sm text-muted-foreground hover:text-foreground" activeProps={{ className: "text-sm text-foreground font-medium" }}>
+          <Link
+            to="/home"
+            className="text-sm text-muted-foreground hover:text-foreground"
+            activeProps={{ className: "text-sm text-foreground font-medium" }}
+          >
             Home
           </Link>
-          <Link to="/burdens" className="text-sm text-muted-foreground hover:text-foreground" activeProps={{ className: "text-sm text-foreground font-medium" }}>
-            Burdens
-          </Link>
-          <Link to="/discernment" className="text-sm text-muted-foreground hover:text-foreground" activeProps={{ className: "text-sm text-foreground font-medium" }}>
-            Discernment
-          </Link>
-          <Link to="/thinkers" className="text-sm text-muted-foreground hover:text-foreground" activeProps={{ className: "text-sm text-foreground font-medium" }}>
-            Thinkers
-          </Link>
-          <Link to="/blog" className="text-sm text-muted-foreground hover:text-foreground" activeProps={{ className: "text-sm text-foreground font-medium" }}>
-            Blog
-          </Link>
-          <Link to="/bible" className="text-sm text-muted-foreground hover:text-foreground" activeProps={{ className: "text-sm text-foreground font-medium" }}>
-            Bible
-          </Link>
-          {isAdmin && (
-            <Link to="/admin/reports" className="relative text-sm text-muted-foreground hover:text-foreground" activeProps={{ className: "relative text-sm text-foreground font-medium" }}>
-              Reports
-              {reportCount > 0 && (
-                <span className="absolute -right-3 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold text-destructive-foreground">
-                  {reportCount}
-                </span>
-              )}
-            </Link>
-          )}
 
-          {/* Dark mode toggle */}
           <button
             onClick={() => setDarkMode((prev) => !prev)}
             className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground transition-colors"
@@ -203,7 +89,7 @@ export function AppNav() {
           >
             {darkMode ? (
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
-                <path d="M10 2a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 10 2ZM10 15a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 10 15ZM10 7a3 3 0 1 0 0 6 3 3 0 0 0 0-6ZM15.657 5.404a.75.75 0 1 0-1.06-1.06l-1.061 1.06a.75.75 0 0 0 1.06 1.061l1.06-1.06ZM6.464 14.596a.75.75 0 1 0-1.06-1.06l-1.061 1.06a.75.75 0 0 0 1.06 1.061l1.06-1.06ZM18 10a.75.75 0 0 1-.75.75h-1.5a.75.75 0 0 1 0-1.5h1.5A.75.75 0 0 1 18 10ZM5 10a.75.75 0 0 1-.75.75h-1.5a.75.75 0 0 1 0-1.5h1.5A.75.75 0 0 1 5 10ZM14.596 15.657a.75.75 0 0 0 1.06-1.06l-1.06-1.061a.75.75 0 1 0-1.061 1.06l1.06 1.06ZM5.404 6.464a.75.75 0 0 0 1.06-1.06l-1.06-1.061a.75.75 0 1 0-1.061 1.06l1.06 1.06Z" />
+                <path d="M10 2a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 10 2ZM10 15a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 10 15ZM10 7a3 3 0 1 0 0 6 3 3 0 0 0 0-6ZM15.657 5.404a.75.75 0 1 0-1.06-1.06l-1.061 1.06a.75.75 0 0 0 1.06 1.061l1.06-1.06ZM6.464 14.596a.75.75 0 1 0-1.06-1.06l-1.061 1.06a.75.75 0 0 0 1.06 1.061l1.06-1.06ZM18 10a.75.75 0 0 1-.75.75h-1.5a.75.75 0 0 1 0-1.5h1.5A.75.75 0 0 1 18 10ZM5 10a.75.75 0 0 1-.75.75h-1.5a.75.75 0 0 1 0-1.5h1.5A.75.75 0 0 1 5 10ZM14.596 15.657a.75.75 0 0 0 1.06-1.06l-1.06-1.061a.75.75 0 1 0-1.061 1.06l1.06-1.06ZM5.404 6.464a.75.75 0 1 0-1.06-1.061a.75.75 0 1 0-1.061 1.06l1.06 1.06Z" />
               </svg>
             ) : (
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
@@ -216,49 +102,26 @@ export function AppNav() {
             <div className="relative" ref={menuRef}>
               <button
                 onClick={() => setOpen(!open)}
-                aria-label="Profile"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 overflow-hidden"
+                aria-label="Account"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
               >
-                {avatarUrl ? (
-                  <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
-                ) : (
-                  initials
-                )}
+                {initials}
               </button>
 
               {open && (
                 <div className="absolute right-0 top-full z-50 mt-2 w-56 rounded-lg border border-border bg-card py-1 shadow-lg">
                   <div className="border-b border-border px-4 py-3">
-                    <p className="text-sm font-medium text-foreground truncate">
+                    <p className="truncate text-sm font-medium text-foreground">
                       {displayName || "User"}
                     </p>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {user.email}
-                    </p>
+                    <p className="truncate text-xs text-muted-foreground">{user.email}</p>
                   </div>
-                  <Link
-                    to="/profile/$userId"
-                    params={{ userId: user.id }}
-                    onClick={() => setOpen(false)}
-                    className="block px-4 py-2.5 text-sm text-foreground hover:bg-secondary"
+                  <button
+                    onClick={handleSignOut}
+                    className="w-full px-4 py-2.5 text-left text-sm text-destructive hover:bg-secondary"
                   >
-                    View Profile
-                  </Link>
-                  <Link
-                    to="/settings"
-                    onClick={() => setOpen(false)}
-                    className="block px-4 py-2.5 text-sm text-foreground hover:bg-secondary"
-                  >
-                    Settings
-                  </Link>
-                  <div className="border-t border-border">
-                    <button
-                      onClick={handleSignOut}
-                      className="w-full px-4 py-2.5 text-left text-sm text-destructive hover:bg-secondary"
-                    >
-                      Log Out
-                    </button>
-                  </div>
+                    Log Out
+                  </button>
                 </div>
               )}
             </div>
@@ -274,30 +137,6 @@ export function AppNav() {
           )}
         </nav>
       </div>
-
-      {/* Mobile expanded search bar */}
-      {user && isMobile && mobileSearchOpen && (
-        <div className="border-t border-border bg-background px-4 py-2">
-          <form onSubmit={handleDiscernSubmit} className="relative flex items-center">
-            <input
-              type="text"
-              value={discernInput}
-              onChange={(e) => setDiscernInput(e.target.value)}
-              placeholder="Ask for discernment..."
-              autoFocus
-              aria-label="Ask for discernment"
-              className="w-full rounded-full border border-input bg-card px-3 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-            />
-            <button
-              type="button"
-              onClick={() => { setMobileSearchOpen(false); setDiscernInput(""); }}
-              className="ml-2 text-sm text-muted-foreground hover:text-foreground"
-            >
-              Cancel
-            </button>
-          </form>
-        </div>
-      )}
     </header>
   );
 }

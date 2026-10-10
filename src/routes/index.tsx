@@ -83,18 +83,6 @@ function Index() {
           <Link to="/home" className="text-foreground transition-colors hover:underline hover:decoration-primary hover:underline-offset-4">
             Home
           </Link>
-          <span style={{ color: "#B8860B" }}>·</span>
-          <Link to="/discernment" className="text-foreground transition-colors hover:underline hover:decoration-primary hover:underline-offset-4">
-            Discernment Bot
-          </Link>
-          <span style={{ color: "#B8860B" }}>·</span>
-          <Link to="/thinkers" className="text-foreground transition-colors hover:underline hover:decoration-primary hover:underline-offset-4">
-            Thinkers
-          </Link>
-          <span style={{ color: "#B8860B" }}>·</span>
-          <Link to="/blog" className="text-foreground transition-colors hover:underline hover:decoration-primary hover:underline-offset-4">
-            Blog
-          </Link>
         </div>
       </div>
     </div>

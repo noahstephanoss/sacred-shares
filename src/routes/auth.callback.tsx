@@ -12,38 +12,26 @@ function AuthCallbackPage() {
 
   useEffect(() => {
     const handleCallback = async () => {
-      try {
-        const { data, error } = await supabase.auth.getSession();
-
-        if (error) {
-          setError(error.message);
-          return;
-        }
-
-        if (data.session) {
-          navigate({ to: "/home" });
-        } else {
-          // No session yet — listen for the auth state change
-          const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            (event, session) => {
-              if (session) {
-                subscription.unsubscribe();
-                navigate({ to: "/home" });
-              }
-            }
-          );
-
-          // Timeout fallback
-          setTimeout(() => {
-            subscription.unsubscribe();
-            setError("Session could not be established. Please sign in manually.");
-          }, 5000);
-        }
-      } catch {
-        setError("An unexpected error occurred.");
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        setError(error.message);
+        return;
       }
+      if (data.session) {
+        navigate({ to: "/home" });
+        return;
+      }
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        if (session) {
+          subscription.unsubscribe();
+          navigate({ to: "/home" });
+        }
+      });
+      setTimeout(() => {
+        subscription.unsubscribe();
+        setError("Session could not be established. Please sign in manually.");
+      }, 5000);
     };
-
     handleCallback();
   }, [navigate]);
 
@@ -51,10 +39,7 @@ function AuthCallbackPage() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
         <div className="w-full max-w-md text-center">
-          <h1
-            className="text-2xl font-bold text-foreground"
-            style={{ fontFamily: "'Georgia', serif" }}
-          >
+          <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
             Something went wrong
           </h1>
           <p className="mt-4 text-muted-foreground">{error}</p>

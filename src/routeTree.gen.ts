@@ -9,40 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ThinkersRouteImport } from './routes/thinkers'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as HomeRouteImport } from './routes/home'
-import { Route as FeedRouteImport } from './routes/feed'
-import { Route as DiscernmentRouteImport } from './routes/discernment'
 import { Route as CheckEmailRouteImport } from './routes/check-email'
-import { Route as BurdensRouteImport } from './routes/burdens'
-import { Route as BlogRouteImport } from './routes/blog'
-import { Route as BibleRouteImport } from './routes/bible'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ProfileUserIdRouteImport } from './routes/profile.$userId'
-import { Route as CirclesCircleIdRouteImport } from './routes/circles.$circleId'
-import { Route as BlogNewRouteImport } from './routes/blog_.new'
-import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
-import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 
-const ThinkersRoute = ThinkersRouteImport.update({
-  id: '/thinkers',
-  path: '/thinkers',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -53,34 +25,9 @@ const HomeRoute = HomeRouteImport.update({
   path: '/home',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FeedRoute = FeedRouteImport.update({
-  id: '/feed',
-  path: '/feed',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DiscernmentRoute = DiscernmentRouteImport.update({
-  id: '/discernment',
-  path: '/discernment',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CheckEmailRoute = CheckEmailRouteImport.update({
   id: '/check-email',
   path: '/check-email',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BurdensRoute = BurdensRouteImport.update({
-  id: '/burdens',
-  path: '/burdens',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BlogRoute = BlogRouteImport.update({
-  id: '/blog',
-  path: '/blog',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BibleRoute = BibleRouteImport.update({
-  id: '/bible',
-  path: '/bible',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -88,204 +35,52 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProfileUserIdRoute = ProfileUserIdRouteImport.update({
-  id: '/profile/$userId',
-  path: '/profile/$userId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CirclesCircleIdRoute = CirclesCircleIdRouteImport.update({
-  id: '/circles/$circleId',
-  path: '/circles/$circleId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BlogNewRoute = BlogNewRouteImport.update({
-  id: '/blog_/new',
-  path: '/blog/new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BlogSlugRoute = BlogSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => BlogRoute,
-} as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminReportsRoute = AdminReportsRouteImport.update({
-  id: '/admin/reports',
-  path: '/admin/reports',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/bible': typeof BibleRoute
-  '/blog': typeof BlogRouteWithChildren
-  '/burdens': typeof BurdensRoute
   '/check-email': typeof CheckEmailRoute
-  '/discernment': typeof DiscernmentRoute
-  '/feed': typeof FeedRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
-  '/settings': typeof SettingsRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/thinkers': typeof ThinkersRoute
-  '/admin/reports': typeof AdminReportsRoute
   '/auth/callback': typeof AuthCallbackRoute
-  '/blog/$slug': typeof BlogSlugRoute
-  '/blog/new': typeof BlogNewRoute
-  '/circles/$circleId': typeof CirclesCircleIdRoute
-  '/profile/$userId': typeof ProfileUserIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/bible': typeof BibleRoute
-  '/blog': typeof BlogRouteWithChildren
-  '/burdens': typeof BurdensRoute
   '/check-email': typeof CheckEmailRoute
-  '/discernment': typeof DiscernmentRoute
-  '/feed': typeof FeedRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
-  '/settings': typeof SettingsRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/thinkers': typeof ThinkersRoute
-  '/admin/reports': typeof AdminReportsRoute
   '/auth/callback': typeof AuthCallbackRoute
-  '/blog/$slug': typeof BlogSlugRoute
-  '/blog/new': typeof BlogNewRoute
-  '/circles/$circleId': typeof CirclesCircleIdRoute
-  '/profile/$userId': typeof ProfileUserIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/bible': typeof BibleRoute
-  '/blog': typeof BlogRouteWithChildren
-  '/burdens': typeof BurdensRoute
   '/check-email': typeof CheckEmailRoute
-  '/discernment': typeof DiscernmentRoute
-  '/feed': typeof FeedRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
-  '/settings': typeof SettingsRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/thinkers': typeof ThinkersRoute
-  '/admin/reports': typeof AdminReportsRoute
   '/auth/callback': typeof AuthCallbackRoute
-  '/blog/$slug': typeof BlogSlugRoute
-  '/blog_/new': typeof BlogNewRoute
-  '/circles/$circleId': typeof CirclesCircleIdRoute
-  '/profile/$userId': typeof ProfileUserIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/bible'
-    | '/blog'
-    | '/burdens'
-    | '/check-email'
-    | '/discernment'
-    | '/feed'
-    | '/home'
-    | '/login'
-    | '/settings'
-    | '/sitemap.xml'
-    | '/thinkers'
-    | '/admin/reports'
-    | '/auth/callback'
-    | '/blog/$slug'
-    | '/blog/new'
-    | '/circles/$circleId'
-    | '/profile/$userId'
+  fullPaths: '/' | '/check-email' | '/home' | '/login' | '/auth/callback'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/bible'
-    | '/blog'
-    | '/burdens'
-    | '/check-email'
-    | '/discernment'
-    | '/feed'
-    | '/home'
-    | '/login'
-    | '/settings'
-    | '/sitemap.xml'
-    | '/thinkers'
-    | '/admin/reports'
-    | '/auth/callback'
-    | '/blog/$slug'
-    | '/blog/new'
-    | '/circles/$circleId'
-    | '/profile/$userId'
-  id:
-    | '__root__'
-    | '/'
-    | '/bible'
-    | '/blog'
-    | '/burdens'
-    | '/check-email'
-    | '/discernment'
-    | '/feed'
-    | '/home'
-    | '/login'
-    | '/settings'
-    | '/sitemap.xml'
-    | '/thinkers'
-    | '/admin/reports'
-    | '/auth/callback'
-    | '/blog/$slug'
-    | '/blog_/new'
-    | '/circles/$circleId'
-    | '/profile/$userId'
+  to: '/' | '/check-email' | '/home' | '/login' | '/auth/callback'
+  id: '__root__' | '/' | '/check-email' | '/home' | '/login' | '/auth/callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  BibleRoute: typeof BibleRoute
-  BlogRoute: typeof BlogRouteWithChildren
-  BurdensRoute: typeof BurdensRoute
   CheckEmailRoute: typeof CheckEmailRoute
-  DiscernmentRoute: typeof DiscernmentRoute
-  FeedRoute: typeof FeedRoute
   HomeRoute: typeof HomeRoute
   LoginRoute: typeof LoginRoute
-  SettingsRoute: typeof SettingsRoute
-  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  ThinkersRoute: typeof ThinkersRoute
-  AdminReportsRoute: typeof AdminReportsRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
-  BlogNewRoute: typeof BlogNewRoute
-  CirclesCircleIdRoute: typeof CirclesCircleIdRoute
-  ProfileUserIdRoute: typeof ProfileUserIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/thinkers': {
-      id: '/thinkers'
-      path: '/thinkers'
-      fullPath: '/thinkers'
-      preLoaderRoute: typeof ThinkersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -300,46 +95,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HomeRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/feed': {
-      id: '/feed'
-      path: '/feed'
-      fullPath: '/feed'
-      preLoaderRoute: typeof FeedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/discernment': {
-      id: '/discernment'
-      path: '/discernment'
-      fullPath: '/discernment'
-      preLoaderRoute: typeof DiscernmentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/check-email': {
       id: '/check-email'
       path: '/check-email'
       fullPath: '/check-email'
       preLoaderRoute: typeof CheckEmailRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/burdens': {
-      id: '/burdens'
-      path: '/burdens'
-      fullPath: '/burdens'
-      preLoaderRoute: typeof BurdensRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/blog': {
-      id: '/blog'
-      path: '/blog'
-      fullPath: '/blog'
-      preLoaderRoute: typeof BlogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/bible': {
-      id: '/bible'
-      path: '/bible'
-      fullPath: '/bible'
-      preLoaderRoute: typeof BibleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -349,34 +109,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/profile/$userId': {
-      id: '/profile/$userId'
-      path: '/profile/$userId'
-      fullPath: '/profile/$userId'
-      preLoaderRoute: typeof ProfileUserIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/circles/$circleId': {
-      id: '/circles/$circleId'
-      path: '/circles/$circleId'
-      fullPath: '/circles/$circleId'
-      preLoaderRoute: typeof CirclesCircleIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/blog_/new': {
-      id: '/blog_/new'
-      path: '/blog/new'
-      fullPath: '/blog/new'
-      preLoaderRoute: typeof BlogNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/blog/$slug': {
-      id: '/blog/$slug'
-      path: '/$slug'
-      fullPath: '/blog/$slug'
-      preLoaderRoute: typeof BlogSlugRouteImport
-      parentRoute: typeof BlogRoute
-    }
     '/auth/callback': {
       id: '/auth/callback'
       path: '/auth/callback'
@@ -384,44 +116,15 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/reports': {
-      id: '/admin/reports'
-      path: '/admin/reports'
-      fullPath: '/admin/reports'
-      preLoaderRoute: typeof AdminReportsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
-interface BlogRouteChildren {
-  BlogSlugRoute: typeof BlogSlugRoute
-}
-
-const BlogRouteChildren: BlogRouteChildren = {
-  BlogSlugRoute: BlogSlugRoute,
-}
-
-const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  BibleRoute: BibleRoute,
-  BlogRoute: BlogRouteWithChildren,
-  BurdensRoute: BurdensRoute,
   CheckEmailRoute: CheckEmailRoute,
-  DiscernmentRoute: DiscernmentRoute,
-  FeedRoute: FeedRoute,
   HomeRoute: HomeRoute,
   LoginRoute: LoginRoute,
-  SettingsRoute: SettingsRoute,
-  SitemapDotxmlRoute: SitemapDotxmlRoute,
-  ThinkersRoute: ThinkersRoute,
-  AdminReportsRoute: AdminReportsRoute,
   AuthCallbackRoute: AuthCallbackRoute,
-  BlogNewRoute: BlogNewRoute,
-  CirclesCircleIdRoute: CirclesCircleIdRoute,
-  ProfileUserIdRoute: ProfileUserIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
