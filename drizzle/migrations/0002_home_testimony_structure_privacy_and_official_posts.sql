@@ -1,0 +1,22 @@
+ALTER TABLE public.testimonies ADD COLUMN IF NOT EXISTS story_format text NOT NULL DEFAULT 'quick', ADD COLUMN IF NOT EXISTS where_i_was text, ADD COLUMN IF NOT EXISTS what_god_did text, ADD COLUMN IF NOT EXISTS where_i_am_now text;
+GRANT SELECT ON public.testimonies TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.testimonies TO authenticated;
+CREATE POLICY "Home private stories stay author only" ON public.testimonies AS RESTRICTIVE FOR SELECT TO public USING (is_public OR user_id = auth.uid());
+CREATE OR REPLACE FUNCTION public.validate_home_testimony() RETURNS trigger LANGUAGE plpgsql SET search_path=public AS $$ BEGIN
+IF NEW.story_format NOT IN ('quick','full') THEN RAISE EXCEPTION 'Invalid story format'; END IF;
+IF cardinality(regexp_split_to_array(btrim(NEW.body), '\s+')) > 900 THEN RAISE EXCEPTION 'Please keep it under 900 words'; END IF;
+IF NEW.story_format='full' AND (COALESCE(btrim(NEW.where_i_was),'')='' OR COALESCE(btrim(NEW.what_god_did),'')='' OR COALESCE(btrim(NEW.where_i_am_now),'')='') THEN RAISE EXCEPTION 'Please complete all three parts'; END IF;
+RETURN NEW; END $$;
+CREATE TRIGGER validate_home_testimony BEFORE INSERT OR UPDATE ON public.testimonies FOR EACH ROW EXECUTE FUNCTION public.validate_home_testimony();
+CREATE OR REPLACE FUNCTION public.sync_home_tag_privacy() RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path=public AS $$ BEGIN UPDATE public.post_tags SET is_public=NEW.is_public WHERE post_type='testimony' AND post_id=NEW.id; RETURN NEW; END $$;
+CREATE TRIGGER sync_home_tag_privacy AFTER UPDATE OF is_public ON public.testimonies FOR EACH ROW EXECUTE FUNCTION public.sync_home_tag_privacy();
+CREATE TABLE public.home_official_posts (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), publish_date date NOT NULL UNIQUE, body text NOT NULL, created_by uuid NOT NULL, created_at timestamptz NOT NULL DEFAULT now(), CONSTRAINT home_official_body_words CHECK (cardinality(regexp_split_to_array(btrim(body), '\s+')) <= 900));
+GRANT SELECT ON public.home_official_posts TO anon;
+GRANT SELECT,INSERT,UPDATE,DELETE ON public.home_official_posts TO authenticated;
+GRANT ALL ON public.home_official_posts TO service_role;
+ALTER TABLE public.home_official_posts ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone reads published official posts" ON public.home_official_posts FOR SELECT TO public USING (publish_date <= CURRENT_DATE);
+CREATE POLICY "Admins read official drafts" ON public.home_official_posts FOR SELECT TO authenticated USING (public.has_role(auth.uid(),'admin'));
+CREATE POLICY "Admins publish official posts" ON public.home_official_posts FOR INSERT TO authenticated WITH CHECK (created_by=auth.uid() AND public.has_role(auth.uid(),'admin'));
+CREATE POLICY "Admins edit official posts" ON public.home_official_posts FOR UPDATE TO authenticated USING (public.has_role(auth.uid(),'admin')) WITH CHECK (public.has_role(auth.uid(),'admin'));
+CREATE POLICY "Admins delete official posts" ON public.home_official_posts FOR DELETE TO authenticated USING (public.has_role(auth.uid(),'admin'));
