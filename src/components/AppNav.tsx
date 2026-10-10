@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { BookOpen, Feather, Home, Lightbulb, MessageCircle, Newspaper, User, HeartHandshake } from "lucide-react";
+import { BookOpen, Home, Lightbulb, MessageCircle, Newspaper, User, HeartHandshake } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/components/AuthProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -102,5 +102,3 @@ export function ComingSoon({ title }: { title: string }) {
   );
 }
 
-// Unused icon kept out of bundle
-void Feather;
