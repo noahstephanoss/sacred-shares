@@ -13,6 +13,7 @@ import { Route as ThinkersRouteImport } from './routes/thinkers'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as HomeRouteImport } from './routes/home'
+import { Route as GetHelpRouteImport } from './routes/get-help'
 import { Route as DiscernmentRouteImport } from './routes/discernment'
 import { Route as CheckEmailRouteImport } from './routes/check-email'
 import { Route as BurdensRouteImport } from './routes/burdens'
@@ -20,6 +21,7 @@ import { Route as BlogRouteImport } from './routes/blog'
 import { Route as BibleRouteImport } from './routes/bible'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 
 const ThinkersRoute = ThinkersRouteImport.update({
   id: '/thinkers',
@@ -39,6 +41,11 @@ const LoginRoute = LoginRouteImport.update({
 const HomeRoute = HomeRouteImport.update({
   id: '/home',
   path: '/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GetHelpRoute = GetHelpRouteImport.update({
+  id: '/get-help',
+  path: '/get-help',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiscernmentRoute = DiscernmentRouteImport.update({
@@ -76,6 +83,11 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminReportsRoute = AdminReportsRouteImport.update({
+  id: '/admin/reports',
+  path: '/admin/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -84,10 +96,12 @@ export interface FileRoutesByFullPath {
   '/burdens': typeof BurdensRoute
   '/check-email': typeof CheckEmailRoute
   '/discernment': typeof DiscernmentRoute
+  '/get-help': typeof GetHelpRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
   '/thinkers': typeof ThinkersRoute
+  '/admin/reports': typeof AdminReportsRoute
   '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRoutesByTo {
@@ -97,10 +111,12 @@ export interface FileRoutesByTo {
   '/burdens': typeof BurdensRoute
   '/check-email': typeof CheckEmailRoute
   '/discernment': typeof DiscernmentRoute
+  '/get-help': typeof GetHelpRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
   '/thinkers': typeof ThinkersRoute
+  '/admin/reports': typeof AdminReportsRoute
   '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRoutesById {
@@ -111,10 +127,12 @@ export interface FileRoutesById {
   '/burdens': typeof BurdensRoute
   '/check-email': typeof CheckEmailRoute
   '/discernment': typeof DiscernmentRoute
+  '/get-help': typeof GetHelpRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
   '/thinkers': typeof ThinkersRoute
+  '/admin/reports': typeof AdminReportsRoute
   '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRouteTypes {
@@ -126,10 +144,12 @@ export interface FileRouteTypes {
     | '/burdens'
     | '/check-email'
     | '/discernment'
+    | '/get-help'
     | '/home'
     | '/login'
     | '/profile'
     | '/thinkers'
+    | '/admin/reports'
     | '/auth/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -139,10 +159,12 @@ export interface FileRouteTypes {
     | '/burdens'
     | '/check-email'
     | '/discernment'
+    | '/get-help'
     | '/home'
     | '/login'
     | '/profile'
     | '/thinkers'
+    | '/admin/reports'
     | '/auth/callback'
   id:
     | '__root__'
@@ -152,10 +174,12 @@ export interface FileRouteTypes {
     | '/burdens'
     | '/check-email'
     | '/discernment'
+    | '/get-help'
     | '/home'
     | '/login'
     | '/profile'
     | '/thinkers'
+    | '/admin/reports'
     | '/auth/callback'
   fileRoutesById: FileRoutesById
 }
@@ -166,10 +190,12 @@ export interface RootRouteChildren {
   BurdensRoute: typeof BurdensRoute
   CheckEmailRoute: typeof CheckEmailRoute
   DiscernmentRoute: typeof DiscernmentRoute
+  GetHelpRoute: typeof GetHelpRoute
   HomeRoute: typeof HomeRoute
   LoginRoute: typeof LoginRoute
   ProfileRoute: typeof ProfileRoute
   ThinkersRoute: typeof ThinkersRoute
+  AdminReportsRoute: typeof AdminReportsRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
 }
 
@@ -201,6 +227,13 @@ declare module '@tanstack/react-router' {
       path: '/home'
       fullPath: '/home'
       preLoaderRoute: typeof HomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/get-help': {
+      id: '/get-help'
+      path: '/get-help'
+      fullPath: '/get-help'
+      preLoaderRoute: typeof GetHelpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/discernment': {
@@ -252,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/reports': {
+      id: '/admin/reports'
+      path: '/admin/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -262,10 +302,12 @@ const rootRouteChildren: RootRouteChildren = {
   BurdensRoute: BurdensRoute,
   CheckEmailRoute: CheckEmailRoute,
   DiscernmentRoute: DiscernmentRoute,
+  GetHelpRoute: GetHelpRoute,
   HomeRoute: HomeRoute,
   LoginRoute: LoginRoute,
   ProfileRoute: ProfileRoute,
   ThinkersRoute: ThinkersRoute,
+  AdminReportsRoute: AdminReportsRoute,
   AuthCallbackRoute: AuthCallbackRoute,
 }
 export const routeTree = rootRouteImport

@@ -3,6 +3,9 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageShell } from "@/components/AppNav";
 import { useSession } from "@/components/AuthProvider";
+import { useCrisisCheck } from "@/components/CrisisSupport";
+import { ReportButton } from "@/components/ReportButton";
+import { StruggleTagPicker, saveStruggleTags, emptyTags, type TagSelection } from "@/components/StruggleTags";
 
 export const Route = createFileRoute("/home")({
   head: () => ({
@@ -38,6 +41,8 @@ function HomePage() {
   const [myReactions, setMyReactions] = useState<Record<string, string>>({});
   const [body, setBody] = useState("");
   const [posting, setPosting] = useState(false);
+  const [tags, setTags] = useState<TagSelection>(emptyTags);
+  const { check, modal } = useCrisisCheck();
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -81,19 +86,28 @@ function HomePage() {
     load();
   }, [load]);
 
-  const handlePost = async (e: FormEvent) => {
+  const handlePost = (e: FormEvent) => {
     e.preventDefault();
     if (!userId || !body.trim()) return;
+    check(body, submitPost);
+  };
+
+  const submitPost = async () => {
+    if (!userId) return;
     setPosting(true);
-    const { error } = await supabase.from("testimonies").insert({
+    const { data: created, error } = await supabase.from("testimonies").insert({
       user_id: userId,
       title: body.trim().slice(0, 60),
       body: body.trim(),
       is_public: true,
-    });
+    }).select("id").single();
+    if (!error && created) {
+      await saveStruggleTags({ postType: "testimony", postId: created.id, userId, isPublic: true, sel: tags });
+    }
     setPosting(false);
     if (!error) {
       setBody("");
+      setTags(emptyTags);
       load();
     }
   };
@@ -138,6 +152,7 @@ function HomePage() {
               rows={3}
               className="w-full resize-y rounded-md border border-input bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20"
             />
+            <StruggleTagPicker value={tags} onChange={setTags} />
             <div className="mt-3 flex justify-end">
               <button
                 type="submit"
@@ -190,7 +205,7 @@ function HomePage() {
                 <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
                   {t.body}
                 </p>
-                <div className="mt-4 flex gap-2">
+                <div className="mt-4 flex flex-wrap items-center gap-2">
                   {REACTIONS.map((r) => {
                     const count = reactions[t.id]?.[r.type] ?? 0;
                     const active = myReactions[t.id] === r.type;
@@ -210,11 +225,15 @@ function HomePage() {
                       </button>
                     );
                   })}
+                  <span className="ml-auto">
+                    <ReportButton type="testimony" id={t.id} ownerId={t.user_id} />
+                  </span>
                 </div>
               </article>
             ))}
           </div>
         )}
+      {modal}
     </PageShell>
   );
 }

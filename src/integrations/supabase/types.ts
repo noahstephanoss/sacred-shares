@@ -436,6 +436,47 @@ export type Database = {
         }
         Relationships: []
       }
+      post_tags: {
+        Row: {
+          created_at: string
+          id: string
+          is_public: boolean
+          other_note: string | null
+          post_id: string
+          post_type: string
+          tag_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          other_note?: string | null
+          post_id: string
+          post_type: string
+          tag_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          other_note?: string | null
+          post_id?: string
+          post_type?: string
+          tag_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "struggle_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           age_confirmed: boolean
@@ -481,6 +522,60 @@ export type Database = {
           theme_preference?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          created_at: string
+          id: string
+          reason: string | null
+          reporter_id: string
+          target_id: string
+          target_type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reason?: string | null
+          reporter_id: string
+          target_id: string
+          target_type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reason?: string | null
+          reporter_id?: string
+          target_id?: string
+          target_type?: string
+        }
+        Relationships: []
+      }
+      struggle_tags: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          label: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          label: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          label?: string
+          slug?: string
+          sort_order?: number
         }
         Relationships: []
       }
@@ -794,6 +889,18 @@ export type Database = {
         }[]
       }
       admin_open_report_count: { Args: never; Returns: number }
+      admin_reports: {
+        Args: never
+        Returns: {
+          author_id: string
+          author_name: string
+          body: string
+          last_reported: string
+          report_count: number
+          target_id: string
+          target_type: string
+        }[]
+      }
       can_join_circle: { Args: { circle: string }; Returns: boolean }
       circle_is_active: { Args: { circle: string }; Returns: boolean }
       circle_member_count: { Args: { circle: string }; Returns: number }
