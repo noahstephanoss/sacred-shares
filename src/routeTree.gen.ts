@@ -13,6 +13,7 @@ import { Route as ThinkersRouteImport } from './routes/thinkers'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as HomeRouteImport } from './routes/home'
+import { Route as GetHelpRouteImport } from './routes/get-help'
 import { Route as DiscernmentRouteImport } from './routes/discernment'
 import { Route as CheckEmailRouteImport } from './routes/check-email'
 import { Route as BurdensRouteImport } from './routes/burdens'
@@ -39,6 +40,11 @@ const LoginRoute = LoginRouteImport.update({
 const HomeRoute = HomeRouteImport.update({
   id: '/home',
   path: '/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GetHelpRoute = GetHelpRouteImport.update({
+  id: '/get-help',
+  path: '/get-help',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiscernmentRoute = DiscernmentRouteImport.update({
@@ -84,6 +90,7 @@ export interface FileRoutesByFullPath {
   '/burdens': typeof BurdensRoute
   '/check-email': typeof CheckEmailRoute
   '/discernment': typeof DiscernmentRoute
+  '/get-help': typeof GetHelpRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
@@ -97,6 +104,7 @@ export interface FileRoutesByTo {
   '/burdens': typeof BurdensRoute
   '/check-email': typeof CheckEmailRoute
   '/discernment': typeof DiscernmentRoute
+  '/get-help': typeof GetHelpRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
@@ -111,6 +119,7 @@ export interface FileRoutesById {
   '/burdens': typeof BurdensRoute
   '/check-email': typeof CheckEmailRoute
   '/discernment': typeof DiscernmentRoute
+  '/get-help': typeof GetHelpRoute
   '/home': typeof HomeRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
@@ -126,6 +135,7 @@ export interface FileRouteTypes {
     | '/burdens'
     | '/check-email'
     | '/discernment'
+    | '/get-help'
     | '/home'
     | '/login'
     | '/profile'
@@ -139,6 +149,7 @@ export interface FileRouteTypes {
     | '/burdens'
     | '/check-email'
     | '/discernment'
+    | '/get-help'
     | '/home'
     | '/login'
     | '/profile'
@@ -152,6 +163,7 @@ export interface FileRouteTypes {
     | '/burdens'
     | '/check-email'
     | '/discernment'
+    | '/get-help'
     | '/home'
     | '/login'
     | '/profile'
@@ -166,6 +178,7 @@ export interface RootRouteChildren {
   BurdensRoute: typeof BurdensRoute
   CheckEmailRoute: typeof CheckEmailRoute
   DiscernmentRoute: typeof DiscernmentRoute
+  GetHelpRoute: typeof GetHelpRoute
   HomeRoute: typeof HomeRoute
   LoginRoute: typeof LoginRoute
   ProfileRoute: typeof ProfileRoute
@@ -201,6 +214,13 @@ declare module '@tanstack/react-router' {
       path: '/home'
       fullPath: '/home'
       preLoaderRoute: typeof HomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/get-help': {
+      id: '/get-help'
+      path: '/get-help'
+      fullPath: '/get-help'
+      preLoaderRoute: typeof GetHelpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/discernment': {
@@ -262,6 +282,7 @@ const rootRouteChildren: RootRouteChildren = {
   BurdensRoute: BurdensRoute,
   CheckEmailRoute: CheckEmailRoute,
   DiscernmentRoute: DiscernmentRoute,
+  GetHelpRoute: GetHelpRoute,
   HomeRoute: HomeRoute,
   LoginRoute: LoginRoute,
   ProfileRoute: ProfileRoute,

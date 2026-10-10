@@ -1,6 +1,8 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { BookOpen, Home, Lightbulb, MessageCircle, Newspaper, User, HeartHandshake } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
+import { Toaster } from "@/components/ui/sonner";
 import { useSession } from "@/components/AuthProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -16,7 +18,15 @@ export const NAV_ITEMS = [
 
 export function AppNav() {
   const navigate = useNavigate();
-  const { user } = useSession();
+  const { user, isAdmin } = useSession();
+  const [openReports, setOpenReports] = useState(0);
+  useEffect(() => {
+    if (!isAdmin) return;
+    const load = () => supabase.rpc("admin_reports").then(({ data }) => setOpenReports(data?.length ?? 0));
+    load();
+    window.addEventListener("reports-changed", load);
+    return () => window.removeEventListener("reports-changed", load);
+  }, [isAdmin]);
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -46,6 +56,14 @@ export function AppNav() {
           </nav>
 
           <div className="flex items-center gap-2">
+            {isAdmin && (
+              <Link to="/admin/reports" className="relative text-sm text-muted-foreground hover:text-foreground">
+                Reports
+                {openReports > 0 && (
+                  <span className="absolute -right-3 -top-2 rounded-full bg-destructive px-1.5 text-[10px] font-medium text-destructive-foreground">{openReports}</span>
+                )}
+              </Link>
+            )}
             <ThemeToggle />
             {user ? (
               <button onClick={signOut} className="text-sm text-muted-foreground hover:text-foreground">
@@ -87,7 +105,15 @@ export function PageShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background">
       <AppNav />
-      <main className="mx-auto max-w-2xl px-4 py-8 pb-28 md:pb-12">{children}</main>
+      <main className="mx-auto max-w-2xl px-4 py-8">{children}</main>
+      <footer className="border-t border-border px-4 pb-28 pt-6 text-center text-xs text-muted-foreground md:pb-8">
+        <p>
+          In crisis? Call or text <a href="tel:988" className="underline">988</a> or text HOME to{" "}
+          <a href="sms:741741&body=HOME" className="underline">741741</a>.
+        </p>
+        <Link to="/get-help" className="mt-2 inline-block font-medium text-primary hover:underline">Get Help</Link>
+      </footer>
+      <Toaster />
     </div>
   );
 }
