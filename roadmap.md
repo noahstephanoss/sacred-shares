@@ -1,4 +1,5 @@
-- [x] Rename the testimony Feed route and wording to Home
-- [x] Preserve /feed as a query-forwarding redirect
-- [x] Polish testimony cards and optimistic reaction animation
-- [x] Verify desktop/mobile flows and build health
+- [x] Build Home testimony sharing, privacy, edits and deletion
+- [x] Add reaction people list and buffered new testimonies
+- [x] Add automatic official daily Proverbs and stopping point
+- [x] Verify rule tests, database policies, guest flows, desktop/mobile light/dark and build health
+- [ ] Verify signed-in sharing, reactions, editing, deletion and live arrivals — blocked: requester has no matching app account; needs preview sign-in or a selected test account

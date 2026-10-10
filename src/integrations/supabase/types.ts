@@ -406,6 +406,30 @@ export type Database = {
           },
         ]
       }
+      home_official_posts: {
+        Row: {
+          body: string
+          created_at: string
+          created_by: string
+          id: string
+          publish_date: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          created_by: string
+          id?: string
+          publish_date: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          publish_date?: string
+        }
+        Relationships: []
+      }
       insight_archive: {
         Row: {
           ai_analysis: string
@@ -587,9 +611,13 @@ export type Database = {
           id: string
           is_public: boolean
           reveal_burden: boolean
+          story_format: string
           title: string
           updated_at: string
           user_id: string
+          what_god_did: string | null
+          where_i_am_now: string | null
+          where_i_was: string | null
         }
         Insert: {
           body: string
@@ -598,9 +626,13 @@ export type Database = {
           id?: string
           is_public?: boolean
           reveal_burden?: boolean
+          story_format?: string
           title: string
           updated_at?: string
           user_id: string
+          what_god_did?: string | null
+          where_i_am_now?: string | null
+          where_i_was?: string | null
         }
         Update: {
           body?: string
@@ -609,9 +641,13 @@ export type Database = {
           id?: string
           is_public?: boolean
           reveal_burden?: boolean
+          story_format?: string
           title?: string
           updated_at?: string
           user_id?: string
+          what_god_did?: string | null
+          where_i_am_now?: string | null
+          where_i_was?: string | null
         }
         Relationships: [
           {
