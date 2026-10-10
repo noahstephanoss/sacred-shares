@@ -41,8 +41,6 @@ export const Route = createRootRoute({
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "Testimonies — A Faith-Based Community" },
       { name: "twitter:description", content: "Share your testimony, seek righteous counsel, and grow in faith with a community rooted in truth." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3394a1df-65d3-4845-8656-2add5155d598/id-preview-ca2d4348--b2381dad-9f27-4886-994f-f6021b80319e.lovable.app-1777948387662.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3394a1df-65d3-4845-8656-2add5155d598/id-preview-ca2d4348--b2381dad-9f27-4886-994f-f6021b80319e.lovable.app-1777948387662.png" },
     ],
     links: [
       {
