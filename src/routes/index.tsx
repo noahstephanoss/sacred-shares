@@ -8,6 +8,8 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Testimonies — A Faith-Based Community" },
       { property: "og:description", content: "Share your spiritual journey, seek counsel, and grow in faith together." },
       { property: "og:url", content: "https://testimonies.chat/" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Index,

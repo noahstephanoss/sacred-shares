@@ -5,7 +5,14 @@ export const Route = createFileRoute("/check-email")({
     email: typeof search.email === "string" ? search.email : "",
   }),
   head: () => ({
-    meta: [{ title: "Check Your Email — Testimonies" }],
+    meta: [
+      { title: "Check Your Email — Testimonies" },
+      { name: "description", content: "Confirm your email to activate your Testimonies account." },
+      { property: "og:title", content: "Check Your Email — Testimonies" },
+      { property: "og:description", content: "Confirm your email to activate your Testimonies account." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
   }),
   component: CheckEmailPage,
 });
