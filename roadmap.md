@@ -3,3 +3,6 @@
 - [x] Add automatic official daily Proverbs and stopping point
 - [x] Verify rule tests, database policies, guest flows, desktop/mobile light/dark and build health
 - [ ] Verify signed-in sharing, reactions, editing, deletion and live arrivals — blocked: requester has no matching app account; needs preview sign-in or a selected test account
+- [ ] Rebuild Home as a cross-section hub — paused at user's request, pending visual direction and unresolved section requirements
+- [x] Present visually distinct Home layout options within the leather Bible theme
+- [ ] Apply the chosen Home visual direction — waiting for user's choice
