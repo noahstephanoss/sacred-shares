@@ -101,11 +101,11 @@ export function AppNav() {
   );
 }
 
-export function PageShell({ children }: { children: React.ReactNode }) {
+export function PageShell({ children, wide = false }: { children: React.ReactNode; wide?: boolean }) {
   return (
     <div className="min-h-screen bg-background">
       <AppNav />
-      <main className="mx-auto max-w-2xl px-4 py-8">{children}</main>
+      <main className={`mx-auto px-4 py-8 ${wide ? "max-w-5xl" : "max-w-2xl"}`}>{children}</main>
       <footer className="border-t border-border px-4 pb-28 pt-6 text-center text-xs text-muted-foreground md:pb-8">
         <p>
           In crisis? Call or text <a href="tel:988" className="underline">988</a> or text HOME to{" "}
